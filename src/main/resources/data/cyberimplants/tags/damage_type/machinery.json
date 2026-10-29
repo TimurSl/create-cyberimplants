@@ -1,0 +1,34 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:cramming",
+    {
+      "id": "create:crush",
+      "required": false
+    },
+    {
+      "id": "create:mechanical_saw",
+      "required": false
+    },
+    {
+      "id": "create:mechanical_drill",
+      "required": false
+    },
+    {
+      "id": "create:mechanical_roller",
+      "required": false
+    },
+    {
+      "id": "create:run_over",
+      "required": false
+    },
+    {
+      "id": "create:fan_fire",
+      "required": false
+    },
+    {
+      "id": "create:fan_lava",
+      "required": false
+    }
+  ]
+}

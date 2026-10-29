@@ -1,0 +1,59 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:iron_block",
+    "minecraft:raw_iron_block",
+    "minecraft:copper_block",
+    "minecraft:exposed_copper",
+    "minecraft:weathered_copper",
+    "minecraft:oxidized_copper",
+    "minecraft:cut_copper",
+    "minecraft:gold_block",
+    "minecraft:raw_gold_block",
+    "minecraft:netherite_block",
+    "minecraft:iron_bars",
+    "minecraft:iron_door",
+    "minecraft:iron_trapdoor",
+    "minecraft:anvil",
+    "minecraft:chipped_anvil",
+    "minecraft:damaged_anvil",
+    "minecraft:cauldron",
+    "minecraft:chain",
+    {
+      "id": "create:brass_casing",
+      "required": false
+    },
+    {
+      "id": "create:copper_casing",
+      "required": false
+    },
+    {
+      "id": "create:andesite_casing",
+      "required": false
+    },
+    {
+      "id": "create:railway_casing",
+      "required": false
+    },
+    {
+      "id": "create:metal_girder",
+      "required": false
+    },
+    {
+      "id": "create:item_vault",
+      "required": false
+    },
+    {
+      "id": "create:fluid_tank",
+      "required": false
+    },
+    {
+      "id": "create:brass_block",
+      "required": false
+    },
+    {
+      "id": "create:zinc_block",
+      "required": false
+    }
+  ]
+}

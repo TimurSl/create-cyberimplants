@@ -1,0 +1,74 @@
+{
+  "_comment": "Schema example, not loaded. Real files live in data/<namespace>/cyberimplants/implant_stats/<type>.json and must contain exactly 5 tiers. Every 'unlocks' id needs an 'unlock_layers' entry giving the implementation layer (1-5) that activates it.",
+  "tiers": [
+    {
+      "load": 9,
+      "charge_cost": 60,
+      "cooldown_ticks": 3000,
+      "values": {
+        "radius": 3,
+        "duration_ticks": 40,
+        "time_scale": 0.25
+      },
+      "unlocks": []
+    },
+    {
+      "load": 10,
+      "charge_cost": 90,
+      "cooldown_ticks": 2400,
+      "values": {
+        "radius": 4,
+        "duration_ticks": 50,
+        "time_scale": 0.15
+      },
+      "unlocks": [
+        "projectile_halt"
+      ]
+    },
+    {
+      "load": 11,
+      "charge_cost": 120,
+      "cooldown_ticks": 2000,
+      "values": {
+        "radius": 5,
+        "duration_ticks": 60,
+        "time_scale": 0.0,
+        "cast_range": 8
+      },
+      "unlocks": []
+    },
+    {
+      "load": 12,
+      "charge_cost": 150,
+      "cooldown_ticks": 1600,
+      "values": {
+        "radius": 6,
+        "duration_ticks": 70,
+        "time_scale": 0.0,
+        "cast_range": 12
+      },
+      "unlocks": [
+        "kinetic_debt"
+      ]
+    },
+    {
+      "load": 14,
+      "charge_cost": 200,
+      "cooldown_ticks": 1200,
+      "values": {
+        "radius": 7,
+        "duration_ticks": 90,
+        "time_scale": 0.0,
+        "cast_range": 16
+      },
+      "unlocks": [
+        "temporal_anchor"
+      ]
+    }
+  ],
+  "unlock_layers": {
+    "projectile_halt": 3,
+    "kinetic_debt": 3,
+    "temporal_anchor": 5
+  }
+}

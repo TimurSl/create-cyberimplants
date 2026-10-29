@@ -1,0 +1,20 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:in_fire",
+    "minecraft:on_fire",
+    "minecraft:lava",
+    "minecraft:hot_floor",
+    "minecraft:campfire",
+    "minecraft:fireball",
+    "minecraft:unattributed_fireball",
+    {
+      "id": "create:fan_fire",
+      "required": false
+    },
+    {
+      "id": "create:fan_lava",
+      "required": false
+    }
+  ]
+}

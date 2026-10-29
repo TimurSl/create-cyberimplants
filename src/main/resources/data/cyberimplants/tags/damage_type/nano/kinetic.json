@@ -1,0 +1,15 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:arrow",
+    "minecraft:trident",
+    "minecraft:thrown",
+    "minecraft:mob_projectile",
+    "minecraft:spit",
+    "minecraft:wind_charge",
+    {
+      "id": "create:potato_cannon",
+      "required": false
+    }
+  ]
+}

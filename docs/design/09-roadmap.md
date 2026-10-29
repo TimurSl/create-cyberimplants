@@ -48,6 +48,9 @@ Infrastructure only. No implant is playable yet.
 - Synapse project skeleton: lexer/parser/VM packages with JUnit harness (no game bindings)
 - `compat/create` package with a stub for each bridge
 
+*Status:* implemented in the repository (see the README). The Synapse lexer and its test suite are included; the
+parser and VM are Layer 1. NeoForge-dependent code has not yet been compiled against NeoForge or Create.
+
 ### Layer 1 — Function
 
 *Goal: every implant does the one thing that defines it, in its simplest form.*

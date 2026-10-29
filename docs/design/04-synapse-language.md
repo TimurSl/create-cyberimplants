@@ -77,7 +77,7 @@ Top-level statements other than declarations are not allowed. All behaviour live
 |---------|------|
 | Comments | `#` to end of line |
 | Blocks | A line ending in `:` opens a block. The block is the following lines indented further (spaces or tabs, consistent per file). |
-| Keywords | Case-insensitive: `ON`, `IF`, `ELIF`, `ELSE`, `WHILE`, `REPEAT`, `FOR`, `IN`, `FROM`, `TO`, `SET`, `LET`, `VAR`, … |
+| Keywords | Case-insensitive: `ON`, `IF`, `ELIF`, `ELSE`, `WHILE`, `REPEAT`, `FOR`, `IN`, `FROM`, `TO`, `SET`, `LET`, `VAR`, … They are **contextual**: the lexer treats every word alike and the parser recognises a keyword only where the grammar expects one. So `SCAN` (statement) and `scan.entities` (the Entity Scanner object) coexist, and so do `SENSOR yard = sensor "Yard"`, `port` and `link`. |
 | Identifiers | `[a-z_][a-z0-9_]*`, case-sensitive |
 | Numbers | `12`, `-3`, `0.75` (64-bit float; integer operations are exact up to 2^53) |
 | Durations | `500ms`, `3s`, `20t`, `2m`. They are stored as ticks; a duration may be multiplied or divided by a number. |
