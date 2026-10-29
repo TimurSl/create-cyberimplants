@@ -25,12 +25,11 @@ import java.util.List;
 
 /** The Charge bar, status bars, Biomonitor vitals, scan readout and the Thermal Vision colour wash. */
 final class Hud {
-    private static final int FRAME = 0xFF101418;
-    private static final int CHARGE = 0xFF35D0FF;
-    private static final int BUFFER = 0xFFFFB020;
-    private static final int SHIELD = 0xFF7AF0A0;
-    private static final int MOMENTUM = 0xFFE070FF;
-    private static final int TEXT = 0xFFE8F4FF;
+    private static final int CHARGE = CyberUi.CYAN;
+    private static final int BUFFER = CyberUi.AMBER;
+    private static final int SHIELD = CyberUi.GREEN;
+    private static final int MOMENTUM = CyberUi.MAGENTA;
+    private static final int TEXT = CyberUi.TEXT;
 
     static void render(GuiGraphics g, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
@@ -95,9 +94,9 @@ final class Hud {
             Component name = Component.translatable("item." + e.id().getNamespace() + "." + e.id().getPath());
             String label = name.getString();
             label = (label.length() > 4 ? label.substring(0, 4) : label) + " " + (offline ? "!!" : (remaining + 19) / 20 + "s");
-            g.drawString(font, label, x, y - 9, offline ? 0xFFFF6060 : TEXT);
+            g.drawString(font, label, x, y - 9, offline ? CyberUi.RED : TEXT);
             long total = Math.max(1, Body.cooldownTicksFor(body, e.id()));
-            bar(g, x, y, 34, 3, offline ? 1.0 : 1.0 - (double) remaining / total, offline ? 0xFFFF6060 : 0xFF8090A0);
+            bar(g, x, y, 34, 3, offline ? 1.0 : 1.0 - (double) remaining / total, offline ? CyberUi.RED : CyberUi.TEXT_DIM);
             x += 40;
             if (x > width / 2 + 91) {
                 x = width / 2 - 91;
@@ -122,7 +121,7 @@ final class Hud {
                 String.format("FOOD %d  SAT %.1f", player.getFoodData().getFoodLevel(), player.getFoodData().getSaturationLevel())};
         int y = 6;
         for (String line : lines) {
-            g.drawString(font, line, width - font.width(line) - 6, y, 0xFFFF8A8A);
+            g.drawString(font, line, width - font.width(line) - 6, y, CyberUi.RED);
             y += 10;
         }
     }
@@ -144,25 +143,23 @@ final class Hud {
             Entity e = mc.level.getEntity(tracked);
             if (e != null) {
                 g.drawString(font, String.format("TRACKING  %s  %.0fm", e.getType().getDescription().getString(),
-                        e.distanceTo(player)), 6, y + 4, 0xFFFFD060);
+                        e.distanceTo(player)), 6, y + 4, CyberUi.AMBER);
             }
         }
     }
 
     private static int kindColor(String kind) {
         return switch (kind) {
-            case "hostile" -> 0xFFFF6060;
+            case "hostile" -> CyberUi.RED;
             case "boss" -> 0xFFFF40FF;
-            case "neutral" -> 0xFFFFD060;
+            case "neutral" -> CyberUi.AMBER;
             case "player" -> 0xFF60C0FF;
             default -> 0xFF80FF80;
         };
     }
 
     private static void bar(GuiGraphics g, int x, int y, int w, int h, double fraction, int color) {
-        g.fill(x - 1, y - 1, x + w + 1, y + h + 1, FRAME);
-        int filled = (int) Math.round(w * Math.max(0.0, Math.min(1.0, fraction)));
-        g.fill(x, y, x + filled, y + h, color);
+        CyberUi.meter(g, x, y, w, h, fraction, color);
     }
 
     private Hud() {

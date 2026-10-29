@@ -168,6 +168,24 @@ chain arrive.*
 | **Crafting** | **Replace placeholders with the real chain**: Precision Etcher, the five fluids, Silica/Silicon/Logic Chip/Myomer/Composite Plate/Military Processor. Tier III needs a ≥ 64 RPM etch line and Tier IV a ≥ 128 RPM one ([Progression §6.3](06-progression-and-crafting.md#63-shared-components-by-tier)). |
 | **UI** | Full Synapse editor (highlighting, lints, footprint), implant config screens, JEI/EMI categories |
 
+*Status:* **started**, not finished. Like Layers 1 and 2 this has only been compiled by CI, never run in a game. In so far:
+
+- **Unlock framework:** `scripts/layer3_unlocks.py` lists the unlock rows that exist in code; the stat files carry them
+  cumulatively per tier (Tier I never has any) and register each one under `unlock_layers` as layer 3, so
+  `layers.maxEnabled < 3` switches them off. Code asks `Stats.unlocked(player | id + tier, "unlock_id")`. Item tooltips list
+  the unlocks of the stack's tier. `StatAuditTest` checks that the rows are cumulative and registered.
+- **Unlocks implemented (11 of the roughly 60 rows):** Regenerator (works while starving, cures Poison, cures Wither and
+  Hunger), Adrenaline Pump (ignores Slowness, boost jump, boost attack speed), Shock Circuit (slows the attacker, chains to
+  one more enemy), Kinetic Shield (projectiles fully absorbed), Emergency Shell (knockback immunity, cleanse and extinguish).
+  `Layer3Tests` covers the tier gating, the Shield and the Shell.
+- **Look and feel (also for the later layers):** every item, block and gel fluid has a hand-drawn neon-on-steel texture
+  (`scripts/gen_textures.py`, called by `gen_layer1_data.py`), and the Rig, Deck and Implant Wheel screens and the HUD share the
+  cyberpunk style of `client/CyberUi.java` (glass panels, neon edges, scanlines, `CyberButton`, `meter`).
+
+Still to do in Layer 3: the remaining unlock rows (Sandevistan, Reflex Booster, Entity Scanner, Thermal Vision, Microgrip, the
+mobility and limb unlocks ...), configuration screens, ISA-3/4, Machine Interface Tiers III-IV, Relay Mast, Redstone Link
+channels, the Precision Etcher and the real manufacturing chain, the full editor and JEI/EMI categories.
+
 *Exit criteria:* a survival player reaches a full Tier IV body using the real Create production chain. The
 "Stress Governor", "Hunter" and "Panic Protocol" programs run. All Tier II–IV unlock rows are covered by GameTests.
 

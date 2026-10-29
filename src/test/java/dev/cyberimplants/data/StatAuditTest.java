@@ -46,9 +46,34 @@ class StatAuditTest {
             Set<String> keys = new TreeSet<>(tiers.get(0).getAsJsonObject().getAsJsonObject("values").keySet());
             for (JsonElement t : tiers) {
                 assertEquals(keys, new TreeSet<>(t.getAsJsonObject().getAsJsonObject("values").keySet()), file + ": tier keys differ");
-                assertEquals(0, t.getAsJsonObject().getAsJsonArray("unlocks").size(), file + ": unlock rows stay off in Layer 2");
             }
         }
+    }
+
+    /** Layer 3: unlock rows are cumulative over the tiers, never on Tier I, and each one is registered for layer 3. */
+    @Test
+    void unlockRowsAreCumulativeAndRegistered() throws IOException {
+        int withUnlocks = 0;
+        for (Path file : statFiles()) {
+            JsonObject json = read(file);
+            JsonArray tiers = json.getAsJsonArray("tiers");
+            JsonObject layers = json.getAsJsonObject("unlock_layers");
+            assertEquals(0, tiers.get(0).getAsJsonObject().getAsJsonArray("unlocks").size(), file + ": Tier I has no unlocks");
+            Set<String> previous = Set.of();
+            for (JsonElement t : tiers) {
+                Set<String> unlocks = new TreeSet<>();
+                t.getAsJsonObject().getAsJsonArray("unlocks").forEach(u -> unlocks.add(u.getAsString()));
+                assertTrue(unlocks.containsAll(previous), file + ": a tier lost an unlock of the tier below");
+                for (String u : unlocks) {
+                    assertEquals(3, layers.get(u).getAsInt(), file + ": unlock " + u + " belongs to layer 3");
+                }
+                previous = unlocks;
+            }
+            if (!previous.isEmpty()) {
+                withUnlocks++;
+            }
+        }
+        assertTrue(withUnlocks >= 5, "Layer 3 starts with at least five implants that have unlock rows");
     }
 
     @Test

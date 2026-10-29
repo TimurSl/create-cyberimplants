@@ -20,7 +20,9 @@
         "lockout_ticks": 120,
         "charge_per_hp": 1.75
       },
-      "unlocks": []
+      "unlocks": [
+        "works_when_starving"
+      ]
     },
     {
       "load": 4,
@@ -31,7 +33,10 @@
         "lockout_ticks": 100,
         "charge_per_hp": 1.5
       },
-      "unlocks": []
+      "unlocks": [
+        "cures_poison",
+        "works_when_starving"
+      ]
     },
     {
       "load": 5,
@@ -42,7 +47,11 @@
         "lockout_ticks": 80,
         "charge_per_hp": 1.25
       },
-      "unlocks": []
+      "unlocks": [
+        "cures_poison",
+        "cures_wither_hunger",
+        "works_when_starving"
+      ]
     },
     {
       "load": 6,
@@ -53,8 +62,16 @@
         "lockout_ticks": 60,
         "charge_per_hp": 1.0
       },
-      "unlocks": []
+      "unlocks": [
+        "cures_poison",
+        "cures_wither_hunger",
+        "works_when_starving"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "cures_poison": 3,
+    "cures_wither_hunger": 3,
+    "works_when_starving": 3
+  }
 }

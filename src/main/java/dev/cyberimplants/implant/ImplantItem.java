@@ -67,6 +67,18 @@ public class ImplantItem extends Item {
         if (load > 0) {
             tooltip.add(Component.translatable("cyberimplants.tooltip.load", load).withStyle(ChatFormatting.YELLOW));
         }
+        // Tier-gated features that are on at this tier (Layer 3).
+        var stats = dev.cyberimplants.data.ImplantStatsRegistry.get(typeId);
+        if (stats.isPresent()) {
+            List<String> unlocks = stats.get().activeUnlocks(Math.max(1, Math.min(5, tier)), dev.cyberimplants.config.Layers.maxEnabled());
+            if (!unlocks.isEmpty()) {
+                tooltip.add(Component.translatable("cyberimplants.tooltip.unlocks").withStyle(ChatFormatting.GREEN));
+                for (String unlock : unlocks) {
+                    tooltip.add(Component.literal("  ").append(Component.translatable("cyberimplants.unlock." + typeId.getPath() + "." + unlock))
+                            .withStyle(ChatFormatting.DARK_GREEN));
+                }
+            }
+        }
         String descKey = "item." + typeId.getNamespace() + "." + typeId.getPath() + ".desc";
         tooltip.add(Component.translatable(descKey).withStyle(ChatFormatting.DARK_GRAY));
     }

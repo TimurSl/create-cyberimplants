@@ -7,10 +7,11 @@ import dev.cyberimplants.body.BodyState;
 import dev.cyberimplants.body.InstalledImplant;
 import dev.cyberimplants.body.SlotId;
 import dev.cyberimplants.client.ClientBodyState;
+import dev.cyberimplants.client.CyberUi;
+import dev.cyberimplants.client.CyberUi.CyberButton;
 import dev.cyberimplants.implant.ImplantItem;
 import dev.cyberimplants.network.RigActionPayload;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -59,10 +60,10 @@ public class RigScreen extends Screen {
             boolean selected = slot == selectedInventorySlot;
             Component label = Component.literal(selected ? "> " : "").append(stack.getHoverName())
                     .append(" [" + ImplantItem.tierOf(stack) + "] L" + Body.loadOf(item.typeId(), ImplantItem.tierOf(stack)));
-            addRenderableWidget(Button.builder(label, b -> {
+            addRenderableWidget(CyberButton.of(10, y, LIST_W, ROW, label, b -> {
                 selectedInventorySlot = slotIndex;
                 rebuildWidgets();
-            }).bounds(10, y, LIST_W, ROW).build());
+            }, selected ? CyberUi.MAGENTA : CyberUi.CYAN));
             y += ROW + 1;
             shown++;
         }
@@ -91,13 +92,12 @@ public class RigScreen extends Screen {
                 text = Component.literal("").append(region).append(" " + (slot.index() + 1) + ": ")
                         .append(Component.translatable("cyberimplants.rig.empty"));
             }
-            Button button = Button.builder(text, b -> onSlotClicked(slot, installed != null))
-                    .bounds(x, 30 + row * (ROW + 1), SLOT_W, ROW).build();
+            CyberButton button = CyberButton.of(x, 30 + row * (ROW + 1), SLOT_W, ROW, text,
+                    b -> onSlotClicked(slot, installed != null), installed != null ? CyberUi.GREEN : CyberUi.CYAN);
             button.active = installed != null || canInstallSelected(body, slot);
             addRenderableWidget(button);
         }
-        addRenderableWidget(Button.builder(Component.translatable("gui.done"), b -> onClose())
-                .bounds(width / 2 - 40, height - 26, 80, 20).build());
+        addRenderableWidget(CyberButton.of(width / 2 - 40, height - 26, 80, 20, Component.translatable("gui.done"), b -> onClose(), CyberUi.MAGENTA));
     }
 
     private boolean canInstallSelected(BodyState body, SlotId slot) {
@@ -149,10 +149,18 @@ public class RigScreen extends Screen {
     }
 
     @Override
+    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        CyberUi.backdrop(g, width, height, minecraft.player == null ? 0 : minecraft.player.tickCount + partialTick);
+        int rightX = 10 + LIST_W + 12;
+        CyberUi.panel(g, 6, 26, LIST_W + 8, Math.max(40, height - 60), CyberUi.CYAN);
+        CyberUi.panel(g, rightX - 4, 26, width - rightX - 2, Math.max(40, height - 60), CyberUi.MAGENTA);
+    }
+
+    @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        super.render(g, mouseX, mouseY, partialTick); // draws the background, then the buttons
+        super.render(g, mouseX, mouseY, partialTick); // draws the backdrop and panels, then the buttons
         BodyState body = ClientBodyState.get();
-        g.drawCenteredString(font, title, width / 2, 8, 0xFFFFFFFF);
+        CyberUi.title(g, font, title, width - font.width(title) - 20, 6, CyberUi.MAGENTA);
         double capacity = Body.capacity(body);
         double margin = Body.overloadMargin(body);
         int load = Body.totalLoad(body);
@@ -160,8 +168,10 @@ public class RigScreen extends Screen {
                 Math.round(capacity * (1 + margin))).getString();
         boolean strained = Body.strained(body);
         g.drawString(font, loadText + "  " + Component.translatable(strained ? "cyberimplants.load.strained" : "cyberimplants.load.stable").getString(),
-                10, 18, strained ? 0xFFFFB060 : 0xFF90FFB0);
-        g.drawString(font, Component.translatable("cyberimplants.rig.inventory"), 10, 30 - 10 + 0, 0xFF9FD8FF);
+                10, 8, strained ? CyberUi.AMBER : CyberUi.GREEN, true);
+        double fraction = capacity <= 0 ? 0 : load / (capacity * (1 + margin));
+        CyberUi.meter(g, 10, 19, LIST_W, 3, fraction, strained ? CyberUi.AMBER : CyberUi.GREEN);
+        g.drawString(font, Component.translatable("cyberimplants.rig.inventory"), 10 + LIST_W + 12, 18, CyberUi.TEXT_DIM, false);
     }
 
     @Override

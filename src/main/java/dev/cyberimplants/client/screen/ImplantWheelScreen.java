@@ -3,6 +3,7 @@ package dev.cyberimplants.client.screen;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.cyberimplants.body.BodyState;
 import dev.cyberimplants.client.ClientBodyState;
+import dev.cyberimplants.client.CyberUi;
 import dev.cyberimplants.client.ModKeys;
 import dev.cyberimplants.implant.ActivationType;
 import dev.cyberimplants.implant.ImplantCatalog;
@@ -73,8 +74,16 @@ public class ImplantWheelScreen extends Screen {
 
     @Override
     public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        // A light dim only: no blur, the world stays readable behind the wheel.
-        g.fill(0, 0, width, height, 0x40000000);
+        // A light dim only: no blur, the world stays readable behind the wheel. A neon ring marks the hub.
+        g.fill(0, 0, width, height, 0x50040810);
+        int cx = centerX();
+        int cy = centerY();
+        for (int i = 0; i < 48; i++) {
+            double a = 2 * Math.PI * i / 48;
+            int px = (int) (cx + Math.cos(a) * 16);
+            int py = (int) (cy + Math.sin(a) * 16);
+            g.fill(px, py, px + 1, py + 1, i % 4 == 0 ? CyberUi.MAGENTA : CyberUi.withAlpha(CyberUi.CYAN, 0xA0));
+        }
     }
 
     @Override
@@ -82,18 +91,21 @@ public class ImplantWheelScreen extends Screen {
         super.render(g, mouseX, mouseY, partialTick);
         BodyState body = ClientBodyState.get();
         int hover = hovered(mouseX, mouseY);
-        g.drawCenteredString(font, title, centerX(), centerY() - 4, 0xFF9FD8FF);
+        g.drawCenteredString(font, title, centerX(), centerY() + 22, CyberUi.CYAN);
         for (int i = 0; i < entries.size(); i++) {
             ResourceLocation id = entries.get(i);
             int x = entryX(i) - ENTRY_W / 2;
             int y = entryY(i) - ENTRY_H / 2;
             long cooldown = body.cooldownRemaining(id);
             boolean on = Toggles.isOn(minecraft.player, id);
-            int background = i == hover ? 0xE0305870 : 0xC0182028;
-            g.fill(x, y, x + ENTRY_W, y + ENTRY_H, background);
-            g.renderOutline(x, y, ENTRY_W, ENTRY_H, on ? 0xFF60FF90 : 0xFF406080);
+            int accent = on ? CyberUi.GREEN : cooldown > 0 ? CyberUi.RED : CyberUi.CYAN;
+            if (i == hover) {
+                CyberUi.panel(g, x - 2, y - 2, ENTRY_W + 4, ENTRY_H + 4, CyberUi.MAGENTA, CyberUi.withAlpha(CyberUi.dim(accent, 0.3f), 0xE8));
+            } else {
+                CyberUi.panel(g, x, y, ENTRY_W, ENTRY_H, CyberUi.dim(accent, 0.7f));
+            }
             g.drawCenteredString(font, Component.translatable("item." + id.getNamespace() + "." + id.getPath()),
-                    x + ENTRY_W / 2, y + 3, 0xFFFFFFFF);
+                    x + ENTRY_W / 2, y + 3, CyberUi.TEXT);
             String status;
             if (on) {
                 status = Component.translatable("cyberimplants.wheel.on").getString();
@@ -102,7 +114,7 @@ public class ImplantWheelScreen extends Screen {
             } else {
                 status = Component.translatable("cyberimplants.wheel.ready").getString();
             }
-            g.drawCenteredString(font, status, x + ENTRY_W / 2, y + 12, cooldown > 0 ? 0xFFFF9090 : 0xFF90FFB0);
+            g.drawCenteredString(font, status, x + ENTRY_W / 2, y + 12, cooldown > 0 ? CyberUi.RED : CyberUi.GREEN);
         }
     }
 

@@ -22,7 +22,9 @@
         "boost_ticks": 70,
         "crash_ticks": 60
       },
-      "unlocks": []
+      "unlocks": [
+        "ignores_slowness"
+      ]
     },
     {
       "load": 3,
@@ -34,7 +36,10 @@
         "boost_ticks": 80,
         "crash_ticks": 40
       },
-      "unlocks": []
+      "unlocks": [
+        "boost_jump",
+        "ignores_slowness"
+      ]
     },
     {
       "load": 3,
@@ -46,7 +51,11 @@
         "boost_ticks": 100,
         "crash_ticks": 20
       },
-      "unlocks": []
+      "unlocks": [
+        "boost_attack_speed",
+        "boost_jump",
+        "ignores_slowness"
+      ]
     },
     {
       "load": 4,
@@ -58,8 +67,16 @@
         "boost_ticks": 120,
         "crash_ticks": 0
       },
-      "unlocks": []
+      "unlocks": [
+        "boost_attack_speed",
+        "boost_jump",
+        "ignores_slowness"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "boost_attack_speed": 3,
+    "boost_jump": 3,
+    "ignores_slowness": 3
+  }
 }

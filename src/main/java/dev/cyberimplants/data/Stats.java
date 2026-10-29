@@ -40,6 +40,18 @@ public final class Stats {
         return of(player, id).value(key, fallback);
     }
 
+    /** Whether the tier-gated feature is on for this implant tier. Features of a layer above {@code layers.maxEnabled} are off. */
+    public static boolean unlocked(ResourceLocation id, int tier, String unlock) {
+        return tier > 0 && ImplantStatsRegistry.get(id)
+                .map(s -> s.activeUnlocks(Mth.clamp(tier, 1, 5), Layers.maxEnabled()).contains(unlock))
+                .orElse(false);
+    }
+
+    /** Whether the player's installed implant of this type has the feature. */
+    public static boolean unlocked(Player player, ResourceLocation id, String unlock) {
+        return unlocked(id, BodyState.get(player).tierOf(id), unlock);
+    }
+
     private Stats() {
     }
 }

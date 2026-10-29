@@ -18,7 +18,9 @@
         "damage": 3,
         "internal_cooldown_ticks": 25
       },
-      "unlocks": []
+      "unlocks": [
+        "slows_attacker"
+      ]
     },
     {
       "load": 4,
@@ -28,7 +30,10 @@
         "damage": 4,
         "internal_cooldown_ticks": 20
       },
-      "unlocks": []
+      "unlocks": [
+        "chain_one",
+        "slows_attacker"
+      ]
     },
     {
       "load": 4,
@@ -38,7 +43,10 @@
         "damage": 5,
         "internal_cooldown_ticks": 15
       },
-      "unlocks": []
+      "unlocks": [
+        "chain_one",
+        "slows_attacker"
+      ]
     },
     {
       "load": 5,
@@ -48,8 +56,14 @@
         "damage": 6,
         "internal_cooldown_ticks": 10
       },
-      "unlocks": []
+      "unlocks": [
+        "chain_one",
+        "slows_attacker"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "chain_one": 3,
+    "slows_attacker": 3
+  }
 }

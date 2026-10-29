@@ -223,5 +223,17 @@
   "cyberimplants.deck.tab.log": "Log",
   "cyberimplants.deck.thread": "Thread %s",
   "cyberimplants.deck.threads": "Threads: %s | neural latency: %s ticks",
-  "cyberimplants.deck.idle": "No program is running."
+  "cyberimplants.deck.idle": "No program is running.",
+  "cyberimplants.unlock.regenerator.works_when_starving": "Works regardless of hunger",
+  "cyberimplants.unlock.regenerator.cures_poison": "Cures Poison",
+  "cyberimplants.unlock.regenerator.cures_wither_hunger": "Cures Wither and Hunger",
+  "cyberimplants.unlock.adrenaline_pump.ignores_slowness": "Ignores Slowness during the boost",
+  "cyberimplants.unlock.adrenaline_pump.boost_jump": "Boost adds jump height",
+  "cyberimplants.unlock.adrenaline_pump.boost_attack_speed": "Boost adds +15% attack speed",
+  "cyberimplants.unlock.shock_circuit.slows_attacker": "Attacker gets Slowness for 1 s",
+  "cyberimplants.unlock.shock_circuit.chain_one": "Chains to 1 extra enemy within 4 blocks",
+  "cyberimplants.unlock.kinetic_shield.absorbs_projectiles": "Projectiles are fully absorbed",
+  "cyberimplants.unlock.emergency_shell.knockback_immune": "Knockback immunity while active",
+  "cyberimplants.unlock.emergency_shell.cleanses": "Extinguishes fire and cleanses harmful effects on trigger",
+  "cyberimplants.tooltip.unlocks": "Unlocked at this tier:"
 }

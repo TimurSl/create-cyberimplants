@@ -1,11 +1,12 @@
 package dev.cyberimplants.client.screen;
 
 import dev.cyberimplants.client.ClientDeckState;
+import dev.cyberimplants.client.CyberUi;
+import dev.cyberimplants.client.CyberUi.CyberButton;
 import dev.cyberimplants.network.DeckCommandPayload;
 import dev.cyberimplants.network.DeckStatusPayload;
 import dev.cyberimplants.network.UploadProgramPayload;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -51,18 +52,17 @@ public class DeckScreen extends Screen {
         }
         for (int t = 0; t < TAB_KEYS.length; t++) {
             int target = t;
-            Button button = Button.builder(Component.translatable("cyberimplants.deck.tab." + TAB_KEYS[t]), b -> {
+            CyberButton button = CyberButton.of(10 + t * 82, 6, 80, 16, Component.translatable("cyberimplants.deck.tab." + TAB_KEYS[t]), b -> {
                 if (editor != null) {
                     pendingText = editor.getValue();
                 }
                 tab = target;
                 rebuildWidgets();
-            }).bounds(10 + t * 82, 6, 80, 16).build();
+            }, CyberUi.GREEN);
             button.active = tab != t;
             addRenderableWidget(button);
         }
-        addRenderableWidget(Button.builder(Component.translatable("gui.done"), b -> onClose())
-                .bounds(width - 70, height - 24, 60, 18).build());
+        addRenderableWidget(CyberButton.of(width - 70, height - 24, 60, 18, Component.translatable("gui.done"), b -> onClose(), CyberUi.MAGENTA));
         if (tab != TAB_PROGRAMS) {
             editor = null;
             return;
@@ -79,32 +79,29 @@ public class DeckScreen extends Screen {
 
         int by = 38 + editorH + 4;
         int bw = Math.min(90, (editorW - 12) / 4);
-        addRenderableWidget(Button.builder(Component.translatable("cyberimplants.deck.save"),
-                b -> PacketDistributor.sendToServer(new UploadProgramPayload(editor.getValue())))
-                .bounds(editorX, by, bw, 18).build());
-        addRenderableWidget(Button.builder(Component.translatable("cyberimplants.deck.load"),
-                b -> PacketDistributor.sendToServer(new DeckCommandPayload(DeckCommandPayload.Op.LOAD, editedProgramName(), thread)))
-                .bounds(editorX + (bw + 4), by, bw, 18).build());
-        addRenderableWidget(Button.builder(Component.translatable("cyberimplants.deck.unload"),
-                b -> PacketDistributor.sendToServer(new DeckCommandPayload(DeckCommandPayload.Op.UNLOAD, "", thread)))
-                .bounds(editorX + 2 * (bw + 4), by, bw, 18).build());
+        addRenderableWidget(CyberButton.of(editorX, by, bw, 18, Component.translatable("cyberimplants.deck.save"),
+                b -> PacketDistributor.sendToServer(new UploadProgramPayload(editor.getValue())), CyberUi.CYAN));
+        addRenderableWidget(CyberButton.of(editorX + (bw + 4), by, bw, 18, Component.translatable("cyberimplants.deck.load"),
+                b -> PacketDistributor.sendToServer(new DeckCommandPayload(DeckCommandPayload.Op.LOAD, editedProgramName(), thread)), CyberUi.GREEN));
+        addRenderableWidget(CyberButton.of(editorX + 2 * (bw + 4), by, bw, 18, Component.translatable("cyberimplants.deck.unload"),
+                b -> PacketDistributor.sendToServer(new DeckCommandPayload(DeckCommandPayload.Op.UNLOAD, "", thread)), CyberUi.AMBER));
         DeckStatusPayload status = ClientDeckState.get();
         if (status != null && status.threads() > 1) {
             thread = Math.min(thread, status.threads() - 1);
-            addRenderableWidget(Button.builder(Component.translatable("cyberimplants.deck.thread", thread),
+            addRenderableWidget(CyberButton.of(editorX + 4 * (bw + 4), by, bw, 18, Component.translatable("cyberimplants.deck.thread", thread),
                     b -> {
                         thread = (thread + 1) % status.threads();
                         rebuildWidgets();
-                    }).bounds(editorX + 4 * (bw + 4), by, bw, 18).build());
+                    }, CyberUi.MAGENTA));
         }
-        addRenderableWidget(Button.builder(Component.translatable("cyberimplants.deck.delete"),
-                b -> command(DeckCommandPayload.Op.DELETE)).bounds(editorX + 3 * (bw + 4), by, bw, 18).build());
+        addRenderableWidget(CyberButton.of(editorX + 3 * (bw + 4), by, bw, 18, Component.translatable("cyberimplants.deck.delete"),
+                b -> command(DeckCommandPayload.Op.DELETE), CyberUi.RED));
 
         addProgramButtons();
-        addRenderableWidget(Button.builder(Component.translatable("cyberimplants.deck.new"), b -> {
+        addRenderableWidget(CyberButton.of(10, 38, LIST_W, 16, Component.translatable("cyberimplants.deck.new"), b -> {
             pendingText = TEMPLATE;
             editor.setValue(TEMPLATE);
-        }).bounds(10, 38, LIST_W, 16).build());
+        }, CyberUi.GREEN));
     }
 
     private void addProgramButtons() {
@@ -117,10 +114,10 @@ public class DeckScreen extends Screen {
             String name = status.names().get(i);
             String source = status.sources().get(i);
             boolean running = name.equals(status.loaded());
-            addRenderableWidget(Button.builder(Component.literal((running ? "> " : "") + name), b -> {
+            addRenderableWidget(CyberButton.of(10, y, LIST_W, 16, Component.literal((running ? "> " : "") + name), b -> {
                 pendingText = source;
                 editor.setValue(source);
-            }).bounds(10, y, LIST_W, 16).build());
+            }, running ? CyberUi.GREEN : CyberUi.CYAN));
             y += 17;
         }
     }
@@ -156,29 +153,41 @@ public class DeckScreen extends Screen {
     }
 
     @Override
+    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        CyberUi.backdrop(g, width, height, minecraft.player == null ? 0 : minecraft.player.tickCount + partialTick);
+        if (tab == TAB_PROGRAMS) {
+            int editorX = 10 + LIST_W + 8;
+            CyberUi.panel(g, 6, 35, LIST_W + 8, Math.max(60, height - 66), CyberUi.GREEN);
+            CyberUi.panel(g, editorX - 3, 35, width - editorX - 4, Math.max(60, height - 104) + 6, CyberUi.CYAN);
+        } else {
+            CyberUi.panel(g, 6, 35, width - 12, Math.max(60, height - 66), CyberUi.CYAN);
+        }
+    }
+
+    @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         super.render(g, mouseX, mouseY, partialTick);
-        g.drawCenteredString(font, title, width / 2 + 120, 10, 0xFFFFFFFF);
+        CyberUi.title(g, font, title, width - font.width(title) - 14, 8, CyberUi.CYAN);
         DeckStatusPayload status = ClientDeckState.get();
         int editorX = tab == TAB_PROGRAMS ? 10 + LIST_W + 8 : 10;
         if (status == null) {
-            g.drawString(font, Component.translatable("cyberimplants.deck.waiting"), editorX, 26, 0xFFAAAAAA);
+            g.drawString(font, Component.translatable("cyberimplants.deck.waiting"), editorX, 26, CyberUi.TEXT_DIM);
             return;
         }
         String hardware = status.booted()
                 ? Component.translatable("cyberimplants.deck.hardware", status.isa(), status.ramCells(),
                 status.storageUsed(), status.storageBytes()).getString()
                 : Component.translatable("cyberimplants.deck.not_booted").getString();
-        g.drawString(font, hardware, editorX, 26, status.booted() ? 0xFF90FFB0 : 0xFFFF9090);
+        g.drawString(font, hardware, editorX, 26, status.booted() ? CyberUi.GREEN : CyberUi.RED);
         if (tab == TAB_PROCESSES) {
-            int row = 36;
-            g.drawString(font, Component.translatable("cyberimplants.deck.threads", status.threads(), status.latency()), 10, row, 0xFFB0C8FF);
+            int row = 42;
+            g.drawString(font, Component.translatable("cyberimplants.deck.threads", status.threads(), status.latency()), 10, row, CyberUi.CYAN);
             row += 14;
             if (status.processes().isEmpty()) {
-                g.drawString(font, Component.translatable("cyberimplants.deck.idle"), 10, row, 0xFFAAAAAA);
+                g.drawString(font, Component.translatable("cyberimplants.deck.idle"), 10, row, CyberUi.TEXT_DIM);
             }
             for (String line : status.processes()) {
-                g.drawString(font, line, 10, row, 0xFFFFFFFF);
+                g.drawString(font, line, 10, row, CyberUi.TEXT);
                 row += 11;
             }
             return;
@@ -186,9 +195,9 @@ public class DeckScreen extends Screen {
         if (tab == TAB_LOG) {
             List<String> lines = status.log();
             int rows = Math.max(1, (height - 60) / 10);
-            int row = 36;
+            int row = 42;
             for (int i = Math.max(0, lines.size() - rows); i < lines.size(); i++) {
-                g.drawString(font, lines.get(i), 10, row, 0xFFB0C8FF);
+                g.drawString(font, lines.get(i), 10, row, CyberUi.CYAN);
                 row += 10;
             }
             return;
@@ -196,17 +205,17 @@ public class DeckScreen extends Screen {
 
         int y = Math.max(60, height - 104) + 38 + 24;
         if (!status.message().isEmpty()) {
-            g.drawString(font, status.message(), editorX, y, 0xFFFFE080);
+            g.drawString(font, status.message(), editorX, y, CyberUi.AMBER);
             y += 11;
         }
         List<String> log = status.log();
         for (int i = Math.max(0, log.size() - 3); i < log.size(); i++) {
-            g.drawString(font, "> " + log.get(i), editorX, y, 0xFFB0C8FF);
+            g.drawString(font, "> " + log.get(i), editorX, y, CyberUi.CYAN);
             y += 10;
         }
         if (!status.loaded().isEmpty()) {
             g.drawString(font, Component.translatable("cyberimplants.deck.running", status.loaded(), status.footprint()),
-                    10, height - 20, 0xFF90FFB0);
+                    10, height - 20, CyberUi.GREEN);
         }
     }
 }

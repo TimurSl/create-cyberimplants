@@ -7,6 +7,7 @@ import dev.cyberimplants.data.Stats;
 import dev.cyberimplants.data.TierStats;
 import dev.cyberimplants.implant.ImplantIds;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -50,13 +51,25 @@ public final class Regenerator {
         if (now - LAST_HURT.getOrDefault(player.getUUID(), -1_000_000L) < stats.value("lockout_ticks", 160)) {
             return;
         }
-        if (player.getFoodData().getFoodLevel() <= 0) {
+        if (player.getFoodData().getFoodLevel() <= 0 && !Stats.unlocked(ImplantIds.REGENERATOR, tier, "works_when_starving")) {
             return;
         }
         float heal = (float) stats.value("heal_per_second", 0.25);
         if (Body.spend(player, heal * stats.value("charge_per_hp", 2.0))) {
             player.heal(heal);
             LAST_HEAL.put(player.getUUID(), now);
+            cure(player, tier);
+        }
+    }
+
+    /** Tier III cures Poison, Tier IV also Wither and Hunger. */
+    private static void cure(ServerPlayer player, int tier) {
+        if (Stats.unlocked(ImplantIds.REGENERATOR, tier, "cures_poison")) {
+            player.removeEffect(MobEffects.POISON);
+        }
+        if (Stats.unlocked(ImplantIds.REGENERATOR, tier, "cures_wither_hunger")) {
+            player.removeEffect(MobEffects.WITHER);
+            player.removeEffect(MobEffects.HUNGER);
         }
     }
 

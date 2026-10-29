@@ -9,6 +9,7 @@ import dev.cyberimplants.deck.DeckEvents;
 import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.Tags;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -55,7 +56,10 @@ public final class KineticShield {
         if (pool <= 0) {
             return amount;
         }
-        double absorbed = Math.min(pool, amount * stats.value("absorb_share", 0.5));
+        // Tier III: projectiles are absorbed in full (while the pool lasts), everything else by the usual share.
+        double share = source.is(DamageTypeTags.IS_PROJECTILE) && Stats.unlocked(ImplantIds.KINETIC_SHIELD, tier, "absorbs_projectiles")
+                ? 1.0 : stats.value("absorb_share", 0.5);
+        double absorbed = Math.min(pool, amount * share);
         double left = pool - absorbed;
         Body.updateQuiet(player, st -> st.withData(KEY, Math.max(0.0, left)));
         if (left <= 1.0E-6 && absorbed > 0) {
