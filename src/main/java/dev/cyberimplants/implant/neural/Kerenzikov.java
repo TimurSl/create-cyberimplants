@@ -49,13 +49,19 @@ public final class Kerenzikov {
             return false;
         }
         Body.startCooldown(player, ImplantIds.KERENZIKOV, stats.cooldownTicks());
-        long end = player.level().getGameTime() + (long) stats.value("window_ticks", 8);
+        double direction = Math.toDegrees(Math.atan2(dirZ, dirX));
+        openWindow(player, tier, direction);
+        DeckEvents.fire(player, "dodge", Map.of("direction", direction));
+        return true;
+    }
+
+    /** Opens the reaction window without a dodge, its Charge or its cooldown (the AES synergy uses this). */
+    public static void openWindow(ServerPlayer player, int tier, double direction) {
+        long end = player.level().getGameTime() + (long) Stats.of(ImplantIds.KERENZIKOV, tier).value("window_ticks", 8);
         WINDOW_END.put(player.getUUID(), end);
         // Hold the attack-strength meter full for the window: a huge attack speed finishes the cooldown instantly.
         Attrs.added(player, Attributes.ATTACK_SPEED, "kerenzikov_window", 100.0, true);
-        DeckEvents.fire(player, "dodge", Map.of("direction", Math.toDegrees(Math.atan2(dirZ, dirX))));
-        DeckEvents.fire(player, "window_opened", Map.of("direction", Math.toDegrees(Math.atan2(dirZ, dirX))));
-        return true;
+        DeckEvents.fire(player, "window_opened", Map.of("direction", direction));
     }
 
     @SubscribeEvent

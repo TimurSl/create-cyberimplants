@@ -7,7 +7,7 @@ Players **manufacture** implants on Create production lines, **install** them on
 **program** their behaviour with a cyberdeck. The cyberdeck can also read and drive Create machinery. Implant tiers
 make the existing abilities stronger; they never add duplicate items.
 
-> Status: **Layer 3 (capability) started** on top of Layer 2 (scaling), see the roadmap for what is in. **Layer 2**: All 46 implant types exist at Tiers I-V with their real numeric rows, with the
+> Status: **Layer 4 (interplay) started** on top of Layer 3 (capability, also started) and Layer 2 (scaling), see the roadmap for what is in. **Layer 2**: All 46 implant types exist at Tiers I-V with their real numeric rows, with the
 > upgrade chain, timed Rig operations (RPM, gel, aborts), Strain, Coprocessors and parallel programs, Machine Interface
 > Tiers I-II, the Proximity Sensor and the ISA-2 Synapse language. The Synapse language is compiled and unit-tested; the
 > NeoForge-dependent code is compiled by CI but has not been run in a game yet (see the roadmap). See
@@ -65,7 +65,7 @@ src/main/java/dev/cyberimplants
   combat/          the damage mitigation pipeline
   deck/            binds Synapse programs to the player (host, handles, storage, events)
   client/          HUD, key bindings, client-side movement, optics overlays, screens and the shared cyberpunk style (CyberUi)
-  gametest/        Layer 1-3 GameTests
+  gametest/        Layer 1-4 GameTests
   synapse/         scripting language (no Minecraft imports): lexer, parser, compiler, VM
 src/main/templates/META-INF/neoforge.mods.toml
 src/test/java      JUnit tests
