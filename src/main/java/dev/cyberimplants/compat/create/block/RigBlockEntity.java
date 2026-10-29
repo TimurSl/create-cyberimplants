@@ -123,16 +123,6 @@ public class RigBlockEntity extends KineticBlockEntity {
                 tank.getFluid().is(ModFluids.NEURAL_GEL.get()), op);
     }
 
-    /**
-     * The holograms reach well past the block: the scanner ring sweeps up to the patient's head and the base arc is
-     * wider than the block. With the default one-block box the renderer was culled whenever the stool itself was off
-     * screen, which is always the case for the patient looking ahead.
-     */
-    @Override
-    protected AABB createRenderBoundingBox() {
-        return new AABB(worldPosition).inflate(0.25, 0, 0.25).expandTowards(0, 2.6, 0);
-    }
-
     /** True when the player is close enough to this Rig and it is running. */
     public static boolean canOperate(ServerPlayer player, BlockPos pos) {
         if (player.distanceToSqr(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) > MAX_USE_DISTANCE * MAX_USE_DISTANCE) {
