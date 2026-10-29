@@ -41,7 +41,7 @@ final class ClientMovement {
     static void tick() {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer p = mc.player;
-        if (p == null || mc.isPaused() || mc.screen != null || p.isSpectator()) {
+        if (p == null || mc.isPaused() || mc.screen != null || p.isSpectator() || ClientRig.restrained()) {
             wasJumping = false;
             return;
         }

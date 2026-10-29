@@ -4,6 +4,8 @@ import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
 import dev.cyberimplants.config.ClientConfig;
 import dev.cyberimplants.body.Strain;
+import dev.cyberimplants.client.ui.Anim;
+import dev.cyberimplants.compat.create.block.RigView;
 import dev.cyberimplants.implant.Arms;
 import dev.cyberimplants.implant.ImplantActions;
 import dev.cyberimplants.implant.ImplantCatalog;
@@ -31,19 +33,26 @@ final class Hud {
     private static final int MOMENTUM = CyberUi.MAGENTA;
     private static final int TEXT = CyberUi.TEXT;
 
+    // Displayed values glide towards the real ones, so bars do not jump between syncs.
+    private static final Anim.Smooth CHARGE_SHOWN = new Anim.Smooth(0, 8);
+    private static final Anim.Smooth BUFFER_SHOWN = new Anim.Smooth(0, 8);
+    private static final Anim.Smooth SHIELD_SHOWN = new Anim.Smooth(0, 10);
+    private static final Anim.Smooth MOMENTUM_SHOWN = new Anim.Smooth(0, 10);
+
     static void render(GuiGraphics g, DeltaTracker delta) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
         if (player == null || mc.options.hideGui || mc.screen != null && mc.screen.isPauseScreen()) {
             return;
         }
+        Font font = mc.font;
+        int height = g.guiHeight();
+        int width = g.guiWidth();
+        rigOperation(g, font, width, height); // also during the very first operation, on an empty body
         BodyState body = ClientBodyState.get();
         if (body.installed().isEmpty()) {
             return;
         }
-        Font font = mc.font;
-        int height = g.guiHeight();
-        int width = g.guiWidth();
 
         thermalWash(g, player, width, height);
 
@@ -51,21 +60,24 @@ final class Hud {
         double max = Body.maxCharge(body);
         int y = height - 14;
         if (max > 0) {
-            bar(g, 6, y, 90, 6, body.charge() / max, CHARGE);
+            double fraction = body.charge() / max;
+            bar(g, 6, y, 90, 6, CHARGE_SHOWN.update((float) fraction), CHARGE);
             double bufferCap = Body.bufferCapacity(body);
             if (bufferCap > 0) {
-                bar(g, 98, y, 30, 6, body.buffer() / bufferCap, BUFFER);
+                bar(g, 98, y, 30, 6, BUFFER_SHOWN.update((float) (body.buffer() / bufferCap)), BUFFER);
             }
-            g.drawString(font, "C " + Math.round(body.charge()) + "/" + Math.round(max), 6, y - 10, TEXT);
+            // Below 15% the readout pulses red.
+            int color = fraction < 0.15 ? Anim.mix(CyberUi.RED, TEXT, Anim.pulse(0.9f)) : TEXT;
+            g.drawString(font, "C " + Math.round(body.charge()) + "/" + Math.round(max), 6, y - 10, color);
             y -= 18;
         }
         if (body.has(ImplantIds.KINETIC_SHIELD)) {
             double cap = KineticShield.max(player);
-            bar(g, 6, y, 90, 4, cap <= 0 ? 0 : KineticShield.value(player) / cap, SHIELD);
+            bar(g, 6, y, 90, 4, SHIELD_SHOWN.update(cap <= 0 ? 0f : (float) (KineticShield.value(player) / cap)), SHIELD);
             y -= 8;
         }
         if (body.has(ImplantIds.MOMENTUM_BOOSTER)) {
-            bar(g, 6, y, 90, 4, MomentumBooster.value(player) / 100.0, MOMENTUM);
+            bar(g, 6, y, 90, 4, MOMENTUM_SHOWN.update((float) (MomentumBooster.value(player) / 100.0)), MOMENTUM);
             y -= 8;
         }
         if (Arms.freeHandWith(player, ImplantIds.BALLISTIC_MODULE) != null
@@ -103,6 +115,35 @@ final class Hud {
                 y -= 16;
             }
         }
+    }
+
+    /**
+     * While strapped into the Rig with its screen closed: a progress plate at the top of the screen and a soft magenta
+     * vignette that says the body is restrained.
+     */
+    private static void rigOperation(GuiGraphics g, Font font, int width, int height) {
+        if (!ClientRig.restrained() || Minecraft.getInstance().screen != null) {
+            return;
+        }
+        if (!ClientConfig.REDUCE_SCREEN_EFFECTS.get()) {
+            int edge = Anim.fade(CyberUi.MAGENTA, 0.18f + 0.12f * Anim.pulse(1.4f));
+            g.fillGradient(0, 0, width, 24, edge, 0x00FF2BD6);
+            g.fillGradient(0, height - 24, width, height, 0x00FF2BD6, edge);
+        }
+        RigView.Operation op = ClientRig.view(ClientRig.strappedInto()).operation();
+        if (op == null) {
+            return;
+        }
+        float p = op.progress(0);
+        int w = 160;
+        int x = (width - w) / 2;
+        int y = 6;
+        CyberUi.panel(g, x, y, w, 22, CyberUi.MAGENTA, 0xD00A0E18);
+        Component label = Component.translatable("cyberimplants.rig.progress", Math.round(p * 100));
+        g.drawString(font, label, x + 6, y + 4, TEXT, false);
+        String left = Component.translatable("cyberimplants.rig.op.left", op.secondsLeft()).getString();
+        g.drawString(font, left, x + w - 6 - font.width(left), y + 4, CyberUi.TEXT_DIM, false);
+        CyberUi.meter(g, x + 4, y + 16, w - 8, 2, p, CyberUi.MAGENTA);
     }
 
     private static void thermalWash(GuiGraphics g, LocalPlayer player, int width, int height) {
