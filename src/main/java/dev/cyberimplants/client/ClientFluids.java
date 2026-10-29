@@ -1,30 +1,30 @@
 package dev.cyberimplants.client;
 
+import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.registry.ModFluids;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 
-/** Gel textures: vanilla water sprites with a tint. */
+/** Gel textures: the animated neon sprites of this mod (textures/block/*_gel_still and *_flow), lightly translucent. */
 public final class ClientFluids {
-    private static final ResourceLocation STILL = ResourceLocation.withDefaultNamespace("block/water_still");
-    private static final ResourceLocation FLOWING = ResourceLocation.withDefaultNamespace("block/water_flow");
-
     public static void register(RegisterClientExtensionsEvent event) {
-        event.registerFluidType(tinted(0xCC6FE0A8), ModFluids.BIO_GEL_TYPE.get());
-        event.registerFluidType(tinted(0xCC9B6BFF), ModFluids.NEURAL_GEL_TYPE.get());
+        event.registerFluidType(sprites("bio_interface_gel", 0xE6FFFFFF), ModFluids.BIO_GEL_TYPE.get());
+        event.registerFluidType(sprites("neural_gel", 0xE6FFFFFF), ModFluids.NEURAL_GEL_TYPE.get());
     }
 
-    private static IClientFluidTypeExtensions tinted(int argb) {
+    private static IClientFluidTypeExtensions sprites(String gel, int argb) {
+        ResourceLocation still = CyberImplants.id("block/" + gel + "_still");
+        ResourceLocation flowing = CyberImplants.id("block/" + gel + "_flow");
         return new IClientFluidTypeExtensions() {
             @Override
             public ResourceLocation getStillTexture() {
-                return STILL;
+                return still;
             }
 
             @Override
             public ResourceLocation getFlowingTexture() {
-                return FLOWING;
+                return flowing;
             }
 
             @Override

@@ -1,5 +1,5 @@
 {
   "textures": {
-    "particle": "minecraft:block/water_still"
+    "particle": "cyberimplants:block/bio_interface_gel_still"
   }
 }

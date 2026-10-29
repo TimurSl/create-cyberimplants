@@ -40,7 +40,9 @@
         "charge_per_hp": 3.0,
         "emergency_cooldown_ticks": 900
       },
-      "unlocks": []
+      "unlocks": [
+        "absorbs_projectiles"
+      ]
     },
     {
       "load": 6,
@@ -54,7 +56,9 @@
         "charge_per_hp": 3.0,
         "emergency_cooldown_ticks": 900
       },
-      "unlocks": []
+      "unlocks": [
+        "absorbs_projectiles"
+      ]
     },
     {
       "load": 7,
@@ -68,8 +72,12 @@
         "charge_per_hp": 3.0,
         "emergency_cooldown_ticks": 900
       },
-      "unlocks": []
+      "unlocks": [
+        "absorbs_projectiles"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "absorbs_projectiles": 3
+  }
 }

@@ -34,7 +34,9 @@
         "duration_ticks": 60,
         "movement_penalty": 0.3
       },
-      "unlocks": []
+      "unlocks": [
+        "knockback_immune"
+      ]
     },
     {
       "load": 4,
@@ -46,7 +48,10 @@
         "duration_ticks": 80,
         "movement_penalty": 0.2
       },
-      "unlocks": []
+      "unlocks": [
+        "cleanses",
+        "knockback_immune"
+      ]
     },
     {
       "load": 5,
@@ -58,8 +63,14 @@
         "duration_ticks": 100,
         "movement_penalty": 0.1
       },
-      "unlocks": []
+      "unlocks": [
+        "cleanses",
+        "knockback_immune"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "cleanses": 3,
+    "knockback_immune": 3
+  }
 }

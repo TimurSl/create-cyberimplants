@@ -28,6 +28,9 @@ public final class AdrenalinePump {
     private static final Map<UUID, Long> BOOST_END = new ConcurrentHashMap<>();
     /** One hunger point is 4 exhaustion. */
     private static final float HUNGER_POINT = 4.0f;
+    /** "Jump +0.5": half a block of extra jump height is roughly +0.06 jump strength. */
+    private static final double JUMP_BONUS = 0.06;
+    private static final double ATTACK_SPEED_BONUS = 0.15;
 
     @SubscribeEvent
     public static void onDamaged(LivingDamageEvent.Post event) {
@@ -45,8 +48,17 @@ public final class AdrenalinePump {
         player.getFoodData().addExhaustion(HUNGER_POINT);
         BOOST_END.put(player.getUUID(), player.level().getGameTime() + (long) stats.value("boost_ticks", 60));
         Attrs.multiplied(player, Attributes.MOVEMENT_SPEED, "adrenaline_boost", stats.value("boost", 0.15), true);
+        applyUnlocks(player, tier, true);
         Body.startCooldown(player, ImplantIds.ADRENALINE_PUMP, stats.cooldownTicks());
         DeckEvents.fire(player, "adrenaline_triggered", Map.of());
+    }
+
+    /** Tier III adds jump height, Tier IV attack speed; both last as long as the boost. */
+    private static void applyUnlocks(ServerPlayer player, int tier, boolean present) {
+        Attrs.added(player, Attributes.JUMP_STRENGTH, "adrenaline_jump", JUMP_BONUS,
+                present && Stats.unlocked(ImplantIds.ADRENALINE_PUMP, tier, "boost_jump"));
+        Attrs.multiplied(player, Attributes.ATTACK_SPEED, "adrenaline_attack_speed", ATTACK_SPEED_BONUS,
+                present && Stats.unlocked(ImplantIds.ADRENALINE_PUMP, tier, "boost_attack_speed"));
     }
 
     @SubscribeEvent
@@ -55,6 +67,10 @@ public final class AdrenalinePump {
             return;
         }
         Long end = BOOST_END.get(player.getUUID());
+        // Tier II ignores Slowness during the boost (the crash comes afterwards).
+        if (end != null && Stats.unlocked(player, ImplantIds.ADRENALINE_PUMP, "ignores_slowness")) {
+            player.removeEffect(MobEffects.MOVEMENT_SLOWDOWN);
+        }
         if (end != null && (!player.isAlive() || player.level().getGameTime() >= end)) {
             finish(player, player.isAlive());
         }
@@ -63,6 +79,7 @@ public final class AdrenalinePump {
     private static void finish(ServerPlayer player, boolean crash) {
         BOOST_END.remove(player.getUUID());
         Attrs.multiplied(player, Attributes.MOVEMENT_SPEED, "adrenaline_boost", 0, false);
+        applyUnlocks(player, 0, false);
         if (crash) {
             int tier = BodyState.get(player).tierOf(ImplantIds.ADRENALINE_PUMP);
             int ticks = (int) Stats.of(ImplantIds.ADRENALINE_PUMP, Math.max(tier, 1)).value("crash_ticks", 80);

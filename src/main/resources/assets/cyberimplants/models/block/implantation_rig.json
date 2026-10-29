@@ -1,6 +1,8 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cube_bottom_top",
   "textures": {
-    "all": "cyberimplants:block/implantation_rig"
+    "side": "cyberimplants:block/implantation_rig",
+    "top": "cyberimplants:block/implantation_rig_top",
+    "bottom": "cyberimplants:block/implantation_rig_bottom"
   }
 }

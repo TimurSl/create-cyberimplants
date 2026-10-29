@@ -8,9 +8,13 @@ import dev.cyberimplants.data.TierStats;
 import dev.cyberimplants.implant.Attrs;
 import dev.cyberimplants.implant.ImplantIds;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -19,6 +23,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -57,15 +62,32 @@ public final class EmergencyShell {
         }
         ACTIVE_UNTIL.put(player.getUUID(), player.level().getGameTime() + (long) stats.value("duration_ticks", 40));
         Attrs.multiplied(player, Attributes.MOVEMENT_SPEED, "shell_slow", -stats.value("movement_penalty", 0.4), true);
+        if (Stats.unlocked(ImplantIds.EMERGENCY_SHELL, tier, "knockback_immune")) {
+            Attrs.added(player, Attributes.KNOCKBACK_RESISTANCE, "shell_knockback", 1.0, true);
+        }
+        if (Stats.unlocked(ImplantIds.EMERGENCY_SHELL, tier, "cleanses")) {
+            cleanse(player);
+        }
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.ANVIL_PLACE, SoundSource.PLAYERS, 0.8f, 1.5f);
         player.serverLevel().sendParticles(ParticleTypes.CRIT, player.getX(), player.getY() + 1.0, player.getZ(), 20, 0.4, 0.6, 0.4, 0.1);
         return true;
     }
 
+    /** Tier IV: the shell puts the user out and clears every harmful effect when it hardens. */
+    private static void cleanse(ServerPlayer player) {
+        player.clearFire();
+        List<Holder<MobEffect>> harmful = player.getActiveEffects().stream()
+                .map(MobEffectInstance::getEffect)
+                .filter(effect -> effect.value().getCategory() == MobEffectCategory.HARMFUL)
+                .toList();
+        harmful.forEach(player::removeEffect);
+    }
+
     private static void end(ServerPlayer player) {
         if (ACTIVE_UNTIL.remove(player.getUUID()) != null) {
             Attrs.multiplied(player, Attributes.MOVEMENT_SPEED, "shell_slow", 0, false);
+            Attrs.added(player, Attributes.KNOCKBACK_RESISTANCE, "shell_knockback", 0, false);
             if (BodyState.get(player).has(ImplantIds.EMERGENCY_SHELL)) {
                 Body.startCooldown(player, ImplantIds.EMERGENCY_SHELL, Body.cooldownTicks(player, ImplantIds.EMERGENCY_SHELL));
             }

@@ -12,6 +12,9 @@ import struct
 import zlib
 
 from layer2_tiers import TIERS, per_tier
+import gen_textures
+import layer3_unlocks
+from layer3_unlocks import unlock_layers, unlocks_for
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src", "main", "resources")
 MOD = "cyberimplants"
@@ -219,43 +222,6 @@ def png(width, height, pixels):
             + chunk(b"IDAT", zlib.compress(raw, 9)) + chunk(b"IEND", b""))
 
 
-def item_texture(name, category):
-    base = CATEGORY_COLOR[category]
-    dark = tuple(int(c * 0.45) for c in base)
-    light = tuple(min(255, int(c * 1.15) + 20) for c in base)
-    px = [[(0, 0, 0, 0)] * 16 for _ in range(16)]
-    for y in range(1, 15):
-        for x in range(1, 15):
-            edge = x in (1, 14) or y in (1, 14)
-            px[y][x] = dark + (255,) if edge else base + (255,)
-    for x in range(2, 14):
-        px[2][x] = light + (255,)
-    words = [w for w in name.replace("-", " ").split() if w]
-    letters = (words[0][0] + (words[1][0] if len(words) > 1 else words[0][1])).upper()
-    for li, ch in enumerate(letters):
-        glyph = FONT.get(ch, FONT["X"])
-        for gy, row in enumerate(glyph):
-            for gx, cell in enumerate(row):
-                if cell == "#":
-                    px[5 + gy][4 + li * 4 + gx] = (16, 20, 28, 255)
-    return png(16, 16, px)
-
-
-def block_texture(kind):
-    colors = {"sensor": ((0x58, 0x50, 0x70), (0xFF, 0x5A, 0x5A)), "rig": ((0x70, 0x88, 0xA0), (0xC8, 0xE0, 0xF0)), "charger": ((0x4A, 0x5C, 0x70), (0x35, 0xD0, 0xFF)),
-              "port": ((0x3A, 0x48, 0x58), (0x3A, 0xC8, 0x9A))}[kind]
-    base, accent = colors
-    px = [[base + (255,) for _ in range(16)] for _ in range(16)]
-    for i in range(16):
-        for edge in (0, 15):
-            px[edge][i] = tuple(int(c * 0.6) for c in base) + (255,)
-            px[i][edge] = tuple(int(c * 0.6) for c in base) + (255,)
-    for y in range(6, 10):
-        for x in range(6, 10):
-            px[y][x] = accent + (255,)
-    return png(16, 16, px)
-
-
 def nbt_string(s):
     b = s.encode("utf-8")
     return struct.pack(">H", len(b)) + b
@@ -333,6 +299,7 @@ def write_gel_recipes():
 
 def main():
     write_gel_recipes()
+    gen_textures.main()
     # ---- stats
     for ident, (category, loads, charge, cooldown, values) in IMPLANTS.items():
         if ident in TIERS:
@@ -343,47 +310,32 @@ def main():
             if ident == "cybernetic_core":
                 v = {k: arr[t] for k, arr in CORE_TIERS.items()}
             tiers.append({"load": loads[t], "charge_cost": per_tier(charge, t), "cooldown_ticks": per_tier(cooldown, t),
-                          "values": v, "unlocks": []})
-        write_json("data/%s/cyberimplants/implant_stats/%s.json" % (MOD, ident), {"tiers": tiers, "unlock_layers": {}})
+                          "values": v, "unlocks": unlocks_for(ident, t + 1)})
+        write_json("data/%s/cyberimplants/implant_stats/%s.json" % (MOD, ident), {"tiers": tiers, "unlock_layers": unlock_layers(ident)})
 
     # ---- item models and textures
     for ident, (category, *_rest) in IMPLANTS.items():
         write_json("assets/%s/models/item/%s.json" % (MOD, ident),
                    {"parent": "minecraft:item/generated", "textures": {"layer0": "%s:item/%s" % (MOD, ident)}})
-        path = os.path.join(ROOT, "assets", MOD, "textures", "item", ident + ".png")
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        with open(path, "wb") as f:
-            f.write(item_texture(NAMES[ident], category))
 
     # transitional item of the upgrade assemblies and the gel buckets
     for extra, label, cat in (("incomplete_implant", "Incomplete Implant", "core"), ("bio_interface_gel_bucket", "Bio Gel", "circulatory"),
                               ("neural_gel_bucket", "Neural Gel", "neural"), ("neuro_stabilizer", "Neuro Stabilizer", "neural")):
         write_json("assets/%s/models/item/%s.json" % (MOD, extra),
                    {"parent": "minecraft:item/generated", "textures": {"layer0": "%s:item/%s" % (MOD, extra)}})
-        with open(os.path.join(ROOT, "assets", MOD, "textures", "item", extra + ".png"), "wb") as f:
-            f.write(item_texture(label, cat))
 
     # gel liquid blocks: a single model keeps the particle sprite; the fluid renders through the client extension
     for gel in ("bio_interface_gel", "neural_gel"):
         write_json("assets/%s/blockstates/%s.json" % (MOD, gel), {"variants": {"": {"model": "%s:block/%s" % (MOD, gel)}}})
-        write_json("assets/%s/models/block/%s.json" % (MOD, gel), {"textures": {"particle": "minecraft:block/water_still"}})
+        write_json("assets/%s/models/block/%s.json" % (MOD, gel), {"textures": {"particle": "%s:block/%s_still" % (MOD, gel)}})
 
     # flechette
     write_json("assets/%s/models/item/flechette.json" % MOD,
                {"parent": "minecraft:item/generated", "textures": {"layer0": "%s:item/flechette" % MOD}})
-    with open(os.path.join(ROOT, "assets", MOD, "textures", "item", "flechette.png"), "wb") as f:
-        f.write(item_texture("Flechette Ammo", "limbs"))
 
     # ---- blocks
     for name, kind in (("implantation_rig", "rig"), ("kinetic_charger", "charger"), ("neural_port", "port"), ("proximity_sensor", "sensor")):
-        tex = os.path.join(ROOT, "assets", MOD, "textures", "block", name + ".png")
-        os.makedirs(os.path.dirname(tex), exist_ok=True)
-        with open(tex, "wb") as f:
-            f.write(block_texture(kind))
-    write_json("assets/%s/models/block/implantation_rig.json" % MOD,
-               {"parent": "minecraft:block/cube_all", "textures": {"all": "%s:block/implantation_rig" % MOD}})
-    write_json("assets/%s/models/block/kinetic_charger.json" % MOD,
-               {"parent": "minecraft:block/slab", "textures": {k: "%s:block/kinetic_charger" % MOD for k in ("bottom", "top", "side")}})
+        pass  # textures and the Rig / Charger models come from gen_textures.py
     # Neural Port: a small plug on the north side of its cell; the blockstate rotates it onto the face it is attached to.
     write_json("assets/%s/models/block/neural_port.json" % MOD, {
         "textures": {"particle": "%s:block/neural_port" % MOD, "all": "%s:block/neural_port" % MOD},
@@ -471,6 +423,8 @@ def main():
     with open(lang_path, encoding="utf-8") as f:
         lang = json.load(f)
     lang.update(LANG_STATIC)
+    lang.update(layer3_unlocks.lang())
+    lang["cyberimplants.tooltip.unlocks"] = "Unlocked at this tier:"
     for ident, name in NAMES.items():
         lang["item.%s.%s" % (MOD, ident)] = name
         lang["item.%s.%s.desc" % (MOD, ident)] = DESCRIPTIONS[ident]
