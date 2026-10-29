@@ -8,6 +8,7 @@ import dev.cyberimplants.data.TierStats;
 import dev.cyberimplants.deck.DeckEvents;
 import dev.cyberimplants.deck.EntityHandle;
 import dev.cyberimplants.implant.ImplantIds;
+import dev.cyberimplants.implant.Synergies;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -81,7 +82,7 @@ public final class Aes {
         }
 
         ServerLevel level = player.serverLevel();
-        int window = (int) stats.value("detection_ticks", 4);
+        int window = (int) stats.value("detection_ticks", 4) + Synergies.visorDetectionBonus(body);
         AABB search = player.getBoundingBox().inflate(16.0);
         List<AbstractArrow> arrows = level.getEntitiesOfClass(AbstractArrow.class, search,
                 a -> (a instanceof Arrow || a instanceof SpectralArrow) && a.getOwner() != player);
@@ -111,6 +112,7 @@ public final class Aes {
             state.charges--;
             sidestep(player, level, velocity, stats.value("distance", 1.5));
             DeckEvents.fire(player, "evaded", Map.of("projectile", EntityHandle.of(player, arrow)));
+            Synergies.aesEvaded(player);
             return; // one evasion per check
         }
     }

@@ -1,6 +1,7 @@
 package dev.cyberimplants.client;
 
 import dev.cyberimplants.body.BodyState;
+import dev.cyberimplants.config.Layers;
 import dev.cyberimplants.data.Stats;
 import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.Toggles;
@@ -138,15 +139,25 @@ public final class ClientOptics {
             return;
         }
         Vec3 eye = player.getEyePosition();
-        Vec3 look = player.getLookAngle();
-        double range = 64.0;
-        AABB box = player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.0);
-        EntityHitResult hit = ProjectileUtil.getEntityHitResult(player, eye, eye.add(look.scale(range)), box,
-                e -> e instanceof LivingEntity && e != player && e.isAlive(), range * range);
-        if (hit == null) {
-            return;
+        Entity target = null;
+        // Layer 4 synergy: with Target Tracking installed the predictor leads the tagged target, not the crosshair's.
+        if (Layers.atLeast(4) && trackedId >= 0 && body.has(ImplantIds.TARGET_TRACKING)) {
+            Entity tagged = mc.level.getEntity(trackedId);
+            if (tagged instanceof LivingEntity && tagged.isAlive() && tagged.distanceToSqr(eye) <= 64.0 * 64.0) {
+                target = tagged;
+            }
         }
-        Entity target = hit.getEntity();
+        if (target == null) {
+            Vec3 look = player.getLookAngle();
+            double range = 64.0;
+            AABB box = player.getBoundingBox().expandTowards(look.scale(range)).inflate(1.0);
+            EntityHitResult hit = ProjectileUtil.getEntityHitResult(player, eye, eye.add(look.scale(range)), box,
+                    e -> e instanceof LivingEntity && e != player && e.isAlive(), range * range);
+            if (hit == null) {
+                return;
+            }
+            target = hit.getEntity();
+        }
         Vec3 velocity = new Vec3(target.getX() - target.xo, target.getY() - target.yo, target.getZ() - target.zo);
         double horizon = Stats.of(ImplantIds.COMBAT_PREDICTOR, tier).value("horizon_ticks", 10);
         Vec3 center = target.position().add(0, target.getBbHeight() * 0.5, 0);

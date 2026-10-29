@@ -204,6 +204,23 @@ channels, the Precision Etcher and the real manufacturing chain, the full editor
 | **PvP and server** | [PvP options](07-balance-and-builds.md#74-pvp-configuration), team resolution (scoreboard, FTB Teams optional), movement-validation hardening |
 | **Balance pass 1** | Archetype loadouts built in GameTests; first tuning of cooldowns, Load and Charge costs |
 
+*Status:* **started**, not finished. Like the earlier layers this is only compiled by CI, never run in a game. All of it is off under
+`layers.maxEnabled < 4`. In so far:
+
+- **Limits:** *Dense frame* (Reinforced Skeleton Tier III+ gets +5% gravity, so the user also sinks in water; the separate
+  -15% swim speed is not done) and *Servo whine* (sprinting Micro-Actuators Tier I-III footsteps are 1.5x louder, cancelled
+  by Silent Actuators Tier IV+). Shock Circuit charging creepers has existed since Layer 1. Both rules live in `implant/Limits.java`.
+- **Synergies** (`implant/Synergies.java`): an AES evasion opens a Kerenzikov window for free; Momentum Booster Tier II+ gains
+  Momentum from falls (5 per block beyond 3), x1.5 with Impact Dampeners installed. Power Actuators + Retractable Blade already
+  works because the blade counts as an empty hand. The Ballistic Visor adds 1 tick to the AES detection window, and the Combat
+  Predictor's lead indicator follows the Target Tracking tag instead of the crosshair. Silent Actuators' ghost step vs the Entity
+  Scanner waits for the scanner's auto-scan (Layer 3).
+- `Layer4Tests` covers the limits and the AES, Momentum and Visor synergies.
+
+Still to do in Layer 4: the other Limits (free hands, metal-only, Temporal Backlash, Charge drain, recalibration windows,
+the Magnetic Soles jump penalty), counterplay and scan warnings, the remaining synergies, the emergency system and ERS danger
+model, deck arbitration, the Create interplay, PvP options and team resolution, and the balance pass.
+
 *Exit criteria:* the five example loadouts in [Balance §7.2](07-balance-and-builds.md#72-specialisations-and-example-loadouts)
 can be assembled and each has a measured weakness against its counter. Multiplayer tests (two clients) cover
 scanning, tracking, Sandevistan fields and ERS reactions without desyncs.

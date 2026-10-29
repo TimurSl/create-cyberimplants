@@ -34,6 +34,9 @@ public final class PassiveModifiers {
         Attrs.added(player, Attributes.MAX_HEALTH, "skeleton_health",
                 Stats.of(REINFORCED_SKELETON, Math.max(skeleton, 1)).value("max_health", 0.0), skeleton > 0);
 
+        // Layer 4 limit: the Dense frame is heavy (+5% gravity, so the user also sinks in water).
+        Attrs.multiplied(player, Attributes.GRAVITY, "dense_frame_gravity", Limits.DENSE_FRAME_GRAVITY, Limits.denseFrame(s));
+
         int tendons = s.tierOf(KINETIC_TENDONS);
         Attrs.added(player, Attributes.JUMP_STRENGTH, "kinetic_tendons_jump",
                 Stats.of(KINETIC_TENDONS, Math.max(tendons, 1)).value("jump_strength", 0.042), tendons > 0);
