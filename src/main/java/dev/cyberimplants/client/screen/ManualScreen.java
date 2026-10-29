@@ -207,13 +207,19 @@ public class ManualScreen extends Screen {
         return false;
     }
 
+    /** Replaces the vanilla blur, which {@link Screen#render} would otherwise draw over the page. */
+    @Override
+    public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        CyberUi.backdrop(g, width, height, (minecraft.level == null ? 0 : minecraft.level.getGameTime()) + partialTick);
+        CyberUi.panel(g, pageLeft() - 6, pageTop() - 4, pageWidth() + 12, pageBottom() - pageTop() + 8, CyberUi.CYAN);
+    }
+
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
-        CyberUi.backdrop(g, width, height, (minecraft.level == null ? 0 : minecraft.level.getGameTime()) + partialTick);
+        super.render(g, mouseX, mouseY, partialTick);
         CyberUi.title(g, font, title, 10, 10, CyberUi.CYAN);
         int left = pageLeft();
         int top = pageTop();
-        CyberUi.panel(g, left - 6, top - 4, pageWidth() + 12, pageBottom() - top + 8, CyberUi.CYAN);
         g.drawString(font, Component.literal((chapter + 1) + "/" + CHAPTERS.size() + "  ").append(title(chapter)),
                 left, top - 20, CyberUi.MAGENTA, true);
 
@@ -264,6 +270,5 @@ public class ManualScreen extends Screen {
             int thumbY = top + 2 + (barH - thumb) * scroll / maxScroll();
             g.fill(barX, thumbY, barX + 2, thumbY + thumb, CyberUi.CYAN);
         }
-        super.render(g, mouseX, mouseY, partialTick);
     }
 }
