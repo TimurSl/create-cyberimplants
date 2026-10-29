@@ -13,7 +13,8 @@ import java.util.Set;
 
 /**
  * Runs one loaded program: queues handler tasks as events arrive and executes them within a per-tick cycle budget
- * (docs/design/03-cyberdeck.md, section 3.5). Layer 1 has a single program and a single thread.
+ * (docs/design/03-cyberdeck.md, section 3.5). One runner is one thread; a deck with Coprocessors runs several. Tasks
+ * that {@code WAIT} sleep without blocking the queue; {@code EVERY} timers and {@code DEBOUNCE} are kept here.
  */
 public final class ProgramRunner {
     public enum State { RUNNING, STOPPED, CRASHED }
@@ -30,22 +31,38 @@ public final class ProgramRunner {
     private record Pending(CompiledHandler handler, Map<String, Object> payload) {
     }
 
+    private record Sleeper(Task task, CompiledHandler handler, long wakeAt) {
+    }
+
     private final CompiledProgram program;
     private final Host host;
     private final Map<String, Object> globals = new HashMap<>();
     private final Deque<Pending> queue = new ArrayDeque<>();
     private final Deque<Long> abortTicks = new ArrayDeque<>();
+    private final Deque<Sleeper> woken = new ArrayDeque<>();
+
+    private final int ramCells;
+    private final List<Sleeper> sleeping = new ArrayList<>();
+    private final Map<CompiledHandler, Long> lastFired = new HashMap<>();
+    private final Map<CompiledHandler, Long> nextTimer = new HashMap<>();
 
     private State state = State.STOPPED;
     private Task current;
+    private CompiledHandler currentHandler;
     private long tickCounter;
     private long totalCycles;
     private int dropped;
     private String lastError = "";
 
     public ProgramRunner(CompiledProgram program, Host host) {
+        this(program, host, Integer.MAX_VALUE);
+    }
+
+    /** {@code ramCells} is the RAM reservation: a task that pushes the program above it dies with OUT_OF_MEMORY. */
+    public ProgramRunner(CompiledProgram program, Host host, int ramCells) {
         this.program = program;
         this.host = host;
+        this.ramCells = ramCells;
     }
 
     public CompiledProgram program() {
@@ -61,7 +78,27 @@ public final class ProgramRunner {
     }
 
     public int queued() {
-        return queue.size() + (current == null ? 0 : 1);
+        return queue.size() + sleeping.size() + (current == null ? 0 : 1);
+    }
+
+    /** Tasks that are sleeping in a {@code WAIT}. */
+    public int sleeping() {
+        return sleeping.size();
+    }
+
+    /** Live memory use in cells: code, subscriptions, variables and the frames of running tasks. */
+    public int usedCells() {
+        int cells = program.footprintCells() - program.globals().size();
+        for (Object value : globals.values()) {
+            cells += Memory.cells(value);
+        }
+        if (current != null) {
+            cells += current.frameCells();
+        }
+        for (Sleeper s : sleeping) {
+            cells += s.task().frameCells();
+        }
+        return cells;
     }
 
     public long totalCycles() {
@@ -76,9 +113,16 @@ public final class ProgramRunner {
     public void start() {
         globals.clear();
         queue.clear();
+        sleeping.clear();
+        lastFired.clear();
+        nextTimer.clear();
         current = null;
+        currentHandler = null;
         abortTicks.clear();
         state = State.RUNNING;
+        for (CompiledHandler timer : program.timers()) {
+            nextTimer.put(timer, tickCounter + Math.max(1, timer.argument().longValue()));
+        }
         try {
             Task init = new Task(program.init(), globals, Map.of(), host, program.isa());
             init.run(Integer.MAX_VALUE);
@@ -93,7 +137,9 @@ public final class ProgramRunner {
     public void stop() {
         state = State.STOPPED;
         queue.clear();
+        sleeping.clear();
         current = null;
+        currentHandler = null;
     }
 
     /** Numeric arguments handlers use with {@code event} (thresholds, key numbers). */
@@ -117,6 +163,9 @@ public final class ProgramRunner {
             if (!h.event().equals(event)) {
                 continue;
             }
+            if (h.event().equals("@every")) {
+                continue;
+            }
             if (h.argument() != null && (argument == null || h.argument().doubleValue() != argument.doubleValue())) {
                 continue;
             }
@@ -126,9 +175,16 @@ public final class ProgramRunner {
             if (h.from() != null && !java.util.Objects.equals(payload.get("source"), globals.get(h.from()))) {
                 continue;
             }
+            if (h.debounceTicks() > 0) {
+                Long last = lastFired.get(h);
+                if (last != null && tickCounter - last < h.debounceTicks()) {
+                    continue;
+                }
+            }
             if (h.when() != null && !passesFilter(h, payload)) {
                 continue;
             }
+            lastFired.put(h, tickCounter);
             enqueue(h, payload);
         }
     }
@@ -157,11 +213,52 @@ public final class ProgramRunner {
                 return;
             }
         }
-        if (queue.size() >= MAX_QUEUE) {
+        if (queued() >= MAX_QUEUE) {
             dropped++;
             return;
         }
         queue.add(new Pending(h, payload));
+    }
+
+    private boolean running(CompiledHandler h) {
+        if (currentHandler == h) {
+            return true;
+        }
+        for (Sleeper s : sleeping) {
+            if (s.handler() == h) {
+                return true;
+            }
+        }
+        for (Pending p : queue) {
+            if (p.handler() == h) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void fireTimers() {
+        for (CompiledHandler timer : program.timers()) {
+            long due = nextTimer.getOrDefault(timer, Long.MAX_VALUE);
+            if (tickCounter < due) {
+                continue;
+            }
+            nextTimer.put(timer, tickCounter + Math.max(1, timer.argument().longValue()));
+            if (!running(timer) && queued() < MAX_QUEUE) {
+                queue.add(new Pending(timer, Map.of()));
+            }
+        }
+    }
+
+    /** Wakes sleepers whose time has come and puts them at the front of the line. */
+    private void wake() {
+        for (int i = sleeping.size() - 1; i >= 0; i--) {
+            Sleeper s = sleeping.get(i);
+            if (s.wakeAt() <= tickCounter) {
+                sleeping.remove(i);
+                woken.addFirst(s);
+            }
+        }
     }
 
     /** Advances one tick with the given cycle budget. @return cycles actually used */
@@ -170,37 +267,63 @@ public final class ProgramRunner {
         if (state != State.RUNNING) {
             return 0;
         }
+        fireTimers();
+        wake();
         int used = 0;
         while (used < budget && state == State.RUNNING) {
             if (current == null) {
-                Pending next = queue.poll();
-                if (next == null) {
-                    break;
+                Sleeper resumed = woken.pollFirst();
+                if (resumed != null) {
+                    current = resumed.task();
+                    currentHandler = resumed.handler();
+                } else {
+                    Pending next = queue.poll();
+                    if (next == null) {
+                        break;
+                    }
+                    current = new Task(next.handler().body(), globals, next.payload(), host, program.isa());
+                    currentHandler = next.handler();
                 }
-                current = new Task(next.handler().body(), globals, next.payload(), host, program.isa());
             }
             long before = current.cyclesUsed();
             try {
                 Task.Status status = current.run(budget - used);
                 used += (int) (current.cyclesUsed() - before);
-                if (status == Task.Status.DONE) {
-                    current = null;
-                } else if (status == Task.Status.STOPPED) {
-                    stop();
-                } else {
-                    if (current.sinceYield() > (long) WATCHDOG_FACTOR * budget) {
-                        throw new VmException(VmError.WATCHDOG, "Task ran too long without yielding", 0);
+                if (usedCells() > ramCells) {
+                    throw new VmException(VmError.OUT_OF_MEMORY,
+                            "The program needs " + usedCells() + " cells but has " + ramCells, 0);
+                }
+                switch (status) {
+                    case DONE -> clearCurrent();
+                    case STOPPED -> {
+                        stop();
                     }
-                    break; // paused: resume next tick
+                    case WAITING -> {
+                        sleeping.add(new Sleeper(current, currentHandler, tickCounter + (long) current.waitTicks()));
+                        current = null;
+                        currentHandler = null;
+                    }
+                    case PAUSED -> {
+                        if (current.sinceYield() > (long) WATCHDOG_FACTOR * budget) {
+                            throw new VmException(VmError.WATCHDOG, "Task ran too long without yielding", 0);
+                        }
+                        totalCycles += used;
+                        return used; // paused: resume next tick
+                    }
                 }
             } catch (VmException e) {
                 used += (int) (current.cyclesUsed() - before);
-                current = null;
+                clearCurrent();
                 abort(e);
             }
         }
         totalCycles += used;
         return used;
+    }
+
+    private void clearCurrent() {
+        current = null;
+        currentHandler = null;
     }
 
     private void abort(VmException e) {
@@ -213,6 +336,7 @@ public final class ProgramRunner {
         if (abortTicks.size() >= CRASH_ABORTS) {
             state = State.CRASHED;
             queue.clear();
+            sleeping.clear();
             host.log("[crash] " + program.name() + " aborted " + CRASH_ABORTS + " tasks in 10 s and was unloaded");
         }
     }

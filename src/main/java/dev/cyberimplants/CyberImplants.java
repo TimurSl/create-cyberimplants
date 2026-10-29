@@ -24,6 +24,7 @@ public final class CyberImplants {
     public CyberImplants(IEventBus modBus, ModContainer container) {
         ModRegistries.register(modBus);
         modBus.addListener(NetworkHandler::registerPayloads);
+        modBus.addListener(dev.cyberimplants.registry.ModCapabilities::register);
         modBus.addListener((FMLCommonSetupEvent event) -> event.enqueueWork(CreateCompat::init));
 
         if (FMLEnvironment.dist == Dist.CLIENT) {

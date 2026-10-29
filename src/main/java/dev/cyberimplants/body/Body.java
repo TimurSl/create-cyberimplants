@@ -1,5 +1,6 @@
 package dev.cyberimplants.body;
 
+import dev.cyberimplants.config.Layers;
 import dev.cyberimplants.config.ServerConfig;
 import dev.cyberimplants.data.Stats;
 import dev.cyberimplants.data.TierStats;
@@ -43,6 +44,17 @@ public final class Body {
     public static double metabolicRate(BodyState s) {
         int tier = s.tierOf(ImplantIds.CORE);
         return tier == 0 ? 0 : Stats.of(ImplantIds.CORE, tier).value("recharge_per_second", 0.25);
+    }
+
+    /** Total Load above Capacity: the Strained state of docs/design/01-core-systems.md, section 1.3. Layer 2 and up. */
+    public static boolean strained(BodyState s) {
+        double capacity = capacity(s);
+        return Layers.atLeast(2) && capacity > 0 && totalLoad(s) > capacity;
+    }
+
+    /** Strained bodies pay 20% more Charge for everything. */
+    public static double chargeMultiplier(BodyState s) {
+        return strained(s) ? 1.2 : 1.0;
     }
 
     public static int loadOf(ResourceLocation type, int tier) {
@@ -91,10 +103,11 @@ public final class Body {
             return true;
         }
         BodyState s = BodyState.get(player);
-        if (s.charge() + 1e-9 < amount) {
+        double cost = amount * chargeMultiplier(s);
+        if (s.charge() + 1e-9 < cost) {
             return false;
         }
-        updateQuiet(player, st -> st.withCharge(st.charge() - amount, st.buffer()));
+        updateQuiet(player, st -> st.withCharge(st.charge() - cost, st.buffer()));
         return true;
     }
 
@@ -104,18 +117,20 @@ public final class Body {
             return true;
         }
         BodyState s = BodyState.get(player);
-        if (s.charge() + s.buffer() + 1e-9 < amount) {
+        double cost = amount * chargeMultiplier(s);
+        if (s.charge() + s.buffer() + 1e-9 < cost) {
             return false;
         }
-        double fromBattery = Math.min(s.charge(), amount);
-        double fromBuffer = amount - fromBattery;
+        double fromBattery = Math.min(s.charge(), cost);
+        double fromBuffer = cost - fromBattery;
         updateQuiet(player, st -> st.withCharge(st.charge() - fromBattery, st.buffer() - fromBuffer));
         BodySync.markDirty(player);
         return true;
     }
 
     public static boolean canAfford(Player player, double amount) {
-        return amount <= 0 || !chargeEnabled() || BodyState.get(player).charge() + 1e-9 >= amount;
+        BodyState s = BodyState.get(player);
+        return amount <= 0 || !chargeEnabled() || s.charge() + 1e-9 >= amount * chargeMultiplier(s);
     }
 
     public static void addCharge(ServerPlayer player, double amount) {
@@ -140,6 +155,12 @@ public final class Body {
         }
         double scaled = chargeEnabled() ? ticks : ticks * ServerConfig.CHARGE_DISABLED_COOLDOWN_MULTIPLIER.get();
         update(player, st -> st.withCooldown(type, st.onlineTicks() + Math.round(scaled)));
+    }
+
+    /** The full cooldown of an installed implant in a body state, for cooldown bars. */
+    public static int cooldownTicksFor(BodyState s, ResourceLocation type) {
+        int tier = s.tierOf(type);
+        return tier == 0 ? 0 : Stats.of(type, tier).cooldownTicks();
     }
 
     /** The tier-1..5 cooldown of an installed implant from its stats. */

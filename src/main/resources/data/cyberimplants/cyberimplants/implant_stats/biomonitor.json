@@ -4,35 +4,50 @@
       "load": 1,
       "charge_cost": 0,
       "cooldown_ticks": 0,
-      "values": {},
+      "values": {
+        "alarms": 1,
+        "broadcast_channels": 0
+      },
       "unlocks": []
     },
     {
       "load": 1,
       "charge_cost": 0,
       "cooldown_ticks": 0,
-      "values": {},
+      "values": {
+        "alarms": 2,
+        "broadcast_channels": 1
+      },
       "unlocks": []
     },
     {
       "load": 2,
       "charge_cost": 0,
       "cooldown_ticks": 0,
-      "values": {},
+      "values": {
+        "alarms": 4,
+        "broadcast_channels": 2
+      },
       "unlocks": []
     },
     {
       "load": 2,
       "charge_cost": 0,
       "cooldown_ticks": 0,
-      "values": {},
+      "values": {
+        "alarms": 6,
+        "broadcast_channels": 3
+      },
       "unlocks": []
     },
     {
       "load": 2,
       "charge_cost": 0,
       "cooldown_ticks": 0,
-      "values": {},
+      "values": {
+        "alarms": 8,
+        "broadcast_channels": 4
+      },
       "unlocks": []
     }
   ],

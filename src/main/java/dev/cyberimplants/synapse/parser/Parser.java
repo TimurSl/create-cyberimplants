@@ -116,15 +116,30 @@ public final class Parser {
                     devices.add(new Ast.Device(id.text(), "port", label.text(), id.line()));
                     endOfLine();
                 }
-                case "CHANNEL", "SENSOR" -> throw needs(t, kw, IsaLevel.ISA_2);
+                case "CHANNEL", "SENSOR" -> throw error(t, kw + " needs a Remote Sensor Uplink module, which arrives with a later layer");
                 case "FUNC" -> throw needs(t, "FUNC", IsaLevel.ISA_3);
-                case "EVERY" -> throw needs(t, "EVERY", IsaLevel.ISA_2);
+                case "EVERY" -> handlers.add(timer());
                 case "ON" -> handlers.add(handler());
                 default -> throw error(t, "Unexpected '" + t.text() + "' at top level; behaviour belongs in ON handlers");
             }
             skipNewlines();
         }
         return new Ast.ProgramNode(name, requires, priority, autostart, consts, vars, devices, handlers);
+    }
+
+    /** {@code EVERY duration:} (ISA-2). */
+    private Ast.Handler timer() {
+        Token every = next();
+        requireIsa(every, "EVERY", IsaLevel.ISA_2);
+        Token d = next();
+        if (!d.is(TokenType.DURATION) && !d.is(TokenType.NUMBER)) {
+            throw error(d, "EVERY needs a duration such as 2s or 10t, found " + describe(d));
+        }
+        if (d.number() < 1) {
+            throw error(d, "EVERY needs an interval of at least 1 tick");
+        }
+        List<Stmt> body = block();
+        return new Ast.Handler(Ast.Handler.EVERY, d.number(), null, null, 0, body, every.line());
     }
 
     private Ast.Handler handler() {
@@ -140,6 +155,7 @@ public final class Parser {
         }
         Expr when = null;
         String from = null;
+        double debounce = 0;
         while (!peek().isOp(":")) {
             Token t = peek();
             if (t.isKeyword("WHEN") && when == null) {
@@ -148,14 +164,20 @@ public final class Parser {
             } else if (t.isKeyword("FROM") && from == null) {
                 next();
                 from = expect(TokenType.WORD, "a device name").text();
-            } else if (t.isKeyword("DEBOUNCE")) {
-                throw needs(t, "DEBOUNCE", IsaLevel.ISA_2);
+            } else if (t.isKeyword("DEBOUNCE") && debounce == 0) {
+                next();
+                requireIsa(t, "DEBOUNCE", IsaLevel.ISA_2);
+                Token d = next();
+                if (!d.is(TokenType.DURATION) && !d.is(TokenType.NUMBER) || d.number() < 1) {
+                    throw error(d, "DEBOUNCE needs a duration such as 2s, found " + describe(d));
+                }
+                debounce = d.number();
             } else {
                 throw error(t, "Expected ':' to open the handler, found " + describe(t));
             }
         }
         List<Stmt> body = block();
-        return new Ast.Handler(eventName, argument, from, when, body, on.line());
+        return new Ast.Handler(eventName, argument, from, when, debounce, body, on.line());
     }
 
     // ---------------------------------------------------------------- statements
@@ -268,8 +290,10 @@ public final class Parser {
                         return new Ast.Stop(t.line());
                     }
                     case "ELIF", "ELSE" -> throw error(t, kw + " without a matching IF");
-                    case "WHILE", "REPEAT", "WAIT", "BREAK", "CONTINUE", "CONFIGURE", "SEND", "TRANSMIT", "READ", "MANIPULATE" ->
-                            throw needs(t, kw, IsaLevel.ISA_2);
+                    case "WHILE", "REPEAT", "WAIT", "BREAK", "CONTINUE", "CONFIGURE", "SEND", "TRANSMIT", "READ", "MANIPULATE" -> {
+                        requireIsa(t, kw, IsaLevel.ISA_2);
+                        return isa2Statement(kw, t);
+                    }
                     case "FOR", "RETURN", "EMIT", "BIND" -> throw needs(t, kw, IsaLevel.ISA_3);
                     case "TRY" -> throw needs(t, kw, IsaLevel.ISA_4);
                     case "AWAIT", "REQUEST", "OVERCLOCK" -> throw needs(t, kw, IsaLevel.ISA_5);
@@ -282,6 +306,98 @@ public final class Parser {
         Stmt s = new Ast.ExprStmt(e, t.line());
         endOfLine();
         return s;
+    }
+
+    /** The ISA-2 statements. The keyword token is still unread. */
+    private Stmt isa2Statement(String kw, Token t) {
+        next();
+        switch (kw) {
+            case "WHILE" -> {
+                Expr cond = expression();
+                return new Ast.While(cond, block(), t.line());
+            }
+            case "REPEAT" -> {
+                Expr count = expression();
+                if (peek().isKeyword("TIMES")) {
+                    next();
+                }
+                return new Ast.Repeat(count, block(), t.line());
+            }
+            case "BREAK" -> {
+                endOfLine();
+                return new Ast.Break(t.line());
+            }
+            case "CONTINUE" -> {
+                endOfLine();
+                return new Ast.Continue(t.line());
+            }
+            case "WAIT" -> {
+                Stmt s = new Ast.Wait(expression(), t.line());
+                endOfLine();
+                return s;
+            }
+            case "CONFIGURE" -> {
+                String implant = expect(TokenType.WORD, "an implant name").text();
+                String key = expect(TokenType.WORD, "a setting name").text();
+                expectOp("=");
+                Stmt s = new Ast.Configure(implant, key, expression(), t.line());
+                endOfLine();
+                return s;
+            }
+            case "SEND" -> {
+                // SEND redstone_signal TO port STRENGTH n  ==  SET port.redstone_out = n
+                Token what = expect(TokenType.WORD, "'redstone_signal'");
+                if (!what.text().equals("redstone_signal")) {
+                    throw error(what, "SEND can only send redstone_signal, found '" + what.text() + "'");
+                }
+                if (!peek().isKeyword("TO")) {
+                    throw error(peek(), "Expected TO, found " + describe(peek()));
+                }
+                next();
+                Expr port = postfix();
+                if (!peek().isKeyword("STRENGTH")) {
+                    throw error(peek(), "Expected STRENGTH, found " + describe(peek()));
+                }
+                next();
+                Stmt s = new Ast.Set(new Ast.Member(port, "redstone_out", t.line()), expression(), t.line());
+                endOfLine();
+                return s;
+            }
+            case "READ" -> {
+                Expr source = postfix();
+                if (!(source instanceof Ast.Member m)) {
+                    throw error(t, "READ needs a device property such as press.speed");
+                }
+                String into = null;
+                if (peek().isKeyword("INTO")) {
+                    next();
+                    into = expect(TokenType.WORD, "a variable name").text();
+                }
+                endOfLine();
+                return new Ast.Read(m, into, t.line());
+            }
+            case "MANIPULATE" -> {
+                Expr target = postfix();
+                Token action = expect(TokenType.WORD, "USE, WRENCH, SET_VALUE or PULL");
+                String name = action.text().toUpperCase(Locale.ROOT);
+                Expr argument = null;
+                switch (name) {
+                    case "USE", "WRENCH", "PULL" -> {
+                    }
+                    case "SET_VALUE" -> argument = expression();
+                    default -> throw error(action, "MANIPULATE needs USE, WRENCH, SET_VALUE or PULL, found '" + action.text() + "'");
+                }
+                endOfLine();
+                return new Ast.Manipulate(target, name, argument, t.line());
+            }
+            default -> throw error(t, kw + " needs a Remote Sensor Uplink module, which arrives with a later layer");
+        }
+    }
+
+    private void requireIsa(Token at, String feature, IsaLevel required) {
+        if (!isa.atLeast(required)) {
+            throw needs(at, feature, required);
+        }
     }
 
     private Stmt ifStatement() {

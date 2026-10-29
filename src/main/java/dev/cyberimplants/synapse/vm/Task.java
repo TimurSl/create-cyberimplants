@@ -4,6 +4,7 @@ import dev.cyberimplants.synapse.IsaLevel;
 import dev.cyberimplants.synapse.compiler.ActivateInfo;
 import dev.cyberimplants.synapse.compiler.Code;
 import dev.cyberimplants.synapse.compiler.Compiler;
+import dev.cyberimplants.synapse.compiler.ConfigureInfo;
 import dev.cyberimplants.synapse.compiler.DeviceInfo;
 import dev.cyberimplants.synapse.compiler.Instr;
 import dev.cyberimplants.synapse.compiler.Op;
@@ -19,7 +20,10 @@ import java.util.Map;
  * spent (then the task is paused and can be resumed next tick), the code ends, the program stops or an error aborts it.
  */
 public final class Task {
-    public enum Status { DONE, PAUSED, STOPPED }
+    public enum Status { DONE, PAUSED, STOPPED, WAITING }
+
+    /** Strings longer than this abort the task: a single value must not outgrow any RAM reservation. */
+    public static final int MAX_STRING = 4096;
 
     private final Code code;
     private final Map<String, Object> globals;
@@ -32,6 +36,7 @@ public final class Task {
     private int pc;
     private long cyclesUsed;
     private long sinceYield;
+    private double waitTicks;
 
     public Task(Code code, Map<String, Object> globals, Map<String, Object> payload, Host host, IsaLevel isa) {
         this.code = code;
@@ -46,7 +51,21 @@ public final class Task {
         return cyclesUsed;
     }
 
-    /** Cycles spent since the task last yielded, for the watchdog. */
+    /** Ticks the task asked to sleep when {@link #run} returned {@link Status#WAITING}. */
+    public double waitTicks() {
+        return waitTicks;
+    }
+
+    /** Cells of this task's frame: 2 plus its locals (docs/design/04-synapse-language.md, section 8.2). */
+    public int frameCells() {
+        int cells = 2;
+        for (Object local : locals) {
+            cells += Memory.cells(local);
+        }
+        return cells + stack.size();
+    }
+
+    /** Cycles spent since the task last yielded (only {@code WAIT} yields), for the watchdog. */
     public long sinceYield() {
         return sinceYield;
     }
@@ -62,7 +81,6 @@ public final class Task {
      */
     public Status run(int budget) {
         long spent = 0;
-        sinceYield = 0;
         List<Instr> instrs = code.instrs();
         while (true) {
             Instr in = instrs.get(pc);
@@ -77,6 +95,16 @@ public final class Task {
             sinceYield += cost;
             cyclesUsed += cost;
             pc++;
+            if (in.op() == Op.WAIT) {
+                Object d = pop();
+                Double ticks = numeric(d);
+                if (ticks == null) {
+                    throw error(VmError.TYPE, "WAIT needs a duration but found " + typeName(d), in);
+                }
+                waitTicks = Math.max(1, Math.ceil(ticks));
+                sinceYield = 0;
+                return Status.WAITING;
+            }
             if (execute(in)) {
                 return Status.STOPPED;
             }
@@ -104,8 +132,7 @@ public final class Task {
                 if (!(target instanceof Handle h)) {
                     throw error(VmError.TYPE, "Cannot read '" + in.k() + "' of " + typeName(target), in);
                 }
-                cyclesUsed += h.readCost() - in.op().cycles();
-                sinceYield += h.readCost() - in.op().cycles();
+                charge(h.readCost() - in.op().cycles());
                 push(h.get((String) in.k()));
             }
             case SET_MEMBER -> {
@@ -117,6 +144,25 @@ public final class Task {
                 if (!(target instanceof Handle h) || !h.set((String) in.k(), value)) {
                     throw error(VmError.TYPE, "'" + in.k() + "' cannot be set", in);
                 }
+                charge(h.writeCost() - in.op().cycles());
+            }
+            case READ -> {
+                Object target = pop();
+                if (target == null) {
+                    throw error(VmError.NULL_ACCESS, "Cannot read '" + in.k() + "' of NULL", in);
+                }
+                if (!(target instanceof Handle h)) {
+                    throw error(VmError.TYPE, "Cannot read '" + in.k() + "' of " + typeName(target), in);
+                }
+                push(h.get((String) in.k()));
+            }
+            case CONFIGURE -> {
+                ConfigureInfo info = (ConfigureInfo) in.k();
+                host.configure(info.implant(), info.key(), pop());
+            }
+            case MANIPULATE -> {
+                Object argument = in.a() == 1 ? pop() : null;
+                host.manipulate(pop(), (String) in.k(), argument);
             }
             case NEG -> {
                 Object v = pop();
@@ -191,6 +237,12 @@ public final class Task {
         return false;
     }
 
+    /** Adds (or refunds) cycles beyond an instruction's base cost. */
+    private void charge(int extra) {
+        cyclesUsed += extra;
+        sinceYield += extra;
+    }
+
     // ---------------------------------------------------------------- values
 
     private Object resolve(String name) {
@@ -249,7 +301,11 @@ public final class Task {
             if (!isa.atLeast(IsaLevel.ISA_2)) {
                 throw error(VmError.TYPE, "String operations require ISA-2", in);
             }
-            push(stringify(a) + stringify(b));
+            String joined = stringify(a) + stringify(b);
+            if (joined.length() > MAX_STRING) {
+                throw error(VmError.OUT_OF_MEMORY, "A string may hold at most " + MAX_STRING + " characters", in);
+            }
+            push(joined);
             return;
         }
         throw error(VmError.TYPE, "Cannot apply " + in.op() + " to " + typeName(a) + " and " + typeName(b), in);
@@ -329,6 +385,15 @@ public final class Task {
                 }
                 throw error(VmError.TYPE, "LEN needs a string", in);
             }
+            case "UPPER" -> text(args[0], in).toUpperCase(java.util.Locale.ROOT);
+            case "LOWER" -> text(args[0], in).toLowerCase(java.util.Locale.ROOT);
+            case "CONTAINS" -> text(args[0], in).contains(text(args[1], in));
+            case "SUBSTR" -> {
+                String s = text(args[0], in);
+                int from = (int) Math.max(0, Math.min(s.length(), num(args[1], in)));
+                int to = (int) Math.max(from, Math.min(s.length(), from + num(args[2], in)));
+                yield s.substring(from, to);
+            }
             case "STR" -> stringify(args[0]);
             case "NUM" -> {
                 if (args[0] instanceof Double) {
@@ -366,6 +431,13 @@ public final class Task {
             return p;
         }
         throw error(VmError.TYPE, "Expected a position or entity", in);
+    }
+
+    private String text(Object v, Instr in) {
+        if (v instanceof String s) {
+            return s;
+        }
+        throw error(VmError.TYPE, "Expected a string but found " + typeName(v), in);
     }
 
     private double num(Object v, Instr in) {

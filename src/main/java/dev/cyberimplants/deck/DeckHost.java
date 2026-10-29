@@ -47,13 +47,55 @@ final class DeckHost implements Host {
         return kind.equals("port") ? new PortHandle(player, label) : null;
     }
 
+    /**
+     * Fires the implant after the chassis' neural latency (4 ticks at Tier I down to 0 at Tier V). With latency the
+     * script sees an optimistic TRUE; a refusal when the action finally runs lands in {@code last_error}.
+     */
     @Override
     public boolean activate(String implant, Object at, Map<String, Object> with) {
         ResourceLocation type = DeckAliases.resolve(implant);
         if (type == null) {
             return fail(UseResult.MISSING);
         }
+        int latency = DeckHardware.of(dev.cyberimplants.body.BodyState.get(player)).latencyTicks();
+        DeckRuntime r = runtime.get();
+        if (latency > 0 && r != null && dev.cyberimplants.config.Layers.atLeast(2)) {
+            r.pending.add(new DeckRuntime.Pending(player.level().getGameTime() + latency, () -> {
+                UseResult result = ImplantActions.use(player, type, UseContext.scripted(at, with));
+                if (!result.ok()) {
+                    fail(result);
+                }
+            }));
+            return true;
+        }
         UseResult result = ImplantActions.use(player, type, UseContext.scripted(at, with));
+        return result.ok() || fail(result);
+    }
+
+    @Override
+    public boolean configure(String implant, String key, Object value) {
+        ResourceLocation type = DeckAliases.resolve(implant);
+        if (type == null) {
+            return fail(UseResult.MISSING);
+        }
+        return ImplantProps.set(player, type, key, value) || fail(UseResult.DENIED);
+    }
+
+    @Override
+    public boolean manipulate(Object target, String action, Object argument) {
+        if (!dev.cyberimplants.config.Layers.atLeast(2)) {
+            return fail(UseResult.DENIED);
+        }
+        net.minecraft.core.BlockPos pos = null;
+        if (target instanceof PortHandle port) {
+            pos = port.targetPos();
+        } else if (target instanceof dev.cyberimplants.synapse.vm.Position p) {
+            pos = net.minecraft.core.BlockPos.containing(p.x(), p.y(), p.z());
+        }
+        if (pos == null) {
+            return fail(UseResult.MISSING);
+        }
+        UseResult result = dev.cyberimplants.implant.limbs.RemoteManipulator.manipulate(player, pos, action);
         return result.ok() || fail(result);
     }
 

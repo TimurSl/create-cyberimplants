@@ -5,7 +5,7 @@
       "charge_cost": 0,
       "cooldown_ticks": 600,
       "values": {
-        "trigger_damage": 3.0,
+        "trigger_damage": 3,
         "boost": 0.15,
         "boost_ticks": 60,
         "crash_ticks": 80
@@ -15,48 +15,48 @@
     {
       "load": 2,
       "charge_cost": 0,
-      "cooldown_ticks": 600,
+      "cooldown_ticks": 500,
       "values": {
-        "trigger_damage": 3.0,
-        "boost": 0.15,
-        "boost_ticks": 60,
-        "crash_ticks": 80
+        "trigger_damage": 3,
+        "boost": 0.2,
+        "boost_ticks": 70,
+        "crash_ticks": 60
       },
       "unlocks": []
     },
     {
       "load": 3,
       "charge_cost": 0,
-      "cooldown_ticks": 600,
+      "cooldown_ticks": 400,
       "values": {
-        "trigger_damage": 3.0,
-        "boost": 0.15,
-        "boost_ticks": 60,
-        "crash_ticks": 80
+        "trigger_damage": 2,
+        "boost": 0.25,
+        "boost_ticks": 80,
+        "crash_ticks": 40
       },
       "unlocks": []
     },
     {
       "load": 3,
       "charge_cost": 0,
-      "cooldown_ticks": 600,
+      "cooldown_ticks": 300,
       "values": {
-        "trigger_damage": 3.0,
-        "boost": 0.15,
-        "boost_ticks": 60,
-        "crash_ticks": 80
+        "trigger_damage": 2,
+        "boost": 0.3,
+        "boost_ticks": 100,
+        "crash_ticks": 20
       },
       "unlocks": []
     },
     {
       "load": 4,
       "charge_cost": 0,
-      "cooldown_ticks": 600,
+      "cooldown_ticks": 240,
       "values": {
-        "trigger_damage": 3.0,
-        "boost": 0.15,
-        "boost_ticks": 60,
-        "crash_ticks": 80
+        "trigger_damage": 0,
+        "boost": 0.35,
+        "boost_ticks": 120,
+        "crash_ticks": 0
       },
       "unlocks": []
     }

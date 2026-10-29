@@ -5,8 +5,10 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "armor": 2.0,
-        "toughness": 0.0
+        "armor": 2,
+        "toughness": 0,
+        "wear_reduction": 0,
+        "weight": 0
       },
       "unlocks": []
     },
@@ -15,8 +17,10 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "armor": 2.0,
-        "toughness": 0.0
+        "armor": 3,
+        "toughness": 1,
+        "wear_reduction": 0,
+        "weight": 0
       },
       "unlocks": []
     },
@@ -25,8 +29,10 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "armor": 2.0,
-        "toughness": 0.0
+        "armor": 4,
+        "toughness": 2,
+        "wear_reduction": 0.2,
+        "weight": -0.02
       },
       "unlocks": []
     },
@@ -35,8 +41,10 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "armor": 2.0,
-        "toughness": 0.0
+        "armor": 5,
+        "toughness": 2,
+        "wear_reduction": 0.35,
+        "weight": -0.03
       },
       "unlocks": []
     },
@@ -45,8 +53,10 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "armor": 2.0,
-        "toughness": 0.0
+        "armor": 6,
+        "toughness": 3,
+        "wear_reduction": 0.5,
+        "weight": -0.03
       },
       "unlocks": []
     }

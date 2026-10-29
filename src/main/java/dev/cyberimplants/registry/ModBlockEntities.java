@@ -4,6 +4,7 @@ import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.compat.create.block.ChargerBlockEntity;
 import dev.cyberimplants.compat.create.block.RigBlockEntity;
 import dev.cyberimplants.content.NeuralPortBlockEntity;
+import dev.cyberimplants.content.ProximitySensorBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -26,6 +27,10 @@ public final class ModBlockEntities {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<NeuralPortBlockEntity>> NEURAL_PORT =
             BLOCK_ENTITY_TYPES.register("neural_port", () ->
                     BlockEntityType.Builder.of(NeuralPortBlockEntity::new, ModBlocks.NEURAL_PORT.get()).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<ProximitySensorBlockEntity>> PROXIMITY_SENSOR =
+            BLOCK_ENTITY_TYPES.register("proximity_sensor", () ->
+                    BlockEntityType.Builder.of(ProximitySensorBlockEntity::new, ModBlocks.PROXIMITY_SENSOR.get()).build(null));
 
     private ModBlockEntities() {
     }

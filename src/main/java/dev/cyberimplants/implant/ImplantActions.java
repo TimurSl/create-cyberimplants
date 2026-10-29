@@ -1,6 +1,7 @@
 package dev.cyberimplants.implant;
 
 import dev.cyberimplants.body.BodyState;
+import dev.cyberimplants.body.Strain;
 import dev.cyberimplants.deck.DeckService;
 import dev.cyberimplants.implant.limbs.RemoteManipulator;
 import dev.cyberimplants.implant.limbs.RetractableBlade;
@@ -52,6 +53,9 @@ public final class ImplantActions {
         }
         if (context.scripted() && !type.activation().scriptable()) {
             return UseResult.DENIED;
+        }
+        if (Strain.offline(player, id)) {
+            return UseResult.OFFLINE;
         }
         UseResult result = action.use(player, context);
         DeckService.recordResult(player, result);

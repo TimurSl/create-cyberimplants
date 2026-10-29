@@ -48,6 +48,14 @@ public enum Op {
     SCAN(10),
     TAG(10),
     UNTAG(10),
+    /** ISA-2: pop a duration or number of ticks and yield the task for that long. */
+    WAIT(1),
+    /** ISA-2: {@code k} = {@link ConfigureInfo}; pops the value. */
+    CONFIGURE(10),
+    /** ISA-2: {@code k} = action name; {@code a} = 1 if an argument is on the stack (below it the target). */
+    MANIPULATE(12),
+    /** ISA-2: pop an object, push its member {@code k} freshly sampled (fixed cost of 6). */
+    READ(6),
     LOG(2),
     ALERT(2),
     STOP(1),

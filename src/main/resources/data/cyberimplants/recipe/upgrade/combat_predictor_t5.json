@@ -1,0 +1,104 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "type": "neoforge:components",
+    "items": "cyberimplants:combat_predictor",
+    "components": {
+      "cyberimplants:tier": 4
+    }
+  },
+  "loops": 4,
+  "results": [
+    {
+      "id": "cyberimplants:combat_predictor",
+      "count": 1,
+      "components": {
+        "cyberimplants:tier": 5
+      }
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_implant"
+        },
+        {
+          "item": "create:electron_tube"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_implant"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_implant"
+        },
+        {
+          "item": "minecraft:echo_shard"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_implant"
+        }
+      ]
+    },
+    {
+      "type": "create:filling",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_implant"
+        },
+        {
+          "type": "neoforge:single",
+          "amount": 100,
+          "fluid": "cyberimplants:neural_gel"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_implant"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_implant"
+        },
+        {
+          "item": "minecraft:netherite_ingot"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_implant"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_implant"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_implant"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "cyberimplants:incomplete_implant"
+  }
+}

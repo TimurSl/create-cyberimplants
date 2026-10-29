@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Generates the Layer 1 data files: implant stats, placeholder recipes, language keys, models and textures.
 
-Layer 1 keeps every stat file at five tiers (design rule 3) but fills tiers II-V with the Tier I numbers, changing
-only Load. Layer 2 replaces the tier tables with the real numeric rows from docs/design/implants.
+Layer 1 kept every stat file at five tiers (design rule 3) but filled tiers II-V with the Tier I numbers. Layer 2
+overrides the numbers with the real tier rows from layer2_tiers.py (the numeric rows of docs/design/implants).
 
 Run from the repository root:  python3 scripts/gen_layer1_data.py
 """
@@ -10,6 +10,8 @@ import json
 import os
 import struct
 import zlib
+
+from layer2_tiers import TIERS, per_tier
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src", "main", "resources")
 MOD = "cyberimplants"
@@ -26,6 +28,8 @@ IMPLANTS = {
     "deck_processor": ("cyberdeck", [1, 1, 1, 1, 1], 0, 0, {"cycles_per_tick": 20, "isa": 1}),
     "deck_ram": ("cyberdeck", [1, 1, 1, 1, 1], 0, 0, {"kb": 2}),
     "deck_storage": ("cyberdeck", [1, 1, 1, 1, 1], 0, 0, {"kb": 4}),
+    "deck_coprocessor": ("cyberdeck", [1, 1, 1, 1, 1], 0, 0, {}),
+    "deck_machine_interface": ("cyberdeck", [1, 1, 1, 1, 1], 0, 0, {}),
     "reinforced_skeleton": ("skeletal", [3, 3, 4, 4, 5], 0, 0, {"blunt_flat": 0.5, "machinery": 0.20}),
     "power_actuators": ("skeletal", [4, 4, 5, 6, 7], 2, 0, {"attack_damage": 1.0, "unarmed_multiplier": 2.0, "knockback": 0.2}),
     "kinetic_tendons": ("skeletal", [2, 3, 3, 4, 4], 0, 0, {"jump_strength": 0.042}),
@@ -74,7 +78,8 @@ NAMES = {
     "cybernetic_core": "Cybernetic Core", "sandevistan": "Sandevistan", "reflex_booster": "Reflex Booster",
     "combat_predictor": "Combat Predictor", "automatic_evasion_system": "Automatic Evasion System",
     "kerenzikov": "Kerenzikov", "deck_chassis": "Cyberdeck Chassis", "deck_processor": "Deck Processor",
-    "deck_ram": "Deck RAM", "deck_storage": "Deck Storage", "reinforced_skeleton": "Reinforced Skeleton",
+    "deck_ram": "Deck RAM", "deck_storage": "Deck Storage", "deck_coprocessor": "Coprocessor",
+    "deck_machine_interface": "Machine Interface", "reinforced_skeleton": "Reinforced Skeleton",
     "power_actuators": "Power Actuators", "kinetic_tendons": "Kinetic Tendons", "micro_actuators": "Micro-Actuators",
     "impact_dampeners": "Impact Dampeners", "inertia_compensation": "Inertia Compensation",
     "cybernetic_arm": "Cybernetic Arm", "remote_manipulator": "Remote Manipulator",
@@ -101,6 +106,8 @@ DESCRIPTIONS = {
     "deck_processor": "Runs Synapse programs. Tier I speaks ISA-1.",
     "deck_ram": "Memory for the running program.",
     "deck_storage": "Stores your programs.",
+    "deck_coprocessor": "Adds execution threads: one more program runs at the same time.",
+    "deck_machine_interface": "Lets the deck bind more Neural Ports and reach farther machines.",
     "reinforced_skeleton": "Flat damage reduction against blunt hits; resists machinery.",
     "power_actuators": "Stronger melee; full-charge hits become Power Strikes.",
     "kinetic_tendons": "Higher ground jumps.",
@@ -159,7 +166,8 @@ SIGNATURE = {
     "cybernetic_core": "minecraft:redstone_block", "sandevistan": "minecraft:clock", "reflex_booster": "minecraft:feather",
     "combat_predictor": "minecraft:compass", "automatic_evasion_system": "minecraft:shield",
     "kerenzikov": "minecraft:rabbit_foot", "deck_chassis": "minecraft:repeater", "deck_processor": "minecraft:comparator",
-    "deck_ram": "minecraft:redstone_lamp", "deck_storage": "minecraft:chest", "reinforced_skeleton": "minecraft:iron_bars",
+    "deck_ram": "minecraft:redstone_lamp", "deck_storage": "minecraft:chest",
+    "deck_coprocessor": "minecraft:observer", "deck_machine_interface": "create:linked_controller", "reinforced_skeleton": "minecraft:iron_bars",
     "power_actuators": "minecraft:iron_block", "kinetic_tendons": "minecraft:slime_ball", "micro_actuators": "minecraft:leather",
     "impact_dampeners": "minecraft:slime_block", "inertia_compensation": "minecraft:honey_bottle",
     "cybernetic_arm": "minecraft:lever", "remote_manipulator": "minecraft:tripwire_hook", "retractable_blade": "minecraft:iron_sword",
@@ -234,7 +242,7 @@ def item_texture(name, category):
 
 
 def block_texture(kind):
-    colors = {"rig": ((0x70, 0x88, 0xA0), (0xC8, 0xE0, 0xF0)), "charger": ((0x4A, 0x5C, 0x70), (0x35, 0xD0, 0xFF)),
+    colors = {"sensor": ((0x58, 0x50, 0x70), (0xFF, 0x5A, 0x5A)), "rig": ((0x70, 0x88, 0xA0), (0xC8, 0xE0, 0xF0)), "charger": ((0x4A, 0x5C, 0x70), (0x35, 0xD0, 0xFF)),
               "port": ((0x3A, 0x48, 0x58), (0x3A, 0xC8, 0x9A))}[kind]
     base, accent = colors
     px = [[base + (255,) for _ in range(16)] for _ in range(16)]
@@ -266,15 +274,76 @@ def empty_structure_nbt(size=(9, 8, 9)):
     return gzip.compress(out, 9, mtime=0)
 
 
+# Layer 2 placeholder upgrade chain (docs/design/06-progression-and-crafting.md, section 6.4): every upgrade is a
+# sequenced assembly on the previous tier with standard Create steps only. Loops grow with the tier, so production
+# cost scales. Layer 3 replaces these placeholder parts with the real shared components.
+TIER_PARTS = {
+    2: ("create:brass_sheet", "create:electron_tube"),
+    3: ("create:precision_mechanism", "create:golden_sheet"),
+    4: ("minecraft:netherite_scrap", "create:sturdy_sheet"),
+    5: ("minecraft:echo_shard", "minecraft:netherite_ingot"),
+}
+TIER_LOOPS = {2: 1, 3: 2, 4: 3, 5: 4}
+TRANSITIONAL = "%s:incomplete_implant" % MOD
+
+
+def write_upgrade_chain(ident, category):
+    part = CATEGORY_INGREDIENTS[category][3]
+    for tier in range(2, 6):
+        gel = "%s:%s" % (MOD, "bio_interface_gel" if tier <= 3 else "neural_gel")
+        a, b = TIER_PARTS[tier]
+
+        def deploy(item):
+            return {"type": "create:deploying", "ingredients": [{"item": TRANSITIONAL}, {"item": item}],
+                    "results": [{"id": TRANSITIONAL}]}
+        steps = [deploy(part), deploy(a),
+                 {"type": "create:filling", "ingredients": [{"item": TRANSITIONAL}, {"type": "neoforge:single", "amount": 100, "fluid": gel}],
+                  "results": [{"id": TRANSITIONAL}]},
+                 deploy(b),
+                 {"type": "create:pressing", "ingredients": [{"item": TRANSITIONAL}], "results": [{"id": TRANSITIONAL}]}]
+        write_json("data/%s/recipe/upgrade/%s_t%d.json" % (MOD, ident, tier), {
+            "type": "create:sequenced_assembly",
+            "ingredient": {"type": "neoforge:components", "items": "%s:%s" % (MOD, ident),
+                           "components": {"%s:tier" % MOD: tier - 1}},
+            "loops": TIER_LOOPS[tier],
+            "results": [{"id": "%s:%s" % (MOD, ident), "count": 1, "components": {"%s:tier" % MOD: tier}}],
+            "sequence": steps,
+            "transitional_item": {"id": TRANSITIONAL}})
+
+
+def write_gel_recipes():
+    # Layer 2 placeholder for the Neuro-Stabilizer: spout a bottle with gel (the real recipe is mixed first).
+    write_json("data/%s/recipe/neuro_stabilizer.json" % MOD, {
+        "type": "create:filling",
+        "ingredients": [{"item": "minecraft:glass_bottle"},
+                        {"type": "neoforge:single", "amount": 250, "fluid": "%s:neural_gel" % MOD}],
+        "results": [{"id": "%s:neuro_stabilizer" % MOD}]})
+    write_json("data/%s/recipe/bio_interface_gel.json" % MOD, {
+        "type": "create:mixing",
+        "ingredients": [{"type": "neoforge:single", "amount": 250, "fluid": "minecraft:water"},
+                        {"item": "minecraft:slime_ball"}, {"item": "minecraft:bone_meal"}, {"item": "minecraft:sugar"}],
+        "results": [{"amount": 250, "id": "%s:bio_interface_gel" % MOD}]})
+    # Layer 2 placeholder; the real recipe needs Nanite Suspension (Layer 3-4).
+    write_json("data/%s/recipe/neural_gel.json" % MOD, {
+        "type": "create:mixing", "heat_requirement": "heated",
+        "ingredients": [{"type": "neoforge:single", "amount": 250, "fluid": "%s:bio_interface_gel" % MOD},
+                        {"item": "minecraft:lapis_lazuli"}, {"item": "minecraft:glowstone_dust"}, {"item": "minecraft:amethyst_shard"}],
+        "results": [{"amount": 250, "id": "%s:neural_gel" % MOD}]})
+
+
 def main():
+    write_gel_recipes()
     # ---- stats
     for ident, (category, loads, charge, cooldown, values) in IMPLANTS.items():
+        if ident in TIERS:
+            loads, charge, cooldown, values = TIERS[ident]
         tiers = []
         for t in range(5):
-            v = dict(values)
+            v = {k: per_tier(x, t) for k, x in values.items()}
             if ident == "cybernetic_core":
                 v = {k: arr[t] for k, arr in CORE_TIERS.items()}
-            tiers.append({"load": loads[t], "charge_cost": charge, "cooldown_ticks": cooldown, "values": v, "unlocks": []})
+            tiers.append({"load": loads[t], "charge_cost": per_tier(charge, t), "cooldown_ticks": per_tier(cooldown, t),
+                          "values": v, "unlocks": []})
         write_json("data/%s/cyberimplants/implant_stats/%s.json" % (MOD, ident), {"tiers": tiers, "unlock_layers": {}})
 
     # ---- item models and textures
@@ -286,6 +355,19 @@ def main():
         with open(path, "wb") as f:
             f.write(item_texture(NAMES[ident], category))
 
+    # transitional item of the upgrade assemblies and the gel buckets
+    for extra, label, cat in (("incomplete_implant", "Incomplete Implant", "core"), ("bio_interface_gel_bucket", "Bio Gel", "circulatory"),
+                              ("neural_gel_bucket", "Neural Gel", "neural"), ("neuro_stabilizer", "Neuro Stabilizer", "neural")):
+        write_json("assets/%s/models/item/%s.json" % (MOD, extra),
+                   {"parent": "minecraft:item/generated", "textures": {"layer0": "%s:item/%s" % (MOD, extra)}})
+        with open(os.path.join(ROOT, "assets", MOD, "textures", "item", extra + ".png"), "wb") as f:
+            f.write(item_texture(label, cat))
+
+    # gel liquid blocks: a single model keeps the particle sprite; the fluid renders through the client extension
+    for gel in ("bio_interface_gel", "neural_gel"):
+        write_json("assets/%s/blockstates/%s.json" % (MOD, gel), {"variants": {"": {"model": "%s:block/%s" % (MOD, gel)}}})
+        write_json("assets/%s/models/block/%s.json" % (MOD, gel), {"textures": {"particle": "minecraft:block/water_still"}})
+
     # flechette
     write_json("assets/%s/models/item/flechette.json" % MOD,
                {"parent": "minecraft:item/generated", "textures": {"layer0": "%s:item/flechette" % MOD}})
@@ -293,7 +375,7 @@ def main():
         f.write(item_texture("Flechette Ammo", "limbs"))
 
     # ---- blocks
-    for name, kind in (("implantation_rig", "rig"), ("kinetic_charger", "charger"), ("neural_port", "port")):
+    for name, kind in (("implantation_rig", "rig"), ("kinetic_charger", "charger"), ("neural_port", "port"), ("proximity_sensor", "sensor")):
         tex = os.path.join(ROOT, "assets", MOD, "textures", "block", name + ".png")
         os.makedirs(os.path.dirname(tex), exist_ok=True)
         with open(tex, "wb") as f:
@@ -316,6 +398,15 @@ def main():
         "facing=west": {"model": port_model, "y": 270},
         "facing=down": {"model": port_model, "x": 90},
         "facing=up": {"model": port_model, "x": 270}}})
+    write_json("assets/%s/models/block/proximity_sensor.json" % MOD,
+               {"parent": "minecraft:block/cube_all", "textures": {"all": "%s:block/proximity_sensor" % MOD}})
+    write_json("assets/%s/models/item/proximity_sensor.json" % MOD, {"parent": "%s:block/proximity_sensor" % MOD})
+    write_json("assets/%s/blockstates/proximity_sensor.json" % MOD, {"variants": {"": {"model": "%s:block/proximity_sensor" % MOD}}})
+    write_json("data/%s/recipe/proximity_sensor.json" % MOD, {
+        "type": "minecraft:crafting_shaped", "category": "misc",
+        "key": {"E": {"item": "create:electron_tube"}, "A": {"item": "create:andesite_casing"}, "R": {"item": "minecraft:redstone"},
+                "S": {"item": "minecraft:spyglass"}},
+        "pattern": [" E ", "ASA", " R "], "result": {"id": "%s:proximity_sensor" % MOD, "count": 1}})
     write_json("assets/%s/models/item/implantation_rig.json" % MOD, {"parent": "%s:block/implantation_rig" % MOD})
     write_json("assets/%s/models/item/kinetic_charger.json" % MOD, {"parent": "%s:block/kinetic_charger" % MOD})
     write_json("assets/%s/blockstates/implantation_rig.json" % MOD, {"variants": {
@@ -327,14 +418,15 @@ def main():
         "axis=y": {"model": "%s:block/kinetic_charger" % MOD},
         "axis=x": {"model": "%s:block/kinetic_charger" % MOD},
         "axis=z": {"model": "%s:block/kinetic_charger" % MOD}}})
-    for name in ("implantation_rig", "kinetic_charger", "neural_port"):
+    for name in ("implantation_rig", "kinetic_charger", "neural_port", "proximity_sensor"):
         write_json("data/%s/loot_table/blocks/%s.json" % (MOD, name), {
             "type": "minecraft:block",
             "pools": [{"rolls": 1.0, "bonus_rolls": 0.0,
                        "entries": [{"type": "minecraft:item", "name": "%s:%s" % (MOD, name)}],
                        "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
     write_json("data/minecraft/tags/block/mineable/pickaxe.json",
-               {"replace": False, "values": ["%s:implantation_rig" % MOD, "%s:kinetic_charger" % MOD, "%s:neural_port" % MOD]})
+               {"replace": False, "values": ["%s:implantation_rig" % MOD, "%s:kinetic_charger" % MOD, "%s:neural_port" % MOD,
+                                                      "%s:proximity_sensor" % MOD]})
 
     # ---- recipes
     for ident, (category, *_rest) in IMPLANTS.items():
@@ -345,8 +437,9 @@ def main():
             "category": "misc",
             "key": {"A": {"item": a}, "B": {"item": b}, "C": {"item": c}, "D": {"item": d}, "X": {"item": SIGNATURE[ident]}},
             "pattern": ["ABA", "CXC", "ADA"],
-            "result": {"id": "%s:%s" % (MOD, ident), "count": 1},
+            "result": {"id": "%s:%s" % (MOD, ident), "count": 1, "components": {"%s:tier" % MOD: 1}},
             "show_notification": False})
+        write_upgrade_chain(ident, category)
     write_json("data/%s/recipe/implantation_rig.json" % MOD, {
         "type": "minecraft:crafting_shaped", "category": "misc",
         "key": {"A": {"item": "create:andesite_casing"}, "I": {"item": "create:iron_sheet"}, "M": {"item": "create:precision_mechanism"},
@@ -389,6 +482,34 @@ def main():
 LANG_STATIC = {
     "itemGroup.cyberimplants": "Create: Cybernetics",
     "item.cyberimplants.flechette": "Flechette",
+    "item.cyberimplants.incomplete_implant": "Incomplete Implant",
+    "item.cyberimplants.neuro_stabilizer": "Neuro-Stabilizer",
+    "cyberimplants.rig.locked": "A redstone signal has locked the chair.",
+    "cyberimplants.use.offline": "Offline (neural glitch)",
+    "item.cyberimplants.bio_interface_gel_bucket": "Bio-Interface Gel Bucket",
+    "item.cyberimplants.neural_gel_bucket": "Neural Gel Bucket",
+    "fluid_type.cyberimplants.bio_interface_gel": "Bio-Interface Gel",
+    "fluid_type.cyberimplants.neural_gel": "Neural Gel",
+    "block.cyberimplants.bio_interface_gel": "Bio-Interface Gel",
+    "block.cyberimplants.neural_gel": "Neural Gel",
+    "cyberimplants.rig.low_rpm": "The Rig needs at least %s RPM for that.",
+    "cyberimplants.rig.no_gel": "The Rig needs %s mB of %s.",
+    "cyberimplants.rig.busy": "The Rig is already operating.",
+    "cyberimplants.rig.progress": "Operating... %s%%",
+    "cyberimplants.rig.done": "Operation complete.",
+    "cyberimplants.rig.abort.rpm": "Operation aborted: the Rig slowed down.",
+    "cyberimplants.rig.abort.gel": "Operation aborted: out of gel.",
+    "cyberimplants.rig.abort.moved": "Operation aborted: the patient moved.",
+    "cyberimplants.rig.abort.invalid": "Operation aborted: the plan changed.",
+    "cyberimplants.rig.no_socket": "That host has no free socket.",
+    "cyberimplants.rig.too_many": "The chassis cannot host another one.",
+    "cyberimplants.strain.glitch": "Neural glitch: %s went offline.",
+    "cyberimplants.strain.static": "Neural static...",
+    "cyberimplants.load.stable": "Stable",
+    "cyberimplants.load.strained": "Strained",
+    "cyberimplants.sensor.filter": "Proximity filter: %s",
+    "cyberimplants.sensor.size": "Detection box: %s blocks",
+    "block.cyberimplants.proximity_sensor": "Proximity Sensor",
     "block.cyberimplants.implantation_rig": "Implantation Rig",
     "block.cyberimplants.kinetic_charger": "Kinetic Charger",
     "block.cyberimplants.neural_port": "Neural Port",
@@ -444,6 +565,12 @@ LANG_STATIC = {
     "cyberimplants.ballistic.no_ammo": "No flechettes to load.",
     "cyberimplants.ballistic.reloading": "Reloading...",
     "cyberimplants.deck.title": "Cyberdeck",
+    "cyberimplants.deck.tab.programs": "Programs",
+    "cyberimplants.deck.tab.processes": "Processes",
+    "cyberimplants.deck.tab.log": "Log",
+    "cyberimplants.deck.thread": "Thread %s",
+    "cyberimplants.deck.threads": "Threads: %s | neural latency: %s ticks",
+    "cyberimplants.deck.idle": "No program is running.",
     "cyberimplants.deck.placeholder": "Write a Synapse program",
     "cyberimplants.deck.save": "Save",
     "cyberimplants.deck.load": "Load",

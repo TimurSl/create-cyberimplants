@@ -1,5 +1,6 @@
 package dev.cyberimplants.body;
 
+import dev.cyberimplants.data.Stats;
 import dev.cyberimplants.implant.ImplantCatalog;
 import dev.cyberimplants.implant.ImplantFlag;
 import dev.cyberimplants.implant.ImplantIds;
@@ -28,7 +29,11 @@ public final class BodyOps {
         HOST_TIER,
         OVERLOAD,
         EMPTY_SLOT,
-        HAS_DEPENDENTS;
+        HAS_DEPENDENTS,
+        /** The host (chassis or arm frame) has no free socket at that index. */
+        NO_SOCKET,
+        /** The chassis cannot carry another module of that kind. */
+        TOO_MANY;
 
         public String translationKey() {
             return "cyberimplants.rig." + name().toLowerCase(java.util.Locale.ROOT);
@@ -37,6 +42,31 @@ public final class BodyOps {
         public boolean ok() {
             return this == OK;
         }
+    }
+
+    /** How many slots of the region are usable: deck sockets follow the chassis tier, arm sockets the frame tier. */
+    public static int effectiveSlots(BodyState s, BodyRegion region) {
+        return switch (region) {
+            case DECK -> {
+                InstalledImplant chassis = s.installed().get(new SlotId(BodyRegion.SPINE, 0));
+                yield chassis == null ? 0 : Math.min(region.slots(),
+                        (int) Stats.of(ImplantIds.DECK_CHASSIS, chassis.tier()).value("module_sockets", 3));
+            }
+            case LEFT_SOCKET -> frameSockets(s, BodyRegion.LEFT_ARM, region);
+            case RIGHT_SOCKET -> frameSockets(s, BodyRegion.RIGHT_ARM, region);
+            default -> region.slots();
+        };
+    }
+
+    private static int frameSockets(BodyState s, BodyRegion frameRegion, BodyRegion socketRegion) {
+        InstalledImplant frame = s.installed().get(new SlotId(frameRegion, 0));
+        return frame == null ? 0 : Math.min(socketRegion.slots(),
+                (int) Stats.of(ImplantIds.CYBERNETIC_ARM, frame.tier()).value("sockets", 1));
+    }
+
+    /** Deck modules that may be installed several times: RAM and Storage are stackable. */
+    private static boolean stackable(ResourceLocation typeId) {
+        return typeId.equals(ImplantIds.DECK_RAM) || typeId.equals(ImplantIds.DECK_STORAGE);
     }
 
     public static Result canInstall(BodyState s, ResourceLocation typeId, int tier, SlotId slot) {
@@ -55,7 +85,8 @@ public final class BodyOps {
         }
         // No duplicates within a region. Arm sockets are separate regions, so the same module may sit in both arms.
         for (Map.Entry<SlotId, InstalledImplant> e : s.installed().entrySet()) {
-            if (e.getKey().region() == slot.region() && e.getValue().type().equals(typeId)) {
+            if (e.getKey().region() == slot.region() && e.getValue().type().equals(typeId) && !stackable(typeId)
+                    && !typeId.equals(ImplantIds.DECK_COPROCESSOR)) {
                 return Result.DUPLICATE;
             }
         }
@@ -77,6 +108,16 @@ public final class BodyOps {
             if (tier > chassis.tier()) {
                 return Result.HOST_TIER;
             }
+            if (typeId.equals(ImplantIds.DECK_COPROCESSOR)) {
+                long have = s.installed().values().stream().filter(i -> i.type().equals(typeId)).count();
+                int max = (int) Stats.of(ImplantIds.DECK_CHASSIS, chassis.tier()).value("max_coprocessors", 1);
+                if (have >= max) {
+                    return Result.TOO_MANY;
+                }
+            }
+        }
+        if (slot.index() >= effectiveSlots(s, slot.region())) {
+            return Result.NO_SOCKET;
         }
         double after = Body.totalLoad(s) + Body.loadOf(typeId, tier);
         double capacity = typeId.equals(ImplantIds.CORE) ? Body.capacity(s.withImplant(slot, new InstalledImplant(typeId, tier))) : Body.capacity(s);
@@ -95,7 +136,7 @@ public final class BodyOps {
             return out;
         }
         for (BodyRegion region : ImplantCatalog.regionsFor(type)) {
-            for (int i = 0; i < region.slots(); i++) {
+            for (int i = 0; i < effectiveSlots(s, region); i++) {
                 SlotId slot = new SlotId(region, i);
                 if (canInstall(s, typeId, tier, slot).ok()) {
                     out.add(slot);
@@ -113,10 +154,10 @@ public final class BodyOps {
         if (item.type().equals(ImplantIds.CORE) && s.installed().size() > 1) {
             return Result.HAS_DEPENDENTS;
         }
-        if (slot.region() == BodyRegion.LEFT_ARM && s.installed().containsKey(new SlotId(BodyRegion.LEFT_SOCKET, 0))) {
+        if (slot.region() == BodyRegion.LEFT_ARM && s.installed().keySet().stream().anyMatch(k -> k.region() == BodyRegion.LEFT_SOCKET)) {
             return Result.HAS_DEPENDENTS;
         }
-        if (slot.region() == BodyRegion.RIGHT_ARM && s.installed().containsKey(new SlotId(BodyRegion.RIGHT_SOCKET, 0))) {
+        if (slot.region() == BodyRegion.RIGHT_ARM && s.installed().keySet().stream().anyMatch(k -> k.region() == BodyRegion.RIGHT_SOCKET)) {
             return Result.HAS_DEPENDENTS;
         }
         if (slot.region() == BodyRegion.SPINE && s.installed().keySet().stream().anyMatch(k -> k.region() == BodyRegion.DECK)) {

@@ -20,6 +20,17 @@ final class KineticBridgeImpl implements KineticBridge {
     }
 
     @Override
+    public java.util.Optional<NetworkStress> networkStress(Level level, BlockPos pos) {
+        if (level.isLoaded(pos) && level.getBlockEntity(pos) instanceof KineticBlockEntity kinetic) {
+            var network = kinetic.getOrCreateNetwork();
+            if (network != null) {
+                return java.util.Optional.of(new NetworkStress(network.calculateStress(), network.calculateCapacity()));
+            }
+        }
+        return java.util.Optional.empty();
+    }
+
+    @Override
     public boolean overstressed(Level level, BlockPos pos) {
         return level.isLoaded(pos) && level.getBlockEntity(pos) instanceof KineticBlockEntity kinetic && kinetic.isOverStressed();
     }

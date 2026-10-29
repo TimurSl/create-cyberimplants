@@ -43,7 +43,8 @@ public final class Defibrillator {
         }
         event.setCanceled(true);
         player.setHealth((float) stats.value("health_restored", 2.0));
-        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, (int) stats.value("resistance_ticks", 40), 0));
+        player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, (int) stats.value("resistance_ticks", 40),
+                (int) stats.value("resistance_amplifier", 0)));
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.TOTEM_USE, SoundSource.PLAYERS, 1.0f, 1.2f);
         player.serverLevel().sendParticles(ParticleTypes.ELECTRIC_SPARK, player.getX(), player.getY() + 1.0, player.getZ(),

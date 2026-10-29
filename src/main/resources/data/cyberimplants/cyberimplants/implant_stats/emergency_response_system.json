@@ -12,36 +12,36 @@
     {
       "load": 3,
       "charge_cost": 0,
-      "cooldown_ticks": 600,
+      "cooldown_ticks": 500,
       "values": {
-        "response_slots": 1
+        "response_slots": 2
       },
       "unlocks": []
     },
     {
       "load": 4,
       "charge_cost": 0,
-      "cooldown_ticks": 600,
+      "cooldown_ticks": 400,
       "values": {
-        "response_slots": 1
+        "response_slots": 2
       },
       "unlocks": []
     },
     {
       "load": 4,
       "charge_cost": 0,
-      "cooldown_ticks": 600,
+      "cooldown_ticks": 300,
       "values": {
-        "response_slots": 1
+        "response_slots": 3
       },
       "unlocks": []
     },
     {
       "load": 5,
       "charge_cost": 0,
-      "cooldown_ticks": 600,
+      "cooldown_ticks": 200,
       "values": {
-        "response_slots": 1
+        "response_slots": 4
       },
       "unlocks": []
     }

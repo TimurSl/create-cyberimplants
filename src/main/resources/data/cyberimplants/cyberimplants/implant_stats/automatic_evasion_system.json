@@ -8,7 +8,8 @@
         "charges": 1,
         "recharge_ticks": 240,
         "detection_ticks": 4,
-        "distance": 1.5
+        "distance": 1.5,
+        "condition_slots": 1
       },
       "unlocks": []
     },
@@ -18,9 +19,10 @@
       "cooldown_ticks": 0,
       "values": {
         "charges": 1,
-        "recharge_ticks": 240,
-        "detection_ticks": 4,
-        "distance": 1.5
+        "recharge_ticks": 200,
+        "detection_ticks": 5,
+        "distance": 1.75,
+        "condition_slots": 2
       },
       "unlocks": []
     },
@@ -29,10 +31,11 @@
       "charge_cost": 10,
       "cooldown_ticks": 0,
       "values": {
-        "charges": 1,
-        "recharge_ticks": 240,
-        "detection_ticks": 4,
-        "distance": 1.5
+        "charges": 2,
+        "recharge_ticks": 160,
+        "detection_ticks": 6,
+        "distance": 2.0,
+        "condition_slots": 3
       },
       "unlocks": []
     },
@@ -41,10 +44,11 @@
       "charge_cost": 10,
       "cooldown_ticks": 0,
       "values": {
-        "charges": 1,
-        "recharge_ticks": 240,
-        "detection_ticks": 4,
-        "distance": 1.5
+        "charges": 2,
+        "recharge_ticks": 120,
+        "detection_ticks": 7,
+        "distance": 2.5,
+        "condition_slots": 4
       },
       "unlocks": []
     },
@@ -53,10 +57,11 @@
       "charge_cost": 10,
       "cooldown_ticks": 0,
       "values": {
-        "charges": 1,
-        "recharge_ticks": 240,
-        "detection_ticks": 4,
-        "distance": 1.5
+        "charges": 3,
+        "recharge_ticks": 80,
+        "detection_ticks": 8,
+        "distance": 3.0,
+        "condition_slots": 6
       },
       "unlocks": []
     }

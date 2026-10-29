@@ -12,6 +12,11 @@ public interface Handle {
         return false;
     }
 
+    /** Cycles charged for a write (docs/design/04-synapse-language.md, section 8.1: 10 for implants, 8 for devices). */
+    default int writeCost() {
+        return 10;
+    }
+
     /** Cycles charged for a read; hosts may raise this for expensive sources. */
     default int readCost() {
         return 2;

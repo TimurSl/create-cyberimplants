@@ -14,44 +14,44 @@
     {
       "load": 3,
       "charge_cost": 5,
-      "cooldown_ticks": 200,
+      "cooldown_ticks": 160,
       "values": {
-        "radius": 12,
-        "reveal_ticks": 60,
-        "max_markers": 8
+        "radius": 16,
+        "reveal_ticks": 80,
+        "max_markers": 12
       },
       "unlocks": []
     },
     {
       "load": 4,
-      "charge_cost": 5,
-      "cooldown_ticks": 200,
+      "charge_cost": 6,
+      "cooldown_ticks": 120,
       "values": {
-        "radius": 12,
-        "reveal_ticks": 60,
-        "max_markers": 8
+        "radius": 24,
+        "reveal_ticks": 100,
+        "max_markers": 16
       },
       "unlocks": []
     },
     {
       "load": 4,
-      "charge_cost": 5,
-      "cooldown_ticks": 200,
+      "charge_cost": 6,
+      "cooldown_ticks": 100,
       "values": {
-        "radius": 12,
-        "reveal_ticks": 60,
-        "max_markers": 8
+        "radius": 32,
+        "reveal_ticks": 120,
+        "max_markers": 24
       },
       "unlocks": []
     },
     {
       "load": 5,
-      "charge_cost": 5,
-      "cooldown_ticks": 200,
+      "charge_cost": 8,
+      "cooldown_ticks": 80,
       "values": {
-        "radius": 12,
-        "reveal_ticks": 60,
-        "max_markers": 8
+        "radius": 48,
+        "reveal_ticks": 160,
+        "max_markers": 32
       },
       "unlocks": []
     }

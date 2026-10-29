@@ -25,9 +25,10 @@ public record CompiledProgram(
 
     /**
      * A handler. {@code argument} is the numeric threshold / key number or null; {@code from} the device a FROM clause
-     * names (or null); {@code when} is the optional filter, evaluated before a task is queued.
+     * names (or null); {@code when} is the optional filter, evaluated before a task is queued. Timer handlers
+     * ({@code EVERY}) have the event {@code "@every"} and the interval in ticks as their argument.
      */
-    public record CompiledHandler(String event, Double argument, String from, Code when, Code body) {
+    public record CompiledHandler(String event, Double argument, String from, Code when, double debounceTicks, Code body) {
     }
 
     /** Distinct numeric arguments used with the given event name, e.g. the thresholds of {@code health_below}. */
@@ -39,6 +40,11 @@ public record CompiledProgram(
             }
         }
         return out;
+    }
+
+    /** The timer handlers' intervals in ticks. */
+    public List<CompiledHandler> timers() {
+        return handlers.stream().filter(h -> h.event().equals("@every")).toList();
     }
 
     public boolean subscribes(String event) {

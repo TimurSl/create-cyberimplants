@@ -1,0 +1,55 @@
+{
+  "tiers": [
+    {
+      "load": 1,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "direct_range": 16,
+        "bound_ports": 2
+      },
+      "unlocks": []
+    },
+    {
+      "load": 1,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "direct_range": 24,
+        "bound_ports": 4
+      },
+      "unlocks": []
+    },
+    {
+      "load": 1,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "direct_range": 32,
+        "bound_ports": 8
+      },
+      "unlocks": []
+    },
+    {
+      "load": 1,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "direct_range": 48,
+        "bound_ports": 16
+      },
+      "unlocks": []
+    },
+    {
+      "load": 1,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "direct_range": 64,
+        "bound_ports": 32
+      },
+      "unlocks": []
+    }
+  ],
+  "unlock_layers": {}
+}

@@ -72,6 +72,18 @@ final class FakeHost implements Host {
     }
 
     @Override
+    public boolean configure(String implant, String key, Object value) {
+        actions.add("configure " + implant + " " + key + " " + value);
+        return true;
+    }
+
+    @Override
+    public boolean manipulate(Object target, String action, Object argument) {
+        actions.add("manipulate " + action + " " + argument);
+        return true;
+    }
+
+    @Override
     public boolean scan() {
         actions.add("scan");
         return true;

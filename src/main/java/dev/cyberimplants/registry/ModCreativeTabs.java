@@ -23,6 +23,10 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.IMPLANTATION_RIG.get());
                         output.accept(ModItems.KINETIC_CHARGER.get());
                         output.accept(ModItems.NEURAL_PORT.get());
+                        output.accept(ModItems.PROXIMITY_SENSOR.get());
+                        output.accept(ModItems.NEURO_STABILIZER.get());
+                        output.accept(ModItems.BIO_GEL_BUCKET.get());
+                        output.accept(ModItems.NEURAL_GEL_BUCKET.get());
                     })
                     .build());
 

@@ -14,8 +14,7 @@ import static dev.cyberimplants.implant.ImplantFlag.*;
 import static dev.cyberimplants.implant.ImplantIds.*;
 
 /**
- * Every implant type of Layer 1: 44 of the catalog's 47 types. The Coprocessor, Machine Interface and Remote Sensor
- * Uplink modules arrive with Layers 2 and 3. Registration, items, recipes and language keys all derive from this list.
+ * Every implant type up to Layer 2: 46 of the catalog's 47 types. The Remote Sensor Uplink module arrives with Layer 3. Registration, items, recipes and language keys all derive from this list.
  */
 public final class ImplantCatalog {
     public record Entry(ResourceLocation id, ImplantType type) {
@@ -37,6 +36,8 @@ public final class ImplantCatalog {
             e(DECK_PROCESSOR, ImplantType.of(CYBERDECK, DECK, PASSIVE, DECK_MODULE)),
             e(DECK_RAM, ImplantType.of(CYBERDECK, DECK, PASSIVE, DECK_MODULE)),
             e(DECK_STORAGE, ImplantType.of(CYBERDECK, DECK, PASSIVE, DECK_MODULE)),
+            e(DECK_COPROCESSOR, ImplantType.of(CYBERDECK, DECK, PASSIVE, DECK_MODULE)),
+            e(DECK_MACHINE_INTERFACE, ImplantType.of(CYBERDECK, DECK, PASSIVE, DECK_MODULE)),
 
             e(REINFORCED_SKELETON, ImplantType.of(SKELETAL, SKELETON, PASSIVE)),
             e(POWER_ACTUATORS, ImplantType.of(SKELETAL, SKELETON, PASSIVE)),

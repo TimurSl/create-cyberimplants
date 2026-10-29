@@ -5,8 +5,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "damage": 6.0,
-        "attack_speed": 1.8
+        "damage": 6,
+        "attack_speed": 1.8,
+        "dual_attack_speed": 0.15
       },
       "unlocks": []
     },
@@ -15,8 +16,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "damage": 6.0,
-        "attack_speed": 1.8
+        "damage": 7,
+        "attack_speed": 1.8,
+        "dual_attack_speed": 0.15
       },
       "unlocks": []
     },
@@ -25,8 +27,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "damage": 6.0,
-        "attack_speed": 1.8
+        "damage": 8,
+        "attack_speed": 2.0,
+        "dual_attack_speed": 0.15
       },
       "unlocks": []
     },
@@ -35,8 +38,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "damage": 6.0,
-        "attack_speed": 1.8
+        "damage": 9,
+        "attack_speed": 2.0,
+        "dual_attack_speed": 0.15
       },
       "unlocks": []
     },
@@ -45,8 +49,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "damage": 6.0,
-        "attack_speed": 1.8
+        "damage": 11,
+        "attack_speed": 2.2,
+        "dual_attack_speed": 0.15
       },
       "unlocks": []
     }

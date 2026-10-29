@@ -16,7 +16,7 @@
       "cooldown_ticks": 0,
       "values": {
         "upkeep_per_second": 0.5,
-        "wall_walk_speed": 0.5
+        "wall_walk_speed": 0.65
       },
       "unlocks": []
     },
@@ -26,7 +26,7 @@
       "cooldown_ticks": 0,
       "values": {
         "upkeep_per_second": 0.5,
-        "wall_walk_speed": 0.5
+        "wall_walk_speed": 0.8
       },
       "unlocks": []
     },
@@ -36,7 +36,7 @@
       "cooldown_ticks": 0,
       "values": {
         "upkeep_per_second": 0.5,
-        "wall_walk_speed": 0.5
+        "wall_walk_speed": 0.9
       },
       "unlocks": []
     },
@@ -46,7 +46,7 @@
       "cooldown_ticks": 0,
       "values": {
         "upkeep_per_second": 0.5,
-        "wall_walk_speed": 0.5
+        "wall_walk_speed": 1.0
       },
       "unlocks": []
     }

@@ -111,6 +111,44 @@ Sandevistan-field GameTests pass.
 | **Crafting** | A complete **I → V upgrade chain** for every implant using **standard Create machines only** (press, saw, mixer, deployer, spout, sequenced assembly) and placeholder items. Production cost scales by loop count. |
 | **UI** | Deck tabs (Programs, Processes, Log), cooldown strip, Load meter |
 
+*Status:* implemented in the repository, **not yet run in a game** (CI compiled it with `./gradlew build`, and the unit tests including the stat audit pass;
+the GameTests exist but CI does not run them). What is in:
+
+- **Data:** `scripts/layer2_tiers.py` holds the numeric rows of every implant table for Tiers I-V; the stat files are
+  generated from it. Unlock rows stay empty. Where a table row mixes a number with an unlock (Sandevistan's 0% time
+  scale at T3 is the "Full freeze" unlock) the Layer 2 value is the last non-unlock number and the unlocked one sits
+  under a separate key (`freeze_time_scale`). `StatAuditTest` checks five tiers per implant, equal key sets, no Tier I
+  copies, and an upgrade recipe per tier.
+- **Body:** Core tiers (already in Layer 1), Strain (+20% Charge cost, a glitch every 60-120 s that knocks one
+  Active/Toggle implant offline for 3-5 s or flickers the HUD), the Neuro-Stabilizer item (10 minutes without
+  glitches), cooldowns that count in online ticks and survive death and logout.
+- **Rig:** timed operations (5/8/12/16/20 s), minimum RPM 16/32/64/128/256, 250 mB of Bio-Interface Gel (T1-T3) or
+  Neural Gel (T4-T5) from a 1,000 mB tank (pipes, buckets), aborts when the Rig slows, the gel runs out or the
+  patient moves (4 HP of damage, the implant stays where it was), comparator output = progress, a redstone signal
+  locks the chair.
+- **Hosts:** the chassis tier sets 3-8 deck sockets, the arm frame tier 1-3 limb sockets; RAM and Storage stack;
+  Coprocessors add threads (capped per chassis tier). Bilateral frames add +10% break speed.
+- **Deck:** ISA-2 (`WHILE`, `REPEAT`, `BREAK`, `CONTINUE`, `WAIT`, `EVERY`, `DEBOUNCE`, `CONFIGURE`, `SEND`, `READ`,
+  `MANIPULATE`, string functions), sleeping tasks, RAM enforcement per task, a watchdog that kills a task that
+  runs 20x its budget without a `WAIT`, the Processor's minimum `EVERY` interval, neural latency for scripted
+  activations, parallel programs per thread, tabs for Programs, Processes and Log.
+- **Create:** Machine Interface Tiers I-II (more bound ports and range, stress and redstone reads, redstone out on a
+  Neural Port), the Kinetic Charger's `|RPM| / 8` rate, the Proximity Sensor (redstone output).
+- **Crafting:** a sequenced-assembly upgrade chain for every implant from Tier I to V, built from placeholder parts and
+  standard Create machines (1/2/3/4 loops), plus the two gel recipes. Layer 3 replaces the placeholder parts.
+
+Deliberate Layer 2 simplifications:
+
+- Neural latency delays the whole activation, so the script sees an optimistic `TRUE` and a later refusal only lands in
+  `last_error` (cost and cooldown are not reserved up front).
+- The Rig's operation is not persisted: unloading the chunk mid-operation cancels it without damage. The patient fade
+  and the two-block chair are still missing.
+- `CHANNEL`, `SENSOR` and `TRANSMIT` need the Remote Sensor Uplink and stay rejected. `MANIPULATE` supports `USE` and `PULL`;
+  `WRENCH` and `SET_VALUE` arrive with Tier III.
+- Processes tab shows each thread's state and cycles; pause and restart buttons are not there (unload kills).
+- The Neuro-Stabilizer's real recipe (mix, then spout) arrives with Layer 3; Layer 2 spouts a bottle with Neural Gel.
+- Machine Interface Tier II's write access is the redstone output of a Neural Port; the Relay Mast is Layer 3.
+
 *Exit criteria:* every implant can be built and upgraded to Tier V. A stat audit test confirms every implant has
 data for all five tiers. "Overspeed Guard" ([Synapse §1](04-synapse-language.md#1-a-first-look)) runs against a
 real Create machine. Strain, Rig aborts and the watchdog behave as specified.

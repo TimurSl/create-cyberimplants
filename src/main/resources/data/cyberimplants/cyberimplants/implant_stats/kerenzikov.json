@@ -13,40 +13,40 @@
     {
       "load": 4,
       "charge_cost": 8,
-      "cooldown_ticks": 60,
+      "cooldown_ticks": 50,
       "values": {
-        "distance": 2.0,
-        "window_ticks": 8
+        "distance": 2.5,
+        "window_ticks": 10
       },
       "unlocks": []
     },
     {
       "load": 5,
       "charge_cost": 8,
-      "cooldown_ticks": 60,
+      "cooldown_ticks": 40,
       "values": {
-        "distance": 2.0,
-        "window_ticks": 8
+        "distance": 3.0,
+        "window_ticks": 12
       },
       "unlocks": []
     },
     {
       "load": 5,
       "charge_cost": 8,
-      "cooldown_ticks": 60,
+      "cooldown_ticks": 30,
       "values": {
-        "distance": 2.0,
-        "window_ticks": 8
+        "distance": 3.5,
+        "window_ticks": 16
       },
       "unlocks": []
     },
     {
       "load": 6,
       "charge_cost": 8,
-      "cooldown_ticks": 60,
+      "cooldown_ticks": 20,
       "values": {
-        "distance": 2.0,
-        "window_ticks": 8
+        "distance": 4.0,
+        "window_ticks": 20
       },
       "unlocks": []
     }

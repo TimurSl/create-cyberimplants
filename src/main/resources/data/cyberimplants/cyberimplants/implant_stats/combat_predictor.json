@@ -5,7 +5,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "horizon_ticks": 10
+        "horizon_ticks": 10,
+        "indicators": 1,
+        "counter_bonus": 0
       },
       "unlocks": []
     },
@@ -14,7 +16,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "horizon_ticks": 10
+        "horizon_ticks": 15,
+        "indicators": 1,
+        "counter_bonus": 0.1
       },
       "unlocks": []
     },
@@ -23,7 +27,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "horizon_ticks": 10
+        "horizon_ticks": 20,
+        "indicators": 2,
+        "counter_bonus": 0.2
       },
       "unlocks": []
     },
@@ -32,7 +38,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "horizon_ticks": 10
+        "horizon_ticks": 30,
+        "indicators": 3,
+        "counter_bonus": 0.3
       },
       "unlocks": []
     },
@@ -41,7 +49,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "horizon_ticks": 10
+        "horizon_ticks": 40,
+        "indicators": 4,
+        "counter_bonus": 0.4
       },
       "unlocks": []
     }

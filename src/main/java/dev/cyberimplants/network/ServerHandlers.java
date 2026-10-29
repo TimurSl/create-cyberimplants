@@ -1,6 +1,5 @@
 package dev.cyberimplants.network;
 
-import dev.cyberimplants.body.BodyOps;
 import dev.cyberimplants.body.BodyRegion;
 import dev.cyberimplants.body.BodySync;
 import dev.cyberimplants.body.SlotId;
@@ -17,7 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.Map;
 import java.util.UUID;
@@ -76,22 +74,16 @@ final class ServerHandlers {
             return;
         }
         SlotId slot = new SlotId(regions[payload.region()], payload.index());
-        BodyOps.Result result;
-        if (payload.install()) {
-            int inv = payload.inventorySlot();
-            if (inv < 0 || inv >= player.getInventory().getContainerSize()) {
-                return;
-            }
-            ItemStack stack = player.getInventory().getItem(inv);
-            result = BodyOps.install(player, slot, stack);
-        } else {
-            result = BodyOps.remove(player, slot);
+        if (!(player.level().getBlockEntity(payload.rig()) instanceof RigBlockEntity rig)) {
+            return;
         }
-        if (result.ok()) {
+        Component error = rig.begin(player, payload.install(), slot, payload.inventorySlot());
+        if (error != null) {
+            player.displayClientMessage(error, true);
+        } else if (!rig.busy()) {
+            // Instant operation (layers.maxEnabled = 1): already done.
             player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundSource.PLAYERS, 1.0f, 0.8f);
-        } else {
-            player.displayClientMessage(Component.translatable(result.translationKey()), true);
         }
         BodySync.markDirty(player);
     }
@@ -103,8 +95,8 @@ final class ServerHandlers {
     static void deckCommand(ServerPlayer player, DeckCommandPayload payload) {
         switch (payload.op()) {
             case STATUS -> DeckService.sendStatus(player, "");
-            case LOAD -> DeckService.loadCommand(player, payload.program());
-            case UNLOAD -> DeckService.unloadCommand(player);
+            case LOAD -> DeckService.loadCommand(player, payload.program(), payload.thread());
+            case UNLOAD -> DeckService.unloadCommand(player, payload.thread());
             case DELETE -> DeckService.deleteCommand(player, payload.program());
         }
     }
