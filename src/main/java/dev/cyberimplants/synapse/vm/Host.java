@@ -1,0 +1,38 @@
+package dev.cyberimplants.synapse.vm;
+
+import java.util.Map;
+
+/**
+ * The game side of a running program. The VM never touches Minecraft; everything it can sense or do goes through
+ * this interface. Actions that can fail return false and record the reason in {@code last_error}.
+ */
+public interface Host {
+    /** Resolves a global name (an implant such as {@code sandevistan}, {@code self}, {@code deck}, {@code last_error}). */
+    Object global(String name);
+
+    boolean activate(String implant, Object at, Map<String, Object> with);
+
+    boolean deactivate(String implant);
+
+    boolean toggle(String implant);
+
+    boolean scan();
+
+    boolean tag(Object entity);
+
+    boolean untag(Object entity);
+
+    void log(String line);
+
+    void alert(String message);
+
+    /** Ticks since the deck booted. */
+    long now();
+
+    /** A value in [0, 1), seeded per deck. */
+    double random();
+
+    /** Called when a task dies with a runtime error; the runner has already logged it. */
+    default void taskAborted(VmError error, String detail, int line) {
+    }
+}

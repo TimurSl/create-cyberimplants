@@ -1,0 +1,119 @@
+package dev.cyberimplants.synapse.ast;
+
+import java.util.List;
+import java.util.Map;
+
+/** Synapse syntax tree. Layer 1 covers ISA-1; later layers add nodes. */
+public final class Ast {
+    private Ast() {
+    }
+
+    public sealed interface Expr permits Num, Bool, Str, Null, Dur, Name, Member, Call, Unary, Binary {
+        int line();
+    }
+
+    public record Num(double value, int line) implements Expr {
+    }
+
+    public record Bool(boolean value, int line) implements Expr {
+    }
+
+    public record Str(String value, int line) implements Expr {
+    }
+
+    public record Null(int line) implements Expr {
+    }
+
+    /** A duration literal; {@code ticks} is already converted. */
+    public record Dur(double ticks, int line) implements Expr {
+    }
+
+    public record Name(String name, int line) implements Expr {
+    }
+
+    public record Member(Expr target, String name, int line) implements Expr {
+    }
+
+    public record Call(String function, List<Expr> args, int line) implements Expr {
+    }
+
+    /** {@code op} is {@code -} or {@code NOT}. */
+    public record Unary(String op, Expr operand, int line) implements Expr {
+    }
+
+    /** {@code op} is one of {@code + - * / % == != < <= > >= AND OR}. */
+    public record Binary(String op, Expr left, Expr right, int line) implements Expr {
+    }
+
+    public sealed interface Stmt permits Let, Set, If, Activate, Deactivate, Toggle, Log, Alert, Scan, Tag, Untag, Stop, ExprStmt {
+        int line();
+    }
+
+    public record Let(String name, Expr value, int line) implements Stmt {
+    }
+
+    /** {@code target} is a {@link Name} or a {@link Member}. */
+    public record Set(Expr target, Expr value, int line) implements Stmt {
+    }
+
+    public record Branch(Expr condition, List<Stmt> body) {
+    }
+
+    /** {@code orElse} is empty when there is no ELSE. */
+    public record If(List<Branch> branches, List<Stmt> orElse, int line) implements Stmt {
+    }
+
+    public record Activate(String implant, Expr at, Map<String, Expr> with, int line) implements Stmt {
+    }
+
+    public record Deactivate(String implant, int line) implements Stmt {
+    }
+
+    public record Toggle(String implant, int line) implements Stmt {
+    }
+
+    public record Log(Expr value, int line) implements Stmt {
+    }
+
+    public record Alert(Expr value, int line) implements Stmt {
+    }
+
+    public record Scan(int line) implements Stmt {
+    }
+
+    public record Tag(Expr entity, int line) implements Stmt {
+    }
+
+    public record Untag(Expr entity, int line) implements Stmt {
+    }
+
+    public record Stop(int line) implements Stmt {
+    }
+
+    /** A bare expression, e.g. a call whose value is discarded. */
+    public record ExprStmt(Expr value, int line) implements Stmt {
+    }
+
+    /**
+     * An {@code ON} handler. {@code argument} is the numeric threshold / key number (null if none) and
+     * {@code when} the optional filter expression.
+     */
+    public record Handler(String event, Double argument, Expr when, List<Stmt> body, int line) {
+    }
+
+    public record Const(String name, Expr value, int line) {
+    }
+
+    public record Var(String name, Expr value, int line) {
+    }
+
+    public record ProgramNode(
+            String name,
+            List<String> requires,
+            int priority,
+            boolean autostart,
+            List<Const> consts,
+            List<Var> vars,
+            List<Handler> handlers) {
+    }
+}
