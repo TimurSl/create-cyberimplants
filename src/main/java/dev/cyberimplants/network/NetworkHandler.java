@@ -48,7 +48,7 @@ public final class NetworkHandler {
                 server((p, payload) -> ServerHandlers.fireBallistic(p)));
     }
 
-    private static <T> net.neoforged.neoforge.network.handling.IPayloadHandler<T> server(BiConsumer<ServerPlayer, T> handler) {
+    private static <T extends net.minecraft.network.protocol.common.custom.CustomPacketPayload> net.neoforged.neoforge.network.handling.IPayloadHandler<T> server(BiConsumer<ServerPlayer, T> handler) {
         return (T payload, IPayloadContext context) -> context.enqueueWork(() -> {
             if (context.player() instanceof ServerPlayer player && ServerHandlers.allow(player)) {
                 handler.accept(player, payload);

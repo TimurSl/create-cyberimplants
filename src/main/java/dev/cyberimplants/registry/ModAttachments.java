@@ -16,14 +16,14 @@ public final class ModAttachments {
     /** Persistent per-player cybernetic state. Kept on death; synced to the owning client explicitly. */
     public static final Supplier<AttachmentType<BodyState>> BODY_STATE = ATTACHMENT_TYPES.register("body_state",
             () -> AttachmentType.builder(() -> BodyState.EMPTY)
-                    .serialize(BodyState.MAP_CODEC)
+                    .serialize(BodyState.CODEC)
                     .copyOnDeath()
                     .build());
 
     /** Stored Synapse programs. Never synced wholesale: the deck screen requests what it shows. */
     public static final Supplier<AttachmentType<DeckData>> DECK_DATA = ATTACHMENT_TYPES.register("deck_data",
             () -> AttachmentType.builder(() -> DeckData.EMPTY)
-                    .serialize(DeckData.MAP_CODEC)
+                    .serialize(DeckData.MAP_CODEC.codec())
                     .copyOnDeath()
                     .build());
 
