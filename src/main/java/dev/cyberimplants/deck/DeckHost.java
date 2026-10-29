@@ -43,6 +43,11 @@ final class DeckHost implements Host {
     }
 
     @Override
+    public Object device(String kind, String label) {
+        return kind.equals("port") ? new PortHandle(player, label) : null;
+    }
+
+    @Override
     public boolean activate(String implant, Object at, Map<String, Object> with) {
         ResourceLocation type = DeckAliases.resolve(implant);
         if (type == null) {

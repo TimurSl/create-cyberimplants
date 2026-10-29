@@ -10,11 +10,11 @@ import net.neoforged.fml.ModList;
  * (and its future implementations) may import {@code com.simibubi.create.*}.
  *
  * <p>Bridges default to no-ops (the interfaces' default methods); real implementations replace them in
- * {@link #init()} as layers need them. Layer 1 adds the goggle bridge. The Rig and Charger blocks live in
+ * {@link #init()} as layers need them. Layer 1 adds the kinetic (speed) and goggle bridges. The Rig and Charger blocks live in
  * {@code compat.create.block} because they extend Create's kinetic classes.
  */
 public final class CreateCompat {
-    private static final KineticBridge KINETIC = new KineticBridge() { };
+    private static volatile KineticBridge kinetic = new KineticBridge() { };
     private static final BehaviourBridge BEHAVIOUR = new BehaviourBridge() { };
     private static final DisplaySourceBridge DISPLAY_SOURCE = new DisplaySourceBridge() { };
     private static final DisplayTargetBridge DISPLAY_TARGET = new DisplayTargetBridge() { };
@@ -32,17 +32,18 @@ public final class CreateCompat {
         createLoaded = ModList.get().isLoaded("create");
         if (createLoaded) {
             // Layer 1: the Machine Analyzer counts as Engineer's Goggles.
+            kinetic = new KineticBridgeImpl();
             goggle = new GoggleBridgeImpl();
             goggle.registerWearingPredicate(player -> BodyState.get(player).has(ImplantIds.MACHINE_ANALYZER));
         }
-        CyberImplants.LOGGER.info("Create compat initialised (Create present: {}; real bridges: goggles)", createLoaded);
+        CyberImplants.LOGGER.info("Create compat initialised (Create present: {}; real bridges: kinetic, goggles)", createLoaded);
     }
 
     public static boolean isCreateLoaded() {
         return createLoaded;
     }
 
-    public static KineticBridge kinetic() { return KINETIC; }
+    public static KineticBridge kinetic() { return kinetic; }
     public static BehaviourBridge behaviour() { return BEHAVIOUR; }
     public static DisplaySourceBridge displaySource() { return DISPLAY_SOURCE; }
     public static DisplayTargetBridge displayTarget() { return DISPLAY_TARGET; }

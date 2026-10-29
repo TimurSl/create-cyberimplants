@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "cyberimplants:implantation_rig",
-    "cyberimplants:kinetic_charger"
+    "cyberimplants:kinetic_charger",
+    "cyberimplants:neural_port"
   ]
 }

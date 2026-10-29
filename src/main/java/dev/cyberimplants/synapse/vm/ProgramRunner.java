@@ -123,6 +123,9 @@ public final class ProgramRunner {
             if (h.argument() == null && argument != null) {
                 continue;
             }
+            if (h.from() != null && !java.util.Objects.equals(payload.get("source"), globals.get(h.from()))) {
+                continue;
+            }
             if (h.when() != null && !passesFilter(h, payload)) {
                 continue;
             }

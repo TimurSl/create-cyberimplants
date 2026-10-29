@@ -87,6 +87,10 @@ the real jar. Deliberate Layer 1 simplifications:
 - Every implant has stat files for five tiers, but tiers II-V repeat the Tier I numbers (only Load differs).
 - Deck: Chassis, Processor, RAM and Storage are installed into three module sockets through the Rig; the editor
   is a single screen without tabs. Coprocessor, Machine Interface and Remote Sensor Uplink arrive in Layers 2-3.
+- Neural Port (rotation read-only): the chassis has the Machine Interface's Tier I limits built in (2 bound ports,
+  16 blocks). Right-click your own port to bind or unbind it; name it by renaming the item in an anvil before
+  placing. Scripts declare it with `DEVICE press = port "Name"` and read `press.speed`, `press.abs_speed`,
+  `press.online`; `ON rotational_speed_changed FROM press` fires when the speed changes.
 
 *Exit criteria:* a survival player can build a Core and at least one implant per category and use each one's core
 ability. Example program 1 in [Synapse §1](04-synapse-language.md#1-a-first-look) runs. Damage-pipeline and

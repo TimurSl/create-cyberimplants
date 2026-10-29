@@ -8,7 +8,7 @@ Players **manufacture** implants on Create production lines, **install** them on
 make the existing abilities stronger; they never add duplicate items.
 
 > Status: **Layer 1 (function)**. All 44 Layer 1 implant types, the Implantation Rig, the Kinetic Charger, the
-> ISA-1 cyberdeck and the Implant Wheel are implemented. The Synapse language is compiled and unit-tested; the
+> Neural Port, the ISA-1 cyberdeck and the Implant Wheel are implemented. The Synapse language is compiled and unit-tested; the
 > NeoForge-dependent code has not yet been compiled against Minecraft (see the roadmap). See
 > [Implementation layers](docs/design/09-roadmap.md).
 

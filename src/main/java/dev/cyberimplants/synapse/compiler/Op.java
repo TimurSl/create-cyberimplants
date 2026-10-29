@@ -15,6 +15,8 @@ public enum Op {
     STORE_GLOBAL(1),
     /** Pop an object, push its member {@code k}. */
     MEMBER(2),
+    /** Push the device handle for {@code k} ({@link DeviceInfo}). */
+    DEVICE(4),
     /** Pop value then object, assign member {@code k} (writable implant property). */
     SET_MEMBER(10),
     NEG(1),

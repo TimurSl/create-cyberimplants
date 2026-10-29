@@ -3,6 +3,7 @@ package dev.cyberimplants.compat.create.block;
 import com.simibubi.create.content.kinetics.base.RotatedPillarKineticBlock;
 import com.simibubi.create.foundation.block.IBE;
 import dev.cyberimplants.registry.ModBlockEntities;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
@@ -17,8 +18,15 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class ChargerBlock extends RotatedPillarKineticBlock implements IBE<ChargerBlockEntity> {
     private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 6, 16);
 
+    public static final MapCodec<ChargerBlock> CODEC = simpleCodec(ChargerBlock::new);
+
     public ChargerBlock(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    protected MapCodec<? extends net.minecraft.world.level.block.Block> codec() {
+        return CODEC;
     }
 
     @Override

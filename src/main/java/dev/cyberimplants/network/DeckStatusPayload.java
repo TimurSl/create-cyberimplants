@@ -1,6 +1,7 @@
 package dev.cyberimplants.network;
 
 import dev.cyberimplants.CyberImplants;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -27,7 +28,7 @@ public record DeckStatusPayload(
 
     public static final Type<DeckStatusPayload> TYPE = new Type<>(CyberImplants.id("deck_status"));
 
-    private static final StreamCodec<RegistryFriendlyByteBuf, List<String>> STRINGS =
+    private static final StreamCodec<ByteBuf, List<String>> STRINGS =
             ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(64));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, DeckStatusPayload> STREAM_CODEC = StreamCodec.of(

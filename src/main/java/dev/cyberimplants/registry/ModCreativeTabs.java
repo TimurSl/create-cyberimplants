@@ -22,6 +22,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.FLECHETTE.get());
                         output.accept(ModItems.IMPLANTATION_RIG.get());
                         output.accept(ModItems.KINETIC_CHARGER.get());
+                        output.accept(ModItems.NEURAL_PORT.get());
                     })
                     .build());
 

@@ -4,6 +4,7 @@ import com.simibubi.create.content.kinetics.base.HorizontalKineticBlock;
 import com.simibubi.create.foundation.block.IBE;
 import dev.cyberimplants.network.OpenRigPayload;
 import dev.cyberimplants.registry.ModBlockEntities;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -19,8 +20,15 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 /** The Implantation Rig: a kinetic surgical chair. Right-click while it spins to operate on yourself. */
 public class RigBlock extends HorizontalKineticBlock implements IBE<RigBlockEntity> {
+    public static final MapCodec<RigBlock> CODEC = simpleCodec(RigBlock::new);
+
     public RigBlock(Properties properties) {
         super(properties);
+    }
+
+    @Override
+    protected MapCodec<? extends net.minecraft.world.level.block.Block> codec() {
+        return CODEC;
     }
 
     @Override

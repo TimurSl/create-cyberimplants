@@ -95,10 +95,14 @@ public final class Ast {
     }
 
     /**
-     * An {@code ON} handler. {@code argument} is the numeric threshold / key number (null if none) and
-     * {@code when} the optional filter expression.
+     * An {@code ON} handler. {@code argument} is the numeric threshold / key number (null if none), {@code from} the
+     * device name of a {@code FROM} clause (null if none) and {@code when} the optional filter expression.
      */
-    public record Handler(String event, Double argument, Expr when, List<Stmt> body, int line) {
+    public record Handler(String event, Double argument, String from, Expr when, List<Stmt> body, int line) {
+    }
+
+    /** {@code DEVICE name = port "label"}: a device bound in the deck's Devices list (Layer 1: ports only). */
+    public record Device(String name, String kind, String label, int line) {
     }
 
     public record Const(String name, Expr value, int line) {
@@ -114,6 +118,7 @@ public final class Ast {
             boolean autostart,
             List<Const> consts,
             List<Var> vars,
+            List<Device> devices,
             List<Handler> handlers) {
     }
 }

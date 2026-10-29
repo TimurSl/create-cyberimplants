@@ -179,5 +179,11 @@
   "item.cyberimplants.inertial_stabilizer": "Inertial Stabilizer",
   "item.cyberimplants.inertial_stabilizer.desc": "Better steering in the air; survive wall impacts.",
   "item.cyberimplants.momentum_booster": "Momentum Booster",
-  "item.cyberimplants.momentum_booster.desc": "Sprinting fills a gauge; release it as a dash."
+  "item.cyberimplants.momentum_booster.desc": "Sprinting fills a gauge; release it as a dash.",
+  "block.cyberimplants.neural_port": "Neural Port",
+  "cyberimplants.port.bound": "Bound port '%s' to your deck.",
+  "cyberimplants.port.unbound": "Unbound port '%s'.",
+  "cyberimplants.port.full": "Your deck can bind %s ports.",
+  "cyberimplants.port.name_taken": "A port named '%s' is already bound. Rename this one in an anvil.",
+  "cyberimplants.port.not_owner": "This port belongs to someone else."
 }

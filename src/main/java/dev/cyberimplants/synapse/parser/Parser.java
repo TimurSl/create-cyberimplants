@@ -52,6 +52,7 @@ public final class Parser {
         boolean autostart = false;
         List<Ast.Const> consts = new ArrayList<>();
         List<Ast.Var> vars = new ArrayList<>();
+        List<Ast.Device> devices = new ArrayList<>();
         List<Ast.Handler> handlers = new ArrayList<>();
 
         skipNewlines();
@@ -103,7 +104,19 @@ public final class Parser {
                     endOfLine();
                 }
                 case "PERSIST" -> throw needs(t, "PERSIST", IsaLevel.ISA_5);
-                case "DEVICE", "CHANNEL", "SENSOR" -> throw needs(t, kw, IsaLevel.ISA_2);
+                case "DEVICE" -> {
+                    next();
+                    Token id = expect(TokenType.WORD, "a device name");
+                    expectOp("=");
+                    Token kind = expect(TokenType.WORD, "a device kind");
+                    if (!kind.text().equals("port")) {
+                        throw error(kind, "Only 'port' devices exist at this point; found '" + kind.text() + "'");
+                    }
+                    Token label = expect(TokenType.STRING, "the device name in quotes");
+                    devices.add(new Ast.Device(id.text(), "port", label.text(), id.line()));
+                    endOfLine();
+                }
+                case "CHANNEL", "SENSOR" -> throw needs(t, kw, IsaLevel.ISA_2);
                 case "FUNC" -> throw needs(t, "FUNC", IsaLevel.ISA_3);
                 case "EVERY" -> throw needs(t, "EVERY", IsaLevel.ISA_2);
                 case "ON" -> handlers.add(handler());
@@ -111,7 +124,7 @@ public final class Parser {
             }
             skipNewlines();
         }
-        return new Ast.ProgramNode(name, requires, priority, autostart, consts, vars, handlers);
+        return new Ast.ProgramNode(name, requires, priority, autostart, consts, vars, devices, handlers);
     }
 
     private Ast.Handler handler() {
@@ -126,13 +139,15 @@ public final class Parser {
             argument = next().number();
         }
         Expr when = null;
+        String from = null;
         while (!peek().isOp(":")) {
             Token t = peek();
             if (t.isKeyword("WHEN") && when == null) {
                 next();
                 when = expression();
-            } else if (t.isKeyword("FROM")) {
-                throw needs(t, "FROM <device>", IsaLevel.ISA_2);
+            } else if (t.isKeyword("FROM") && from == null) {
+                next();
+                from = expect(TokenType.WORD, "a device name").text();
             } else if (t.isKeyword("DEBOUNCE")) {
                 throw needs(t, "DEBOUNCE", IsaLevel.ISA_2);
             } else {
@@ -140,7 +155,7 @@ public final class Parser {
             }
         }
         List<Stmt> body = block();
-        return new Ast.Handler(eventName, argument, when, body, on.line());
+        return new Ast.Handler(eventName, argument, from, when, body, on.line());
     }
 
     // ---------------------------------------------------------------- statements

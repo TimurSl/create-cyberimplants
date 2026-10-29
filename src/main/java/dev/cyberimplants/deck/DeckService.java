@@ -223,6 +223,23 @@ public final class DeckService {
             }
             rt.prevHealthPct = pct;
         }
+        if (runner.subscribes("rotational_speed_changed")) {
+            for (String name : player.getData(ModAttachments.DECK_DATA).ports().keySet()) {
+                PortHandle port = new PortHandle(player, name);
+                if (port.get("speed") instanceof Double speed) {
+                    Double previous = rt.lastSpeeds.put(name, speed);
+                    if (previous != null && Math.abs(previous - speed) > 1.0E-3) {
+                        Map<String, Object> payload = new HashMap<>();
+                        payload.put("source", port);
+                        payload.put("old_speed", previous);
+                        payload.put("rotational_speed", speed);
+                        runner.fire("rotational_speed_changed", null, payload);
+                    }
+                } else {
+                    rt.lastSpeeds.remove(name);
+                }
+            }
+        }
         if (runner.subscribes("charge_below")) {
             double charge = body.charge();
             if (!Double.isNaN(rt.prevCharge)) {

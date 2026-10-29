@@ -10,6 +10,11 @@ public interface Host {
     /** Resolves a global name (an implant such as {@code sandevistan}, {@code self}, {@code deck}, {@code last_error}). */
     Object global(String name);
 
+    /** The device handle for a {@code DEVICE} declaration. It resolves its binding lazily, so it may be offline. */
+    default Object device(String kind, String label) {
+        return null;
+    }
+
     boolean activate(String implant, Object at, Map<String, Object> with);
 
     boolean deactivate(String implant);

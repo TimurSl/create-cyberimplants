@@ -18,6 +18,7 @@ public final class DeckRuntime {
     String lastError = "";
     double prevHealthPct = Double.NaN;
     double prevCharge = Double.NaN;
+    final java.util.Map<String, Double> lastSpeeds = new java.util.HashMap<>();
     final java.util.Set<net.minecraft.resources.ResourceLocation> cooling = new java.util.HashSet<>();
     int lastCycles;
     double cycleDebt;

@@ -392,6 +392,51 @@ class VmTest {
     }
 
     @Test
+    void devicesAreBoundAtLoadAndReadThroughTheirHandle() {
+        FakeHost host = new FakeHost();
+        Handle press = FakeHost.object("speed", 64.0, "type", "port");
+        host.devices.put("port:Press Line A", press);
+        ProgramRunner r = load("""
+                PROGRAM "d"
+                DEVICE press = port "Press Line A"
+                ON key 1:
+                    LOG press.speed
+                """, host);
+        r.fire("key", 1.0, Map.of());
+        drain(r);
+        assertEquals(List.of("64"), host.logs);
+    }
+
+    @Test
+    void fromClauseOnlyMatchesEventsFromThatDevice() {
+        FakeHost host = new FakeHost();
+        Handle a = FakeHost.object("speed", 1.0);
+        Handle b = FakeHost.object("speed", 2.0);
+        host.devices.put("port:A", a);
+        host.devices.put("port:B", b);
+        ProgramRunner r = load("""
+                PROGRAM "f"
+                DEVICE first = port "A"
+                DEVICE second = port "B"
+                ON rotational_speed_changed FROM first:
+                    LOG "first " + STR(first.speed)
+                ON rotational_speed_changed FROM second:
+                    LOG "second " + STR(second.speed)
+                """, host, IsaLevel.ISA_2);
+        r.fire("rotational_speed_changed", null, Map.of("source", b));
+        drain(r);
+        assertEquals(List.of("second 2"), host.logs);
+    }
+
+    @Test
+    void deviceNamesCannotBeAssignedAndFromMustNameADevice() {
+        assertThrows(SynapseException.class, () -> Compiler.compile(
+                "PROGRAM \"c\"\nDEVICE p = port \"A\"\nON boot:\n    SET p = 1\n", IsaLevel.ISA_1));
+        assertThrows(SynapseException.class, () -> Compiler.compile(
+                "PROGRAM \"c\"\nON boot FROM nothing:\n    LOG 1\n", IsaLevel.ISA_1));
+    }
+
+    @Test
     void eventPayloadIsAvailableThroughEventDotField() {
         FakeHost host = new FakeHost();
         ProgramRunner r = load("PROGRAM \"e\"\nON enemy_detected:\n    LOG event.distance\n", host);

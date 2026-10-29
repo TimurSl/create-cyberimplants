@@ -60,6 +60,10 @@ public final class Compiler {
         for (Ast.Var v : ast.vars()) {
             declareGlobal(v.name(), v.line());
         }
+        for (Ast.Device d : ast.devices()) {
+            declareGlobal(d.name(), d.line());
+            constants.add(d.name());
+        }
 
         begin();
         for (Ast.Const c : ast.consts()) {
@@ -69,6 +73,10 @@ public final class Compiler {
         for (Ast.Var v : ast.vars()) {
             expr(v.value());
             emit(new Instr(Op.STORE_GLOBAL, 0, v.name(), v.line()));
+        }
+        for (Ast.Device d : ast.devices()) {
+            emit(new Instr(Op.DEVICE, 0, new DeviceInfo(d.kind(), d.label()), d.line()));
+            emit(new Instr(Op.STORE_GLOBAL, 0, d.name(), d.line()));
         }
         Code init = finish();
 
@@ -81,6 +89,9 @@ public final class Compiler {
     }
 
     private CompiledProgram.CompiledHandler handler(Ast.Handler h) {
+        if (h.from() != null && !globals.contains(h.from())) {
+            throw new SynapseException("FROM refers to unknown device '" + h.from() + "'", h.line(), 1);
+        }
         Code when = null;
         if (h.when() != null) {
             begin();
@@ -90,7 +101,7 @@ public final class Compiler {
         begin();
         block(h.body());
         Code body = finish();
-        return new CompiledProgram.CompiledHandler(h.event().toLowerCase(Locale.ROOT), h.argument(), when, body);
+        return new CompiledProgram.CompiledHandler(h.event().toLowerCase(Locale.ROOT), h.argument(), h.from(), when, body);
     }
 
     // ---------------------------------------------------------------- statements

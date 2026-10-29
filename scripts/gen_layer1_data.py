@@ -234,7 +234,8 @@ def item_texture(name, category):
 
 
 def block_texture(kind):
-    colors = {"rig": ((0x70, 0x88, 0xA0), (0xC8, 0xE0, 0xF0)), "charger": ((0x4A, 0x5C, 0x70), (0x35, 0xD0, 0xFF))}[kind]
+    colors = {"rig": ((0x70, 0x88, 0xA0), (0xC8, 0xE0, 0xF0)), "charger": ((0x4A, 0x5C, 0x70), (0x35, 0xD0, 0xFF)),
+              "port": ((0x3A, 0x48, 0x58), (0x3A, 0xC8, 0x9A))}[kind]
     base, accent = colors
     px = [[base + (255,) for _ in range(16)] for _ in range(16)]
     for i in range(16):
@@ -292,7 +293,7 @@ def main():
         f.write(item_texture("Flechette Ammo", "limbs"))
 
     # ---- blocks
-    for name, kind in (("implantation_rig", "rig"), ("kinetic_charger", "charger")):
+    for name, kind in (("implantation_rig", "rig"), ("kinetic_charger", "charger"), ("neural_port", "port")):
         tex = os.path.join(ROOT, "assets", MOD, "textures", "block", name + ".png")
         os.makedirs(os.path.dirname(tex), exist_ok=True)
         with open(tex, "wb") as f:
@@ -301,6 +302,20 @@ def main():
                {"parent": "minecraft:block/cube_all", "textures": {"all": "%s:block/implantation_rig" % MOD}})
     write_json("assets/%s/models/block/kinetic_charger.json" % MOD,
                {"parent": "minecraft:block/slab", "textures": {k: "%s:block/kinetic_charger" % MOD for k in ("bottom", "top", "side")}})
+    # Neural Port: a small plug on the north side of its cell; the blockstate rotates it onto the face it is attached to.
+    write_json("assets/%s/models/block/neural_port.json" % MOD, {
+        "textures": {"particle": "%s:block/neural_port" % MOD, "all": "%s:block/neural_port" % MOD},
+        "elements": [{"from": [5, 5, 0], "to": [11, 11, 5],
+                      "faces": {d: {"uv": [0, 0, 16, 16], "texture": "#all"} for d in ("north", "south", "east", "west", "up", "down")}}]})
+    write_json("assets/%s/models/item/neural_port.json" % MOD, {"parent": "%s:block/neural_port" % MOD})
+    port_model = "%s:block/neural_port" % MOD
+    write_json("assets/%s/blockstates/neural_port.json" % MOD, {"variants": {
+        "facing=north": {"model": port_model},
+        "facing=east": {"model": port_model, "y": 90},
+        "facing=south": {"model": port_model, "y": 180},
+        "facing=west": {"model": port_model, "y": 270},
+        "facing=down": {"model": port_model, "x": 90},
+        "facing=up": {"model": port_model, "x": 270}}})
     write_json("assets/%s/models/item/implantation_rig.json" % MOD, {"parent": "%s:block/implantation_rig" % MOD})
     write_json("assets/%s/models/item/kinetic_charger.json" % MOD, {"parent": "%s:block/kinetic_charger" % MOD})
     write_json("assets/%s/blockstates/implantation_rig.json" % MOD, {"variants": {
@@ -312,14 +327,14 @@ def main():
         "axis=y": {"model": "%s:block/kinetic_charger" % MOD},
         "axis=x": {"model": "%s:block/kinetic_charger" % MOD},
         "axis=z": {"model": "%s:block/kinetic_charger" % MOD}}})
-    for name in ("implantation_rig", "kinetic_charger"):
+    for name in ("implantation_rig", "kinetic_charger", "neural_port"):
         write_json("data/%s/loot_table/blocks/%s.json" % (MOD, name), {
             "type": "minecraft:block",
             "pools": [{"rolls": 1.0, "bonus_rolls": 0.0,
                        "entries": [{"type": "minecraft:item", "name": "%s:%s" % (MOD, name)}],
                        "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
     write_json("data/minecraft/tags/block/mineable/pickaxe.json",
-               {"replace": False, "values": ["%s:implantation_rig" % MOD, "%s:kinetic_charger" % MOD]})
+               {"replace": False, "values": ["%s:implantation_rig" % MOD, "%s:kinetic_charger" % MOD, "%s:neural_port" % MOD]})
 
     # ---- recipes
     for ident, (category, *_rest) in IMPLANTS.items():
@@ -342,6 +357,11 @@ def main():
         "key": {"A": {"item": "create:andesite_casing"}, "R": {"item": "minecraft:redstone_block"}, "C": {"item": "create:copper_sheet"},
                 "S": {"item": "create:shaft"}},
         "pattern": ["CRC", "SAS", "CCC"], "result": {"id": "%s:kinetic_charger" % MOD, "count": 1}})
+    write_json("data/%s/recipe/neural_port.json" % MOD, {
+        "type": "minecraft:crafting_shaped", "category": "misc",
+        "key": {"T": {"item": "create:electron_tube"}, "C": {"item": "create:copper_sheet"}, "A": {"item": "create:andesite_casing"},
+                "R": {"item": "minecraft:redstone"}},
+        "pattern": [" T ", "CAC", " R "], "result": {"id": "%s:neural_port" % MOD, "count": 1}})
     write_json("data/%s/recipe/flechette.json" % MOD, {
         "type": "minecraft:crafting_shapeless", "category": "misc",
         "ingredients": [{"item": "minecraft:iron_nugget"}, {"item": "minecraft:iron_nugget"}, {"item": "minecraft:flint"}],
@@ -371,6 +391,12 @@ LANG_STATIC = {
     "item.cyberimplants.flechette": "Flechette",
     "block.cyberimplants.implantation_rig": "Implantation Rig",
     "block.cyberimplants.kinetic_charger": "Kinetic Charger",
+    "block.cyberimplants.neural_port": "Neural Port",
+    "cyberimplants.port.bound": "Bound port '%s' to your deck.",
+    "cyberimplants.port.unbound": "Unbound port '%s'.",
+    "cyberimplants.port.full": "Your deck can bind %s ports.",
+    "cyberimplants.port.name_taken": "A port named '%s' is already bound. Rename this one in an anvil.",
+    "cyberimplants.port.not_owner": "This port belongs to someone else.",
     "cyberimplants.region.deck": "Deck module",
     "cyberimplants.region.left_socket": "Left arm socket",
     "cyberimplants.region.right_socket": "Right arm socket",

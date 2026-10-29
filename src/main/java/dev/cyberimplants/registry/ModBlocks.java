@@ -3,12 +3,13 @@ package dev.cyberimplants.registry;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.compat.create.block.ChargerBlock;
 import dev.cyberimplants.compat.create.block.RigBlock;
+import dev.cyberimplants.content.NeuralPortBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-/** Implantation Rig and Kinetic Charger. Etcher, Neural Port, Relay Mast, Proximity Sensor and Terminal come later. */
+/** Implantation Rig, Kinetic Charger and Neural Port. Etcher, Relay Mast, Proximity Sensor and Terminal come later. */
 public final class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(CyberImplants.MOD_ID);
 
@@ -19,6 +20,10 @@ public final class ModBlocks {
     public static final DeferredBlock<ChargerBlock> KINETIC_CHARGER = BLOCKS.register("kinetic_charger",
             () -> new ChargerBlock(BlockBehaviour.Properties.of()
                     .strength(3.0f, 6.0f).sound(SoundType.METAL).noOcclusion().requiresCorrectToolForDrops()));
+
+    public static final DeferredBlock<NeuralPortBlock> NEURAL_PORT = BLOCKS.register("neural_port",
+            () -> new NeuralPortBlock(BlockBehaviour.Properties.of()
+                    .strength(1.5f, 4.0f).sound(SoundType.METAL).noOcclusion().noCollission()));
 
     private ModBlocks() {
     }

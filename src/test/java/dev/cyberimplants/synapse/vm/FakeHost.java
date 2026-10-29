@@ -41,6 +41,13 @@ final class FakeHost implements Host {
         };
     }
 
+    final Map<String, Object> devices = new HashMap<>();
+
+    @Override
+    public Object device(String kind, String label) {
+        return devices.get(kind + ":" + label);
+    }
+
     @Override
     public Object global(String name) {
         return globals.get(name);

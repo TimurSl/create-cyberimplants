@@ -4,6 +4,7 @@ import dev.cyberimplants.synapse.IsaLevel;
 import dev.cyberimplants.synapse.compiler.ActivateInfo;
 import dev.cyberimplants.synapse.compiler.Code;
 import dev.cyberimplants.synapse.compiler.Compiler;
+import dev.cyberimplants.synapse.compiler.DeviceInfo;
 import dev.cyberimplants.synapse.compiler.Instr;
 import dev.cyberimplants.synapse.compiler.Op;
 import dev.cyberimplants.synapse.compiler.Ticks;
@@ -91,6 +92,10 @@ public final class Task {
             case STORE_LOCAL -> locals[in.a()] = pop();
             case LOAD_NAME -> push(resolve((String) in.k()));
             case STORE_GLOBAL -> globals.put((String) in.k(), pop());
+            case DEVICE -> {
+                DeviceInfo info = (DeviceInfo) in.k();
+                push(host.device(info.kind(), info.label()));
+            }
             case MEMBER -> {
                 Object target = pop();
                 if (target == null) {

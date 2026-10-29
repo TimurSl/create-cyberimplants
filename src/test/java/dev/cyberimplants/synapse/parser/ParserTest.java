@@ -128,13 +128,31 @@ class ParserTest {
     void higherIsaFeaturesAreRejectedWithTheLevelThatIntroducesThem() {
         assertIsaError("PROGRAM \"x\"\nON boot:\n    WHILE TRUE:\n        LOG 1\n", "ISA-2");
         assertIsaError("PROGRAM \"x\"\nEVERY 2s:\n    LOG 1\n", "ISA-2");
-        assertIsaError("PROGRAM \"x\"\nDEVICE p = port \"A\"\n", "ISA-2");
+        assertIsaError("PROGRAM \"x\"\nCHANNEL c = link \"A\"\n", "ISA-2");
         assertIsaError("PROGRAM \"x\"\nON boot:\n    CONFIGURE aes x = 1\n", "ISA-2");
         assertIsaError("PROGRAM \"x\"\nON boot:\n    FOR i IN xs:\n        LOG i\n", "ISA-3");
         assertIsaError("PROGRAM \"x\"\nFUNC f(x):\n    RETURN x\n", "ISA-3");
         assertIsaError("PROGRAM \"x\"\nON boot:\n    LET a = [1, 2]\n", "ISA-3");
         assertIsaError("PROGRAM \"x\"\nON boot:\n    TRY:\n        LOG 1\n", "ISA-4");
         assertIsaError("PROGRAM \"x\"\nPERSIST VAR a = 1\n", "ISA-5");
+    }
+
+    @Test
+    void parsesDevicesAndFromClauses() {
+        Ast.ProgramNode p = parse("""
+                PROGRAM "Overspeed Watch"
+                DEVICE press = port "Press Line A"
+                ON rotational_speed_changed FROM press:
+                    LOG press.speed
+                """);
+        assertEquals("Press Line A", p.devices().get(0).label());
+        assertEquals("press", p.devices().get(0).name());
+        assertEquals("press", p.handlers().get(0).from());
+    }
+
+    @Test
+    void onlyPortDevicesExistInLayerOne() {
+        assertThrows(SynapseException.class, () -> parse("PROGRAM \"x\"\nDEVICE p = sensor \"A\"\n"));
     }
 
     @Test
