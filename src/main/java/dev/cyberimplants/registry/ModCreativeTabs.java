@@ -19,6 +19,7 @@ public final class ModCreativeTabs {
                     .icon(() -> new ItemStack(ModItems.itemFor(ImplantIds.CORE)))
                     .displayItems((parameters, output) -> {
                         ModItems.implants().values().forEach(item -> output.accept(item.get()));
+                        output.accept(ModItems.FIELD_MANUAL.get());
                         output.accept(ModItems.FLECHETTE.get());
                         output.accept(ModItems.IMPLANTATION_RIG.get());
                         output.accept(ModItems.KINETIC_CHARGER.get());

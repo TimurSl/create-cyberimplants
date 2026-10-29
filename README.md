@@ -13,6 +13,17 @@ make the existing abilities stronger; they never add duplicate items.
 > NeoForge-dependent code is compiled by CI but has not been run in a game yet (see the roadmap). See
 > [Implementation layers](docs/design/09-roadmap.md).
 
+## Languages and in-game guide
+
+The mod ships `en_us` and `ru_ru` (Russian) language files. Every item, screen, message and the guide below is translated.
+
+The **Field Manual** is the in-game guide: 12 chapters (first steps, body and Neural Load, Charge, the Rig, controls, tiers,
+the implant catalog, building a cyberdeck, your first Synapse program, a Synapse cheat sheet, Create machines, and
+troubleshooting). Open it with the *Open Field Manual* key (`H` by default) or by right-clicking the item. New players get one
+on their first join (server config `manual.giveOnFirstJoin`); it is also craftable from a book and a redstone dust. The text
+lives in the language files (`cyberimplants.manual.*`), and `LangAuditTest` checks that both languages have the same keys and
+that every Synapse example in the manual compiles. Russian players: [README.ru.md](README.ru.md).
+
 ## Design specification
 
 | # | Document | Contents |

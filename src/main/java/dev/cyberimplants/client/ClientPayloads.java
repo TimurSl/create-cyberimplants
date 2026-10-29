@@ -12,6 +12,10 @@ public final class ClientPayloads {
         Minecraft.getInstance().setScreen(new RigScreen(pos));
     }
 
+    public static void openManual() {
+        Minecraft.getInstance().setScreen(new dev.cyberimplants.client.screen.ManualScreen());
+    }
+
     public static void scanResult(ScanResultPayload payload) {
         ClientOptics.setScan(payload);
     }

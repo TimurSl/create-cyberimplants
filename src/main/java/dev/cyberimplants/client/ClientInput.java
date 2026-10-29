@@ -39,6 +39,11 @@ final class ClientInput {
                 mc.setScreen(new DeckScreen());
             }
         }
+        while (ModKeys.MANUAL.consumeClick()) {
+            if (mc.screen == null) {
+                mc.setScreen(new dev.cyberimplants.client.screen.ManualScreen());
+            }
+        }
         while (ModKeys.FIRE_BALLISTIC.consumeClick()) {
             if (mc.screen == null && Arms.freeHandWith(player, ImplantIds.BALLISTIC_MODULE) != null) {
                 PacketDistributor.sendToServer(new FireBallisticPayload());
