@@ -82,7 +82,7 @@ public final class Aes {
         }
 
         ServerLevel level = player.serverLevel();
-        int window = (int) stats.value("detection_ticks", 4);
+        int window = (int) stats.value("detection_ticks", 4) + Synergies.visorDetectionBonus(body);
         AABB search = player.getBoundingBox().inflate(16.0);
         List<AbstractArrow> arrows = level.getEntitiesOfClass(AbstractArrow.class, search,
                 a -> (a instanceof Arrow || a instanceof SpectralArrow) && a.getOwner() != player);

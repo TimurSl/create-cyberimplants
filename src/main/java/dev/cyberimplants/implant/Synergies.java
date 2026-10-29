@@ -32,6 +32,11 @@ public final class Synergies {
         }
     }
 
+    /** AES + Ballistic Visor: the visor reads the arrow sooner, so the detection window is one tick longer. */
+    public static int visorDetectionBonus(BodyState body) {
+        return Layers.atLeast(4) && body.has(ImplantIds.BALLISTIC_VISOR) ? 1 : 0;
+    }
+
     /** Momentum gained from a fall of this distance for the player's installed implants; 0 when there is no source. */
     public static double fallMomentum(ServerPlayer player, double distance) {
         BodyState body = BodyState.get(player);

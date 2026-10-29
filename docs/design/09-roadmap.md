@@ -212,8 +212,10 @@ channels, the Precision Etcher and the real manufacturing chain, the full editor
   by Silent Actuators Tier IV+). Shock Circuit charging creepers has existed since Layer 1. Both rules live in `implant/Limits.java`.
 - **Synergies** (`implant/Synergies.java`): an AES evasion opens a Kerenzikov window for free; Momentum Booster Tier II+ gains
   Momentum from falls (5 per block beyond 3), x1.5 with Impact Dampeners installed. Power Actuators + Retractable Blade already
-  works because the blade counts as an empty hand.
-- `Layer4Tests` covers all four rules.
+  works because the blade counts as an empty hand. The Ballistic Visor adds 1 tick to the AES detection window, and the Combat
+  Predictor's lead indicator follows the Target Tracking tag instead of the crosshair. Silent Actuators' ghost step vs the Entity
+  Scanner waits for the scanner's auto-scan (Layer 3).
+- `Layer4Tests` covers the limits and the AES, Momentum and Visor synergies.
 
 Still to do in Layer 4: the other Limits (free hands, metal-only, Temporal Backlash, Charge drain, recalibration windows,
 the Magnetic Soles jump penalty), counterplay and scan warnings, the remaining synergies, the emergency system and ERS danger

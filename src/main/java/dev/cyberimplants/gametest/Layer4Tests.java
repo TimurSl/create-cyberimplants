@@ -96,6 +96,16 @@ public final class Layer4Tests {
         helper.succeed();
     }
 
+    @GameTest(template = "empty")
+    public static void ballisticVisorWidensTheAesWindow(GameTestHelper helper) {
+        ServerPlayer plain = playerWith(helper, new Fit(BodyRegion.CORTEX, 0, ImplantIds.AES, 1));
+        ServerPlayer visor = playerWith(helper, new Fit(BodyRegion.CORTEX, 0, ImplantIds.AES, 1),
+                new Fit(BodyRegion.OCULAR, 0, ImplantIds.BALLISTIC_VISOR, 1));
+        helper.assertTrue(Synergies.visorDetectionBonus(BodyState.get(plain)) == 0, "no visor, no bonus");
+        helper.assertTrue(Synergies.visorDetectionBonus(BodyState.get(visor)) == 1, "the visor adds one tick");
+        helper.succeed();
+    }
+
     private Layer4Tests() {
     }
 }
