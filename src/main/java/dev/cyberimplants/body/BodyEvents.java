@@ -44,6 +44,7 @@ public final class BodyEvents {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
         }
+        dev.cyberimplants.implant.Appearance.tick(player);
         BodyState state = BodyState.get(player);
         if (state.installed().isEmpty() && state.data().isEmpty()) {
             return; // an unmodified body costs nothing

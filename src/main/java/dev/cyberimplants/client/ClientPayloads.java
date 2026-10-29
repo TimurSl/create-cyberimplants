@@ -1,6 +1,7 @@
 package dev.cyberimplants.client;
 
 import dev.cyberimplants.client.screen.RigScreen;
+import dev.cyberimplants.network.AppearancePayload;
 import dev.cyberimplants.network.DeckStatusPayload;
 import dev.cyberimplants.network.ScanResultPayload;
 import dev.cyberimplants.network.ScreenFxPayload;
@@ -27,6 +28,10 @@ public final class ClientPayloads {
 
     public static void deckStatus(DeckStatusPayload payload) {
         ClientDeckState.set(payload);
+    }
+
+    public static void appearance(AppearancePayload payload) {
+        ClientAppearance.set(payload.entityId(), payload.bits());
     }
 
     public static void screenFx(ScreenFxPayload payload) {

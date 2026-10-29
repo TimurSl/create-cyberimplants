@@ -9,12 +9,16 @@ import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.Limits;
 import dev.cyberimplants.implant.PassiveModifiers;
 import dev.cyberimplants.implant.Synergies;
+import dev.cyberimplants.implant.Toggles;
 import dev.cyberimplants.implant.neural.Kerenzikov;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
@@ -49,6 +53,22 @@ public final class Layer4Tests {
             helper.assertTrue(tier == 2 ? Math.abs(gravity - vanilla) < 1.0E-9 : gravity > vanilla,
                     "Tier " + tier + " gravity " + gravity + " vs " + vanilla);
         }
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void bladeWorksFromEitherArmWithAnEmptyMainHand(GameTestHelper helper) {
+        // The mock player is right-handed; the blade sits in the left (off-hand) arm's socket.
+        ServerPlayer player = playerWith(helper, new Fit(BodyRegion.LEFT_ARM, 0, ImplantIds.CYBERNETIC_ARM, 1),
+                new Fit(BodyRegion.LEFT_SOCKET, 0, ImplantIds.RETRACTABLE_BLADE, 1));
+        BodyState.set(player, BodyState.get(player).withFlag(Toggles.key(ImplantIds.RETRACTABLE_BLADE), true));
+        PassiveModifiers.apply(player);
+        double damage = player.getAttributeValue(Attributes.ATTACK_DAMAGE);
+        helper.assertTrue(Math.abs(damage - 6.0) < 1.0E-9, "a deployed Tier I blade hits for 6, got " + damage);
+
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.STICK));
+        PassiveModifiers.apply(player);
+        helper.assertTrue(player.getAttributeValue(Attributes.ATTACK_DAMAGE) < 6.0, "a full main hand stows the blade");
         helper.succeed();
     }
 

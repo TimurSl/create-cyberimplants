@@ -12,6 +12,10 @@ import net.minecraft.world.entity.player.Player;
 public final class Arms {
     public enum Side { LEFT, RIGHT }
 
+    public static Side other(Side side) {
+        return side == Side.LEFT ? Side.RIGHT : Side.LEFT;
+    }
+
     public static BodyRegion frameRegion(Side side) {
         return side == Side.LEFT ? BodyRegion.LEFT_ARM : BodyRegion.RIGHT_ARM;
     }
@@ -46,6 +50,17 @@ public final class Arms {
             }
         }
         return 0;
+    }
+
+    /** Highest tier of the module across both arms, or 0. */
+    public static int anyModuleTier(BodyState s, ResourceLocation module) {
+        return Math.max(moduleTier(s, Side.LEFT, module), moduleTier(s, Side.RIGHT, module));
+    }
+
+    /** True when the Retractable Blade is deployed and actually armed: it strikes through the main hand, which must be empty. */
+    public static boolean bladeArmed(Player player) {
+        return anyModuleTier(BodyState.get(player), ImplantIds.RETRACTABLE_BLADE) > 0
+                && Toggles.isOn(player, ImplantIds.RETRACTABLE_BLADE) && player.getMainHandItem().isEmpty();
     }
 
     /** True when both arms carry a frame of the same tier (the bilateral bonus). */

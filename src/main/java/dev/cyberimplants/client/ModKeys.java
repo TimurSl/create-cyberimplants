@@ -13,6 +13,7 @@ public final class ModKeys {
     public static final KeyMapping FIRE_BALLISTIC = key("fire_ballistic", GLFW.GLFW_KEY_G);
     public static final KeyMapping DECK = key("deck", GLFW.GLFW_KEY_K);
     public static final KeyMapping MANUAL = key("manual", GLFW.GLFW_KEY_H);
+    public static final KeyMapping SETTINGS = key("settings", InputConstants.UNKNOWN.getValue());
     public static final KeyMapping[] MACROS = {
             key("macro_1", InputConstants.UNKNOWN.getValue()),
             key("macro_2", InputConstants.UNKNOWN.getValue()),
@@ -24,13 +25,14 @@ public final class ModKeys {
     }
 
     public static KeyMapping[] all() {
-        KeyMapping[] all = new KeyMapping[5 + MACROS.length];
+        KeyMapping[] all = new KeyMapping[6 + MACROS.length];
         all[0] = WHEEL;
         all[1] = DODGE;
         all[2] = FIRE_BALLISTIC;
         all[3] = DECK;
         all[4] = MANUAL;
-        System.arraycopy(MACROS, 0, all, 5, MACROS.length);
+        all[5] = SETTINGS;
+        System.arraycopy(MACROS, 0, all, 6, MACROS.length);
         return all;
     }
 
