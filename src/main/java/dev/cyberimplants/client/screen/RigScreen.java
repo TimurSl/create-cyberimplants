@@ -70,7 +70,7 @@ public class RigScreen extends Screen {
         // Right: the body, two columns of slots.
         List<SlotId> slots = new ArrayList<>();
         for (BodyRegion region : BodyRegion.values()) {
-            for (int i = 0; i < region.slots(); i++) {
+            for (int i = 0; i < BodyOps.effectiveSlots(body, region); i++) {
                 slots.add(new SlotId(region, i));
             }
         }

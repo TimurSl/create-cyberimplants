@@ -15,6 +15,7 @@ public final class ClientSetup {
     public static void init(IEventBus modBus) {
         modBus.addListener(ClientSetup::registerKeys);
         modBus.addListener(ClientSetup::registerGuiLayers);
+        modBus.addListener(ClientFluids::register);
         NeoForge.EVENT_BUS.addListener(ClientSetup::onClientTick);
         NeoForge.EVENT_BUS.addListener(ClientSetup::onMovementInput);
     }

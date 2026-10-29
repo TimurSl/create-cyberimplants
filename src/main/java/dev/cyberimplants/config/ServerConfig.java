@@ -14,6 +14,8 @@ public final class ServerConfig {
     public static final ModConfigSpec.BooleanValue CHARGE_ENABLED;
     public static final ModConfigSpec.DoubleValue CHARGE_DISABLED_COOLDOWN_MULTIPLIER;
 
+    public static final ModConfigSpec.DoubleValue RIG_TIME_MULTIPLIER;
+
     public static final ModConfigSpec.BooleanValue KEEP_ON_DEATH;
 
     public static final ModConfigSpec.IntValue DECK_MAX_CYCLES_PER_PLAYER_PER_TICK;
@@ -43,6 +45,12 @@ public final class ServerConfig {
         CHARGE_DISABLED_COOLDOWN_MULTIPLIER = b
                 .comment("Cooldown multiplier applied to every active implant while Charge is disabled.")
                 .defineInRange("disabledCooldownMultiplier", 1.5, 1.0, 10.0);
+        b.pop();
+
+        b.push("rig");
+        RIG_TIME_MULTIPLIER = b
+                .comment("Scales the 5-20 s Implantation Rig operation time. 0.01 makes operations nearly instant.")
+                .defineInRange("timeMultiplier", 1.0, 0.01, 10.0);
         b.pop();
 
         b.push("implants");

@@ -56,7 +56,9 @@ public final class MomentumBooster {
             player.setDeltaMovement(flat.x * speed, Math.max(player.getDeltaMovement().y, 0.1), flat.z * speed);
             player.hurtMarked = true;
             int buffTicks = (int) (stats.value("buff_ticks", 40) * Math.max(fraction, 0.25));
-            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, buffTicks, 0));
+            // Speed I is +20%: the table's +20/25/30/40/50% maps to Speed I, I, II, II, III.
+            int amplifier = Math.max(0, (int) Math.round(stats.value("buff_speed", 0.20) / 0.2) - 1);
+            player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, buffTicks, amplifier));
             Body.update(player, s -> s.withData(KEY, 0));
             player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.FIREWORK_ROCKET_LAUNCH, SoundSource.PLAYERS, 0.8f, 1.2f);

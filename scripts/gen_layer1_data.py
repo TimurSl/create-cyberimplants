@@ -312,6 +312,12 @@ def write_upgrade_chain(ident, category):
 
 
 def write_gel_recipes():
+    # Layer 2 placeholder for the Neuro-Stabilizer: spout a bottle with gel (the real recipe is mixed first).
+    write_json("data/%s/recipe/neuro_stabilizer.json" % MOD, {
+        "type": "create:filling",
+        "ingredients": [{"item": "minecraft:glass_bottle"},
+                        {"type": "neoforge:single", "amount": 250, "fluid": "%s:neural_gel" % MOD}],
+        "results": [{"id": "%s:neuro_stabilizer" % MOD}]})
     write_json("data/%s/recipe/bio_interface_gel.json" % MOD, {
         "type": "create:mixing",
         "ingredients": [{"type": "neoforge:single", "amount": 250, "fluid": "minecraft:water"},
@@ -351,11 +357,16 @@ def main():
 
     # transitional item of the upgrade assemblies and the gel buckets
     for extra, label, cat in (("incomplete_implant", "Incomplete Implant", "core"), ("bio_interface_gel_bucket", "Bio Gel", "circulatory"),
-                              ("neural_gel_bucket", "Neural Gel", "neural")):
+                              ("neural_gel_bucket", "Neural Gel", "neural"), ("neuro_stabilizer", "Neuro Stabilizer", "neural")):
         write_json("assets/%s/models/item/%s.json" % (MOD, extra),
                    {"parent": "minecraft:item/generated", "textures": {"layer0": "%s:item/%s" % (MOD, extra)}})
         with open(os.path.join(ROOT, "assets", MOD, "textures", "item", extra + ".png"), "wb") as f:
             f.write(item_texture(label, cat))
+
+    # gel liquid blocks: a single model keeps the particle sprite; the fluid renders through the client extension
+    for gel in ("bio_interface_gel", "neural_gel"):
+        write_json("assets/%s/blockstates/%s.json" % (MOD, gel), {"variants": {"": {"model": "%s:block/%s" % (MOD, gel)}}})
+        write_json("assets/%s/models/block/%s.json" % (MOD, gel), {"textures": {"particle": "minecraft:block/water_still"}})
 
     # flechette
     write_json("assets/%s/models/item/flechette.json" % MOD,
@@ -462,6 +473,9 @@ LANG_STATIC = {
     "itemGroup.cyberimplants": "Create: Cybernetics",
     "item.cyberimplants.flechette": "Flechette",
     "item.cyberimplants.incomplete_implant": "Incomplete Implant",
+    "item.cyberimplants.neuro_stabilizer": "Neuro-Stabilizer",
+    "cyberimplants.rig.locked": "A redstone signal has locked the chair.",
+    "cyberimplants.use.offline": "Offline (neural glitch)",
     "item.cyberimplants.bio_interface_gel_bucket": "Bio-Interface Gel Bucket",
     "item.cyberimplants.neural_gel_bucket": "Neural Gel Bucket",
     "fluid_type.cyberimplants.bio_interface_gel": "Bio-Interface Gel",

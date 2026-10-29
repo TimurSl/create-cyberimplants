@@ -5,6 +5,8 @@ import dev.cyberimplants.implant.ImplantCatalog;
 import dev.cyberimplants.implant.ImplantItem;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -27,6 +29,18 @@ public final class ModItems {
 
     /** Ammunition for the Ballistic Module. */
     public static final DeferredItem<Item> FLECHETTE = ITEMS.registerSimpleItem("flechette");
+
+    /** The transitional item of every upgrade sequenced assembly. */
+    public static final DeferredItem<Item> INCOMPLETE_IMPLANT = ITEMS.register("incomplete_implant",
+            () -> new dev.cyberimplants.compat.create.IncompleteImplantItem(new Item.Properties().stacksTo(1)));
+
+    public static final DeferredItem<Item> NEURO_STABILIZER = ITEMS.register("neuro_stabilizer",
+            () -> new dev.cyberimplants.implant.NeuroStabilizerItem(new Item.Properties().stacksTo(16)));
+
+    public static final DeferredItem<Item> BIO_GEL_BUCKET = ITEMS.register("bio_interface_gel_bucket",
+            () -> new BucketItem(ModFluids.BIO_GEL.get(), new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
+    public static final DeferredItem<Item> NEURAL_GEL_BUCKET = ITEMS.register("neural_gel_bucket",
+            () -> new BucketItem(ModFluids.NEURAL_GEL.get(), new Item.Properties().craftRemainder(Items.BUCKET).stacksTo(1)));
 
     public static final DeferredItem<BlockItem> IMPLANTATION_RIG =
             ITEMS.registerSimpleBlockItem("implantation_rig", ModBlocks.IMPLANTATION_RIG);

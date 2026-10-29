@@ -4,6 +4,8 @@ import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.compat.create.block.ChargerBlock;
 import dev.cyberimplants.compat.create.block.RigBlock;
 import dev.cyberimplants.content.NeuralPortBlock;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -24,6 +26,11 @@ public final class ModBlocks {
     public static final DeferredBlock<NeuralPortBlock> NEURAL_PORT = BLOCKS.register("neural_port",
             () -> new NeuralPortBlock(BlockBehaviour.Properties.of()
                     .strength(1.5f, 4.0f).sound(SoundType.METAL).noOcclusion().noCollission()));
+
+    public static final DeferredBlock<LiquidBlock> BIO_GEL_BLOCK = BLOCKS.register("bio_interface_gel",
+            () -> new LiquidBlock(ModFluids.BIO_GEL.get(), BlockBehaviour.Properties.ofFullCopy(Blocks.WATER)));
+    public static final DeferredBlock<LiquidBlock> NEURAL_GEL_BLOCK = BLOCKS.register("neural_gel",
+            () -> new LiquidBlock(ModFluids.NEURAL_GEL.get(), BlockBehaviour.Properties.ofFullCopy(Blocks.WATER).lightLevel(s -> 6)));
 
     private ModBlocks() {
     }

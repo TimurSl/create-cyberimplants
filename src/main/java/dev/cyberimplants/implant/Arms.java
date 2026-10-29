@@ -33,14 +33,26 @@ public final class Arms {
     }
 
     public static boolean hasModule(BodyState s, Side side, ResourceLocation module) {
-        var installed = s.installed().get(new SlotId(socketRegion(side), 0));
-        return installed != null && installed.type().equals(module);
+        return moduleTier(s, side, module) > 0;
     }
 
-    /** Tier of the module in the given arm's socket, or 0. */
+    /** Tier of the module in any of the given arm's sockets (1-3 depending on the frame), or 0. */
     public static int moduleTier(BodyState s, Side side, ResourceLocation module) {
-        var installed = s.installed().get(new SlotId(socketRegion(side), 0));
-        return installed != null && installed.type().equals(module) ? installed.tier() : 0;
+        BodyRegion region = socketRegion(side);
+        for (int i = 0; i < region.slots(); i++) {
+            var installed = s.installed().get(new SlotId(region, i));
+            if (installed != null && installed.type().equals(module)) {
+                return installed.tier();
+            }
+        }
+        return 0;
+    }
+
+    /** True when both arms carry a frame of the same tier (the bilateral bonus). */
+    public static boolean bilateral(BodyState s) {
+        var left = s.installed().get(new SlotId(BodyRegion.LEFT_ARM, 0));
+        var right = s.installed().get(new SlotId(BodyRegion.RIGHT_ARM, 0));
+        return left != null && right != null && left.tier() == right.tier();
     }
 
     /** The first arm whose socket holds this module and whose hand is empty, or null. */

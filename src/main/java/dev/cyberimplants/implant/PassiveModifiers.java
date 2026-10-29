@@ -30,6 +30,10 @@ public final class PassiveModifiers {
         double unarmedMultiplier = Stats.of(POWER_ACTUATORS, Math.max(power, 1)).value("unarmed_multiplier", 2.0);
         Attrs.added(player, Attributes.ATTACK_DAMAGE, "power_actuators_damage", handEmpty ? bonus * unarmedMultiplier : bonus, power > 0);
 
+        int skeleton = s.tierOf(REINFORCED_SKELETON);
+        Attrs.added(player, Attributes.MAX_HEALTH, "skeleton_health",
+                Stats.of(REINFORCED_SKELETON, Math.max(skeleton, 1)).value("max_health", 0.0), skeleton > 0);
+
         int tendons = s.tierOf(KINETIC_TENDONS);
         Attrs.added(player, Attributes.JUMP_STRENGTH, "kinetic_tendons_jump",
                 Stats.of(KINETIC_TENDONS, Math.max(tendons, 1)).value("jump_strength", 0.042), tendons > 0);
@@ -52,8 +56,11 @@ public final class PassiveModifiers {
         Arms.Side main = Arms.mainSide(player);
         int frame = s.installed().containsKey(new dev.cyberimplants.body.SlotId(Arms.frameRegion(main), 0))
                 ? s.installed().get(new dev.cyberimplants.body.SlotId(Arms.frameRegion(main), 0)).tier() : 0;
+        var frameStats = Stats.of(CYBERNETIC_ARM, Math.max(frame, 1));
+        double bilateral = Arms.bilateral(s) ? frameStats.value("bilateral_break_speed", 0.0) : 0.0;
         Attrs.multiplied(player, Attributes.BLOCK_BREAK_SPEED, "arm_break_speed",
-                Stats.of(CYBERNETIC_ARM, Math.max(frame, 1)).value("break_speed", 0.10), frame > 0);
+                frameStats.value("break_speed", 0.10) + bilateral, frame > 0);
+        Attrs.added(player, Attributes.BLOCK_INTERACTION_RANGE, "arm_reach", frameStats.value("reach", 0.0), frame > 0);
 
         int bladeTier = Arms.moduleTier(s, main, RETRACTABLE_BLADE);
         boolean bladeOut = bladeTier > 0 && handEmpty && Toggles.isOn(player, RETRACTABLE_BLADE);
@@ -67,6 +74,7 @@ public final class PassiveModifiers {
         var platingStats = Stats.of(ARMOR_PLATING, Math.max(plating, 1));
         Attrs.added(player, Attributes.ARMOR, "plating_armor", platingStats.value("armor", 2.0), plating > 0);
         Attrs.added(player, Attributes.ARMOR_TOUGHNESS, "plating_toughness", platingStats.value("toughness", 0.0), plating > 0);
+        Attrs.multiplied(player, Attributes.MOVEMENT_SPEED, "plating_weight", platingStats.value("weight", 0.0), plating > 0);
     }
 
     private record TierDamp(double safeFall, double reduction) {

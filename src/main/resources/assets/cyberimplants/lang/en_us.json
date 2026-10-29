@@ -214,5 +214,8 @@
   "cyberimplants.load.strained": "Strained",
   "cyberimplants.sensor.filter": "Proximity filter: %s",
   "cyberimplants.sensor.size": "Detection box: %s blocks",
-  "block.cyberimplants.proximity_sensor": "Proximity Sensor"
+  "block.cyberimplants.proximity_sensor": "Proximity Sensor",
+  "item.cyberimplants.neuro_stabilizer": "Neuro-Stabilizer",
+  "cyberimplants.rig.locked": "A redstone signal has locked the chair.",
+  "cyberimplants.use.offline": "Offline (neural glitch)"
 }

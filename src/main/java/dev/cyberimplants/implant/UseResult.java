@@ -9,7 +9,9 @@ public enum UseResult {
     RANGE,
     NO_LOS,
     DENIED,
-    MISSING;
+    MISSING,
+    /** Knocked out by a Strain glitch for a few seconds. */
+    OFFLINE;
 
     public boolean ok() {
         return this == OK;
