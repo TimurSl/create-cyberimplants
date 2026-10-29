@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.skeletal;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -35,6 +36,9 @@ public final class ImpactDampeners {
         double recovered = Math.min(stats.value("recovery_cap", 50), absorbed * stats.value("energy_per_block", 0));
         if (recovered > 0) {
             Body.addCharge(player, recovered);
+        }
+        if (absorbed > 0) {
+            ImplantFx.landing(player, event.getDistance(), recovered);
         }
         DeckEvents.fire(player, "landed", Map.of("fall_distance", (double) event.getDistance(), "recovered", recovered));
     }

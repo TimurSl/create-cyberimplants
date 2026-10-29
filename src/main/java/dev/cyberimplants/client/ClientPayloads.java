@@ -3,6 +3,7 @@ package dev.cyberimplants.client;
 import dev.cyberimplants.client.screen.RigScreen;
 import dev.cyberimplants.network.DeckStatusPayload;
 import dev.cyberimplants.network.ScanResultPayload;
+import dev.cyberimplants.network.ScreenFxPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 
@@ -26,6 +27,10 @@ public final class ClientPayloads {
 
     public static void deckStatus(DeckStatusPayload payload) {
         ClientDeckState.set(payload);
+    }
+
+    public static void screenFx(ScreenFxPayload payload) {
+        ClientFx.trigger(payload.effect(), payload.ticks(), payload.strength());
     }
 
     private ClientPayloads() {

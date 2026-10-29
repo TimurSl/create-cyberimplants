@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.mobility;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -39,6 +40,7 @@ public final class MagneticSoles {
                 return UseResult.NO_CHARGE;
             }
             Toggles.set(player, ImplantIds.MAGNETIC_SOLES, next);
+            ImplantFx.soles(player, next);
             if (!next) {
                 detach(player);
             }
@@ -74,6 +76,7 @@ public final class MagneticSoles {
         boolean was = attached(player);
         ATTACHED_UNTIL.put(player.getUUID(), player.level().getGameTime() + LEASE_TICKS);
         if (!was) {
+            ImplantFx.solesClamp(player);
             DeckEvents.fire(player, "attached", Map.of("surface", "metal"));
         }
     }
@@ -96,6 +99,9 @@ public final class MagneticSoles {
         if (player.level().getGameTime() >= until) {
             detach(player);
             return;
+        }
+        if (player.tickCount % 4 == 0) {
+            ImplantFx.solesHold(player);
         }
         double perSecond = Stats.of(ImplantIds.MAGNETIC_SOLES, BodyState.get(player).tierOf(ImplantIds.MAGNETIC_SOLES))
                 .value("upkeep_per_second", 0.5);

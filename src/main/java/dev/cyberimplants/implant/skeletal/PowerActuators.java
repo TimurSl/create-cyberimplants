@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.skeletal;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -62,6 +63,7 @@ public final class PowerActuators {
         double extra = Stats.of(ImplantIds.POWER_ACTUATORS, tier).value("knockback", 0.2) * 0.4;
         float yaw = player.getYRot() * ((float) Math.PI / 180f);
         target.knockback(extra, Mth.sin(yaw), -Mth.cos(yaw));
+        ImplantFx.powerStrike(player, target);
         DeckEvents.fire(player, "power_strike", Map.of("target", EntityHandle.of(player, target)));
     }
 

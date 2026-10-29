@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.subdermal;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -62,6 +63,9 @@ public final class KineticShield {
         double absorbed = Math.min(pool, amount * share);
         double left = pool - absorbed;
         Body.updateQuiet(player, st -> st.withData(KEY, Math.max(0.0, left)));
+        if (absorbed > 0) {
+            ImplantFx.shieldAbsorb(player, absorbed, left <= 1.0E-6);
+        }
         if (left <= 1.0E-6 && absorbed > 0) {
             DeckEvents.fire(player, "shield_broken", Map.of());
         }
@@ -82,6 +86,7 @@ public final class KineticShield {
             return false;
         }
         Body.updateQuiet(player, st -> st.withData(KEY, target));
+        ImplantFx.shieldEmergency(player);
         Body.startCooldown(player, ImplantIds.KINETIC_SHIELD, (int) stats.value("emergency_cooldown_ticks", 900));
         return true;
     }
@@ -110,6 +115,7 @@ public final class KineticShield {
             double next = pool + add;
             Body.updateQuiet(player, st -> st.withData(KEY, next));
             if (next >= cap - 1.0E-6) {
+                ImplantFx.shieldFull(player);
                 DeckEvents.fire(player, "shield_full", Map.of());
             }
         }

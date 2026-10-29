@@ -113,7 +113,8 @@ public final class ClientOptics {
             if (!GLOWING.containsKey(id)) {
                 GLOWING.put(id, e.isCurrentlyGlowing());
             }
-            e.setGlowingTag(true);
+            // Re-applied every tick: the server rewrites the whole flag byte whenever any other flag changes.
+            setGlowing(e, true);
         }
         GLOWING.entrySet().removeIf(entry -> {
             if (wanted.contains(entry.getKey())) {
@@ -121,10 +122,40 @@ public final class ClientOptics {
             }
             Entity e = mc.level.getEntity(entry.getKey());
             if (e != null) {
-                e.setGlowingTag(entry.getValue());
+                setGlowing(e, entry.getValue());
             }
             return true;
         });
+    }
+
+    /**
+     * The glow outline on the client follows shared flag 6. {@link Entity#setGlowingTag} cannot set it here: on the
+     * client it copies {@code isCurrentlyGlowing()}, which reads that very flag, back into it, so it stays off. Write
+     * the flag directly instead.
+     */
+    private static void setGlowing(Entity entity, boolean glowing) {
+        if (SET_SHARED_FLAG != null) {
+            try {
+                SET_SHARED_FLAG.invoke(entity, GLOWING_FLAG, glowing);
+                return;
+            } catch (ReflectiveOperationException | RuntimeException ignored) {
+                // fall through
+            }
+        }
+        entity.setGlowingTag(glowing);
+    }
+
+    private static final int GLOWING_FLAG = 6;
+    private static final java.lang.reflect.Method SET_SHARED_FLAG = findSetSharedFlag();
+
+    private static java.lang.reflect.Method findSetSharedFlag() {
+        try {
+            java.lang.reflect.Method m = Entity.class.getDeclaredMethod("setSharedFlag", int.class, boolean.class);
+            m.setAccessible(true);
+            return m;
+        } catch (ReflectiveOperationException | RuntimeException e) {
+            return null;
+        }
     }
 
     // ---------------------------------------------------------------- Combat Predictor

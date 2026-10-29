@@ -1,5 +1,6 @@
 package dev.cyberimplants.body;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.deck.DeckEvents;
 import dev.cyberimplants.implant.ImplantAction;
@@ -9,8 +10,6 @@ import dev.cyberimplants.implant.Toggles;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -95,8 +94,7 @@ public final class Strain {
         RandomSource random = player.getRandom();
         if (candidates.isEmpty() || random.nextBoolean()) {
             player.displayClientMessage(Component.translatable("cyberimplants.strain.static"), true);
-            player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 0.5f, 1.8f);
+            ImplantFx.glitch(player, false);
             return;
         }
         ResourceLocation id = candidates.get(random.nextInt(candidates.size()));
@@ -109,8 +107,7 @@ public final class Strain {
         Body.update(player, st -> st.withData(OFFLINE + id.getPath(), end));
         player.displayClientMessage(Component.translatable("cyberimplants.strain.glitch",
                 Component.translatable("item." + id.getNamespace() + "." + id.getPath())), true);
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.BEACON_DEACTIVATE, SoundSource.PLAYERS, 0.8f, 1.2f);
+        ImplantFx.glitch(player, true);
     }
 
     @SubscribeEvent

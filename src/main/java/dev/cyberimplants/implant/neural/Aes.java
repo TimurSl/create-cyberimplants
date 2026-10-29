@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.neural;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -9,7 +10,6 @@ import dev.cyberimplants.deck.DeckEvents;
 import dev.cyberimplants.deck.EntityHandle;
 import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.Synergies;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -110,14 +110,14 @@ public final class Aes {
                 return;
             }
             state.charges--;
-            sidestep(player, level, velocity, stats.value("distance", 1.5));
+            sidestep(player, level, velocity, stats.value("distance", 1.5), start);
             DeckEvents.fire(player, "evaded", Map.of("projectile", EntityHandle.of(player, arrow)));
             Synergies.aesEvaded(player);
             return; // one evasion per check
         }
     }
 
-    private static void sidestep(ServerPlayer player, ServerLevel level, Vec3 projectileVelocity, double distance) {
+    private static void sidestep(ServerPlayer player, ServerLevel level, Vec3 projectileVelocity, double distance, Vec3 arrowAt) {
         Vec3 flat = new Vec3(projectileVelocity.x, 0, projectileVelocity.z);
         if (flat.lengthSqr() < 1.0E-4) {
             flat = player.getLookAngle().multiply(1, 0, 1);
@@ -133,7 +133,7 @@ public final class Aes {
             }
         }
         // A dodge into a wall is wasted: the charge is spent and the flicker still shows.
-        level.sendParticles(ParticleTypes.CLOUD, player.getX(), player.getY() + 1.0, player.getZ(), 8, 0.3, 0.5, 0.3, 0.02);
+        ImplantFx.aesSidestep(player, arrowAt);
         if (chosen != null) {
             double impulse = player.onGround() ? distance * 0.45 : distance * 0.12;
             player.setDeltaMovement(player.getDeltaMovement().add(chosen.scale(impulse)));

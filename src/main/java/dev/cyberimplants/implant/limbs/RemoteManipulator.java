@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.limbs;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
 import dev.cyberimplants.data.Stats;
@@ -60,6 +61,7 @@ public final class RemoteManipulator {
             player.gameMode.useItemOn(player, level, ItemStack.EMPTY, InteractionHand.MAIN_HAND, blockHit);
             Body.startCooldown(player, ImplantIds.REMOTE_MANIPULATOR, stats.cooldownTicks());
             tether(level, player.getEyePosition().add(0, -0.3, 0), Vec3.atCenterOf(pos));
+            ImplantFx.manipulate(player, Vec3.atCenterOf(pos));
             return UseResult.OK;
         }
     };
@@ -119,6 +121,7 @@ public final class RemoteManipulator {
         }
         Body.startCooldown(player, ImplantIds.REMOTE_MANIPULATOR, stats.cooldownTicks());
         tether(level, player.getEyePosition().add(0, -0.3, 0), target);
+        ImplantFx.manipulate(player, target);
         return UseResult.OK;
     }
 

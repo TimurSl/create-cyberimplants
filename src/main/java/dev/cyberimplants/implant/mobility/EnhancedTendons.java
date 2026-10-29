@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.mobility;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -32,6 +33,7 @@ public final class EnhancedTendons {
             return false;
         }
         USED.put(player.getUUID(), used + 1);
+        ImplantFx.airJump(player);
         return true;
     }
 

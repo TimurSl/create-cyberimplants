@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.circulatory;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -58,6 +59,7 @@ public final class Regenerator {
         if (Body.spend(player, heal * stats.value("charge_per_hp", 2.0))) {
             player.heal(heal);
             LAST_HEAL.put(player.getUUID(), now);
+            ImplantFx.regenerate(player);
             cure(player, tier);
         }
     }

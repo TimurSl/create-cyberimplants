@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.circulatory;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -46,7 +47,9 @@ public final class AdrenalinePump {
             return;
         }
         player.getFoodData().addExhaustion(HUNGER_POINT);
-        BOOST_END.put(player.getUUID(), player.level().getGameTime() + (long) stats.value("boost_ticks", 60));
+        int boostTicks = (int) stats.value("boost_ticks", 60);
+        BOOST_END.put(player.getUUID(), player.level().getGameTime() + boostTicks);
+        ImplantFx.adrenaline(player, boostTicks);
         Attrs.multiplied(player, Attributes.MOVEMENT_SPEED, "adrenaline_boost", stats.value("boost", 0.15), true);
         applyUnlocks(player, tier, true);
         Body.startCooldown(player, ImplantIds.ADRENALINE_PUMP, stats.cooldownTicks());
@@ -73,6 +76,8 @@ public final class AdrenalinePump {
         }
         if (end != null && (!player.isAlive() || player.level().getGameTime() >= end)) {
             finish(player, player.isAlive());
+        } else if (end != null) {
+            ImplantFx.adrenalineTick(player, end - player.level().getGameTime());
         }
     }
 

@@ -5,6 +5,7 @@ import dev.cyberimplants.body.BodyState;
 import dev.cyberimplants.data.Stats;
 import dev.cyberimplants.data.TierStats;
 import dev.cyberimplants.deck.DeckEvents;
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.implant.ImplantAction;
 import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.Tags;
@@ -17,8 +18,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -80,8 +79,7 @@ public final class Sandevistan {
             Field field = new Field(player.level().dimension(), player.position(), radius,
                     player.level().getGameTime() + duration, scale, duration, maxDuration);
             FIELDS.put(player.getUUID(), field);
-            player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.BEACON_ACTIVATE, SoundSource.PLAYERS, 1.0f, 0.6f);
+            ImplantFx.sandevistanStart(player, field.center, radius, duration);
             DeckEvents.fire(player, "chrono_field_started", Map.of("position", new Position(field.center.x, field.center.y, field.center.z)));
             return UseResult.OK;
         }
@@ -115,6 +113,9 @@ public final class Sandevistan {
         }
         if (owner.isAlive()) {
             owner.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 0));
+        }
+        if (!owner.hasDisconnected()) {
+            ImplantFx.sandevistanEnd(owner, field.center);
         }
         if (BodyState.get(owner).has(ImplantIds.SANDEVISTAN)) {
             double used = field.maxDurationTicks == 0 ? 1 : (double) field.durationTicks / field.maxDurationTicks;
@@ -151,6 +152,11 @@ public final class Sandevistan {
                 return; // this tick is allowed through
             }
             event.setCanceled(true);
+            // Frozen entities shed a little green, so it is plain who is caught in the field.
+            if (entity.level().getGameTime() % 6 == entity.getId() % 6 && entity.level() instanceof ServerLevel level) {
+                level.sendParticles(ImplantFx.dust(ImplantFx.GREEN, 0.9f), entity.getX(), entity.getY() + entity.getBbHeight() * 0.6,
+                        entity.getZ(), 2, entity.getBbWidth() * 0.4, entity.getBbHeight() * 0.3, entity.getBbWidth() * 0.4, 0);
+            }
             if (entity instanceof LivingEntity living) {
                 // The hit window: hurt cooldowns keep counting at real speed.
                 if (living.invulnerableTime > 0) {
@@ -186,8 +192,10 @@ public final class Sandevistan {
                 }
             }
         }
+        long age = level.getGameTime() - (field.endTick - field.durationTicks);
+        ImplantFx.sandevistanTick(owner, field.center, field.radius, age);
         if (owner.tickCount % 3 == 0) {
-            for (int i = 0; i < 12; i++) {
+            for (int i = 0; i < 8; i++) {
                 Vec3 dir = new Vec3(level.random.nextGaussian(), level.random.nextGaussian(), level.random.nextGaussian());
                 if (dir.lengthSqr() < 1.0E-4) {
                     continue;

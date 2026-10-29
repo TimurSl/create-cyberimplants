@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.mobility;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
 import dev.cyberimplants.data.Stats;
@@ -7,8 +8,6 @@ import dev.cyberimplants.data.TierStats;
 import dev.cyberimplants.deck.DeckEvents;
 import dev.cyberimplants.implant.ImplantIds;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 
 import java.util.Map;
@@ -27,8 +26,7 @@ public final class HydraulicLegs {
         }
         Body.startCooldown(player, ImplantIds.HYDRAULIC_LEGS, stats.cooldownTicks());
         float power = Mth.clamp(fraction, 0.0f, 1.0f);
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.PISTON_EXTEND, SoundSource.PLAYERS, 0.8f, 0.7f);
+        ImplantFx.leap(player, power);
         DeckEvents.fire(player, "leap", Map.of("power", (double) power));
         return true;
     }
@@ -47,8 +45,7 @@ public final class HydraulicLegs {
         double height = stats.value("max_vertical", 4);
         player.setDeltaMovement(player.getDeltaMovement().x * 0.5, launchSpeedForHeight(height), player.getDeltaMovement().z * 0.5);
         player.hurtMarked = true;
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.PISTON_EXTEND, SoundSource.PLAYERS, 0.8f, 0.7f);
+        ImplantFx.leap(player, 1.0f);
         DeckEvents.fire(player, "leap", Map.of("power", 1.0));
         return true;
     }
