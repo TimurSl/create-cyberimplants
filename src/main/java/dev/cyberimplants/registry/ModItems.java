@@ -34,6 +34,10 @@ public final class ModItems {
     public static final DeferredItem<Item> INCOMPLETE_IMPLANT = ITEMS.register("incomplete_implant",
             () -> new dev.cyberimplants.compat.create.IncompleteImplantItem(new Item.Properties().stacksTo(1)));
 
+    /** The in-game guide (also on a key). Given once to new players unless {@code manual.giveOnFirstJoin} is off. */
+    public static final DeferredItem<Item> FIELD_MANUAL = ITEMS.register("field_manual",
+            () -> new dev.cyberimplants.content.FieldManualItem(new Item.Properties().stacksTo(1)));
+
     public static final DeferredItem<Item> NEURO_STABILIZER = ITEMS.register("neuro_stabilizer",
             () -> new dev.cyberimplants.implant.NeuroStabilizerItem(new Item.Properties().stacksTo(16)));
 

@@ -216,6 +216,21 @@ def item_icon(ident):
     return cv
 
 
+def manual_icon():
+    """The Field Manual: a dark book with a neon cover glyph and a cyan spine."""
+    cv = Canvas()
+    neon = NEON["optical"]
+    cv.rect(2, 1, 13, 14, OUTLINE)
+    cv.rect(3, 2, 12, 13, STEEL)
+    cv.rect(3, 2, 4, 13, dim(neon, 0.6))          # spine
+    cv.rect(5, 2, 12, 2, STEEL_HI)
+    cv.rect(11, 3, 12, 13, STEEL_DARK)             # page edge
+    cv.glyph(["###", "# #", "###", " # ", "###"], 6, 4, neon, dim(neon, 0.5))
+    cv.rect(6, 11, 10, 11, dim(neon, 0.5))
+    cv.set(9, 5, WHITE)
+    return cv
+
+
 def bucket_icon(neon, deep):
     cv = Canvas()
     for y in range(3, 15):  # bucket body (tapered)
@@ -377,6 +392,7 @@ def main():
         if ident.endswith("_bucket"):
             continue
         save("textures/item/%s.png" % ident, item_icon(ident).png())
+    save("textures/item/field_manual.png", manual_icon().png())
     save("textures/item/bio_interface_gel_bucket.png", bucket_icon((0x6F, 0xE0, 0xA8), (0x0E, 0x6A, 0x4A)).png())
     save("textures/item/neural_gel_bucket.png", bucket_icon((0xB4, 0x5C, 0xFF), (0x3E, 0x12, 0x7A)).png())
     for name, cv in (("implantation_rig", rig_side()), ("implantation_rig_top", rig_top()), ("implantation_rig_bottom", rig_bottom()),

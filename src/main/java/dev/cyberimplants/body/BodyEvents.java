@@ -73,6 +73,22 @@ public final class BodyEvents {
     public static void onLogin(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             ImplantRuntime.bodyChanged(player);
+            giveManualOnce(player);
+        }
+    }
+
+    private static final String MANUAL_GIVEN = "cyberimplants_manual_given";
+
+    /** New players get one Field Manual; a persistent flag stops it from coming back after death or relogging. */
+    private static void giveManualOnce(ServerPlayer player) {
+        if (!dev.cyberimplants.config.ServerConfig.MANUAL_GIVE_ON_FIRST_JOIN.get()
+                || player.getPersistentData().getBoolean(MANUAL_GIVEN)) {
+            return;
+        }
+        player.getPersistentData().putBoolean(MANUAL_GIVEN, true);
+        net.minecraft.world.item.ItemStack manual = new net.minecraft.world.item.ItemStack(dev.cyberimplants.registry.ModItems.FIELD_MANUAL.get());
+        if (!player.getInventory().add(manual)) {
+            player.drop(manual, false);
         }
     }
 

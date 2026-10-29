@@ -278,6 +278,11 @@ def write_upgrade_chain(ident, category):
 
 
 def write_gel_recipes():
+    # The Field Manual (in-game guide): a book and a redstone dust. New players also get one on first join.
+    write_json("data/%s/recipe/field_manual.json" % MOD, {
+        "type": "minecraft:crafting_shapeless", "category": "misc",
+        "ingredients": [{"item": "minecraft:book"}, {"item": "minecraft:redstone"}],
+        "result": {"id": "%s:field_manual" % MOD}})
     # Layer 2 placeholder for the Neuro-Stabilizer: spout a bottle with gel (the real recipe is mixed first).
     write_json("data/%s/recipe/neuro_stabilizer.json" % MOD, {
         "type": "create:filling",
@@ -320,7 +325,8 @@ def main():
 
     # transitional item of the upgrade assemblies and the gel buckets
     for extra, label, cat in (("incomplete_implant", "Incomplete Implant", "core"), ("bio_interface_gel_bucket", "Bio Gel", "circulatory"),
-                              ("neural_gel_bucket", "Neural Gel", "neural"), ("neuro_stabilizer", "Neuro Stabilizer", "neural")):
+                              ("neural_gel_bucket", "Neural Gel", "neural"), ("neuro_stabilizer", "Neuro Stabilizer", "neural"),
+                              ("field_manual", "Field Manual", "optical")):
         write_json("assets/%s/models/item/%s.json" % (MOD, extra),
                    {"parent": "minecraft:item/generated", "textures": {"layer0": "%s:item/%s" % (MOD, extra)}})
 
@@ -436,6 +442,7 @@ def main():
 LANG_STATIC = {
     "itemGroup.cyberimplants": "Create: Cybernetics",
     "item.cyberimplants.flechette": "Flechette",
+    "item.cyberimplants.field_manual": "Field Manual",
     "item.cyberimplants.incomplete_implant": "Incomplete Implant",
     "item.cyberimplants.neuro_stabilizer": "Neuro-Stabilizer",
     "cyberimplants.rig.locked": "A redstone signal has locked the chair.",

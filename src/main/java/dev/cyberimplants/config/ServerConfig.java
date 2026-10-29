@@ -17,6 +17,7 @@ public final class ServerConfig {
     public static final ModConfigSpec.DoubleValue RIG_TIME_MULTIPLIER;
 
     public static final ModConfigSpec.BooleanValue KEEP_ON_DEATH;
+    public static final ModConfigSpec.BooleanValue MANUAL_GIVE_ON_FIRST_JOIN;
 
     public static final ModConfigSpec.IntValue DECK_MAX_CYCLES_PER_PLAYER_PER_TICK;
     public static final ModConfigSpec.IntValue DECK_MAX_CYCLES_PER_SERVER_TICK;
@@ -57,6 +58,12 @@ public final class ServerConfig {
         KEEP_ON_DEATH = b
                 .comment("Installed implants persist through death.")
                 .define("keepOnDeath", true);
+        b.pop();
+
+        b.push("manual");
+        MANUAL_GIVE_ON_FIRST_JOIN = b
+                .comment("Give every player one Field Manual (the in-game guide) the first time they join.")
+                .define("giveOnFirstJoin", true);
         b.pop();
 
         b.push("deck");
