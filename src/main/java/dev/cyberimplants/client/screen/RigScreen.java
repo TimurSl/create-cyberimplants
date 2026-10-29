@@ -600,29 +600,12 @@ public class RigScreen extends Screen {
     private void header(GuiGraphics g, BodyState body, RigView view, RigView.Operation op, float time) {
         g.fill(0, 0, width, HEADER, 0xC0060912);
         g.fill(0, HEADER, width, HEADER + 1, Anim.fade(CyberUi.CYAN, 0.5f));
-        String title = Anim.typed(this.title.getString().toUpperCase(java.util.Locale.ROOT), openedAt + 0.2f, 40);
-        g.drawString(font, Component.literal(title).withStyle(ChatFormatting.BOLD), 8, 9, CyberUi.CYAN, true);
+        Component fullTitle = Component.literal(this.title.getString().toUpperCase(java.util.Locale.ROOT)).withStyle(ChatFormatting.BOLD);
+        String typed = Anim.typed(fullTitle.getString(), openedAt + 0.2f, 40);
+        g.drawString(font, Component.literal(typed).withStyle(ChatFormatting.BOLD), 8, 9, CyberUi.CYAN, true);
 
-        int x = 8 + font.width(this.title.copy().withStyle(ChatFormatting.BOLD).getString().toUpperCase(java.util.Locale.ROOT)) + 14;
-        int rpmColor = !view.powered() ? CyberUi.RED : CyberUi.GREEN;
-        Component rpm = view.powered() ? Component.translatable("cyberimplants.rig.telemetry.rpm", Math.round(view.rpm()))
-                : Component.translatable("cyberimplants.rig.telemetry.offline");
-        x += CyberUi.chip(g, font, rpm, x, 8, rpmColor) + 4;
-        Component gel = view.gel() <= 0 ? Component.translatable("cyberimplants.rig.telemetry.no_gel")
-                : Component.translatable("cyberimplants.rig.telemetry.gel", view.gel(), gelName(view.neuralGel() ? 4 : 1));
-        int gelColor = view.gel() <= 0 ? CyberUi.AMBER : view.neuralGel() ? 0xFFB45CFF : 0xFF6FE0A8;
-        if (x + font.width(gel) + 8 < width - 190) {
-            x += CyberUi.chip(g, font, gel, x, 8, gelColor) + 4;
-        }
-        if (view.locked()) {
-            x += CyberUi.chip(g, font, Component.translatable("cyberimplants.rig.telemetry.locked"), x, 8, CyberUi.RED) + 4;
-        }
-        if (ClientRig.restrained() && x + 60 < width - 190) {
-            int c = Anim.mix(CyberUi.MAGENTA, 0xFFFFFFFF, Anim.pulse(0.8f) * 0.4f);
-            CyberUi.chip(g, font, Component.translatable("cyberimplants.rig.telemetry.restrained"), x, 8, c);
-        }
-
-        // Neural Load with a ghost of what the selected implant would add.
+        // Right: Neural Load with a ghost of what the selected implant would add. Laid out first so the chips know
+        // how much room is left.
         double capacity = Body.capacity(body);
         double limit = capacity * (1 + Body.overloadMargin(body));
         int load = Body.totalLoad(body);
@@ -633,8 +616,9 @@ public class RigScreen extends Screen {
         boolean strained = Body.strained(body);
         Component label = Component.translatable("cyberimplants.rig.load.short", load + (extra > 0 ? "+" + extra : ""),
                 Math.round(capacity));
+        int labelX = mx - font.width(label) - 6;
         int labelColor = load + extra > limit ? CyberUi.RED : load + extra > capacity ? CyberUi.AMBER : CyberUi.TEXT;
-        g.drawString(font, label, mx - font.width(label) - 6, 9, labelColor, false);
+        g.drawString(font, label, labelX, 9, labelColor, false);
         g.drawString(font, Component.translatable(strained ? "cyberimplants.load.strained" : "cyberimplants.load.stable"),
                 mx, 4, strained ? CyberUi.AMBER : CyberUi.GREEN, false);
         double max = Math.max(1, limit);
@@ -645,10 +629,35 @@ public class RigScreen extends Screen {
             int ghost = load + extra > limit ? CyberUi.RED : load + extra > capacity ? CyberUi.AMBER : CyberUi.CYAN;
             g.fill(from, 14, Math.max(from + 1, to), 19, Anim.fade(ghost, 0.35f + 0.35f * Anim.pulse(1.2f)));
         }
-        // The capacity mark (beyond it the body is Strained).
-        if (limit > 0) {
+        if (limit > 0) { // the capacity mark: beyond it the body is Strained
             int cap = mx + (int) Math.round(meterW * capacity / max);
             g.fill(cap, 12, cap + 1, 21, 0xFFFFFFFF);
+        }
+
+        // Left, after the title: the Rig's telemetry as chips, as many as fit.
+        int room = labelX - 8;
+        int x = 8 + font.width(fullTitle) + 12;
+        int rpmColor = !view.powered() ? CyberUi.RED : CyberUi.GREEN;
+        Component rpm = view.powered() ? Component.translatable("cyberimplants.rig.telemetry.rpm", Math.round(view.rpm()))
+                : Component.translatable("cyberimplants.rig.telemetry.offline");
+        Component gel = view.gel() <= 0 ? Component.translatable("cyberimplants.rig.telemetry.no_gel")
+                : Component.translatable("cyberimplants.rig.telemetry.gel", view.gel(), gelName(view.neuralGel() ? 4 : 1));
+        int gelColor = view.gel() <= 0 ? CyberUi.AMBER : view.neuralGel() ? 0xFFB45CFF : 0xFF6FE0A8;
+        List<Component> chips = new ArrayList<>(List.of(rpm, gel));
+        List<Integer> colors = new ArrayList<>(List.of(rpmColor, gelColor));
+        if (view.locked()) {
+            chips.add(Component.translatable("cyberimplants.rig.telemetry.locked"));
+            colors.add(CyberUi.RED);
+        }
+        if (ClientRig.restrained()) {
+            chips.add(Component.translatable("cyberimplants.rig.telemetry.restrained"));
+            colors.add(Anim.mix(CyberUi.MAGENTA, 0xFFFFFFFF, Anim.pulse(0.8f) * 0.4f));
+        }
+        for (int i = 0; i < chips.size(); i++) {
+            if (x + font.width(chips.get(i)) + 8 > room) {
+                break;
+            }
+            x += CyberUi.chip(g, font, chips.get(i), x, 8, colors.get(i)) + 4;
         }
     }
 
