@@ -22,7 +22,7 @@ make the existing abilities stronger; they never add duplicate items.
 | 6 | [Progression & crafting](docs/design/06-progression-and-crafting.md) | Five technology tiers, materials, production chains, upgrade rules |
 | 7 | [Balance & builds](docs/design/07-balance-and-builds.md) | Specialisations, example loadouts, counterplay |
 | 8 | [Technical architecture](docs/design/08-technical-architecture.md) | NeoForge/Create implementation plan |
-| 9 | [Roadmap](docs/design/09-roadmap.md) | Milestones and scope order |
+| 9 | [Implementation layers](docs/design/09-roadmap.md) | Five layers of increasing complexity, each covering all content |
 
 ## Target platform
 

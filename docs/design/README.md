@@ -74,4 +74,4 @@ senses or effectors of its own. It is only as capable as the implants and machin
 6. [Progression & crafting](06-progression-and-crafting.md)
 7. [Balance & builds](07-balance-and-builds.md)
 8. [Technical architecture](08-technical-architecture.md)
-9. [Roadmap](09-roadmap.md)
+9. [Implementation layers](09-roadmap.md)

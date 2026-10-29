@@ -114,7 +114,7 @@ Mechanism encourages at a smaller scale.
 
 ## 6.5 Progression pacing (targets)
 
-| Milestone | Expected game stage |
+| In-game milestone | Expected game stage |
 |-----------|---------------------|
 | First implant (Core T1 + one T1 implant) | After the andesite age: a press, saw, mixer and deployer on a waterwheel |
 | A full T1 body | Early brass age |

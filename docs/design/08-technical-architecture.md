@@ -207,5 +207,5 @@ moving parts (Rig arm, Etcher head, Mast rotor). Ponder scenes are registered th
 | Create API changes between patch versions | Pin an exact Create version; isolate all access in `compat/create`; GameTests against real Create blocks |
 | Movement desync and anti-cheat kicks | Client-predicted abilities with server validation and temporary movement-tolerance widening (§8.6) |
 | Temporal field visual desync | Fields mirrored to clients; client-side tick skipping; interpolation clamped for frozen entities |
-| Scope (47 implant types × 5 tiers) | Shared behaviour base classes and data-driven stats; vertical-slice roadmap ([§9](09-roadmap.md)) |
+| Scope (47 implant types × 5 tiers) | Shared behaviour base classes and data-driven stats; layered implementation plan ([§9](09-roadmap.md)) |
 | Script abuse (lag, griefing) | Sandboxed VM, hard cycle caps, ownership checks, no chunk loading, rate-limited payloads |
