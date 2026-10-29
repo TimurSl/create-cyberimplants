@@ -111,7 +111,7 @@ Sandevistan-field GameTests pass.
 | **Crafting** | A complete **I → V upgrade chain** for every implant using **standard Create machines only** (press, saw, mixer, deployer, spout, sequenced assembly) and placeholder items. Production cost scales by loop count. |
 | **UI** | Deck tabs (Programs, Processes, Log), cooldown strip, Load meter |
 
-*Status:* implemented in the repository, **not yet run in a game** (CI compiles it and the Minecraft-free tests pass;
+*Status:* implemented in the repository, **not yet run in a game** (CI compiled it with `./gradlew build`, and the unit tests including the stat audit pass;
 the GameTests exist but CI does not run them). What is in:
 
 - **Data:** `scripts/layer2_tiers.py` holds the numeric rows of every implant table for Tiers I-V; the stat files are
