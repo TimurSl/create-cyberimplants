@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [main, claude/festive-cori-mqd0yq]
+    branches: [main]
   pull_request:
 
 permissions:
