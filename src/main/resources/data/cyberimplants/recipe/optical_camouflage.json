@@ -1,0 +1,32 @@
+{
+  "type": "create:mechanical_crafting",
+  "accept_mirrored": false,
+  "category": "misc",
+  "key": {
+    "A": {
+      "item": "create:copper_sheet"
+    },
+    "B": {
+      "item": "create:andesite_casing"
+    },
+    "C": {
+      "item": "minecraft:glass_pane"
+    },
+    "D": {
+      "item": "create:electron_tube"
+    },
+    "X": {
+      "item": "minecraft:fermented_spider_eye"
+    }
+  },
+  "pattern": [
+    "ABA",
+    "CXC",
+    "ADA"
+  ],
+  "result": {
+    "id": "cyberimplants:optical_camouflage",
+    "count": 1
+  },
+  "show_notification": false
+}

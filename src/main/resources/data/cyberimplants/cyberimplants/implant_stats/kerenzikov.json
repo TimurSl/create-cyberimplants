@@ -1,0 +1,55 @@
+{
+  "tiers": [
+    {
+      "load": 4,
+      "charge_cost": 8,
+      "cooldown_ticks": 60,
+      "values": {
+        "distance": 2.0,
+        "window_ticks": 8
+      },
+      "unlocks": []
+    },
+    {
+      "load": 4,
+      "charge_cost": 8,
+      "cooldown_ticks": 60,
+      "values": {
+        "distance": 2.0,
+        "window_ticks": 8
+      },
+      "unlocks": []
+    },
+    {
+      "load": 5,
+      "charge_cost": 8,
+      "cooldown_ticks": 60,
+      "values": {
+        "distance": 2.0,
+        "window_ticks": 8
+      },
+      "unlocks": []
+    },
+    {
+      "load": 5,
+      "charge_cost": 8,
+      "cooldown_ticks": 60,
+      "values": {
+        "distance": 2.0,
+        "window_ticks": 8
+      },
+      "unlocks": []
+    },
+    {
+      "load": 6,
+      "charge_cost": 8,
+      "cooldown_ticks": 60,
+      "values": {
+        "distance": 2.0,
+        "window_ticks": 8
+      },
+      "unlocks": []
+    }
+  ],
+  "unlock_layers": {}
+}

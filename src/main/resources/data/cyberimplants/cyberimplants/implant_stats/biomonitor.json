@@ -1,0 +1,40 @@
+{
+  "tiers": [
+    {
+      "load": 1,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {},
+      "unlocks": []
+    },
+    {
+      "load": 1,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {},
+      "unlocks": []
+    },
+    {
+      "load": 2,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {},
+      "unlocks": []
+    },
+    {
+      "load": 2,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {},
+      "unlocks": []
+    },
+    {
+      "load": 2,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {},
+      "unlocks": []
+    }
+  ],
+  "unlock_layers": {}
+}

@@ -1,0 +1,60 @@
+{
+  "tiers": [
+    {
+      "load": 4,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "attack_speed": 0.05,
+        "walk_speed": 0.02,
+        "item_use_speed": 0.1
+      },
+      "unlocks": []
+    },
+    {
+      "load": 4,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "attack_speed": 0.05,
+        "walk_speed": 0.02,
+        "item_use_speed": 0.1
+      },
+      "unlocks": []
+    },
+    {
+      "load": 5,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "attack_speed": 0.05,
+        "walk_speed": 0.02,
+        "item_use_speed": 0.1
+      },
+      "unlocks": []
+    },
+    {
+      "load": 5,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "attack_speed": 0.05,
+        "walk_speed": 0.02,
+        "item_use_speed": 0.1
+      },
+      "unlocks": []
+    },
+    {
+      "load": 6,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "attack_speed": 0.05,
+        "walk_speed": 0.02,
+        "item_use_speed": 0.1
+      },
+      "unlocks": []
+    }
+  ],
+  "unlock_layers": {}
+}

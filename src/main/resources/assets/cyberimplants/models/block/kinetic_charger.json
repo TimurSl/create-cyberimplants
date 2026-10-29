@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "cyberimplants:block/kinetic_charger",
+    "top": "cyberimplants:block/kinetic_charger",
+    "side": "cyberimplants:block/kinetic_charger"
+  }
+}

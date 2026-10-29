@@ -1,0 +1,55 @@
+{
+  "tiers": [
+    {
+      "load": 3,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "damage": 6.0,
+        "attack_speed": 1.8
+      },
+      "unlocks": []
+    },
+    {
+      "load": 4,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "damage": 6.0,
+        "attack_speed": 1.8
+      },
+      "unlocks": []
+    },
+    {
+      "load": 4,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "damage": 6.0,
+        "attack_speed": 1.8
+      },
+      "unlocks": []
+    },
+    {
+      "load": 5,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "damage": 6.0,
+        "attack_speed": 1.8
+      },
+      "unlocks": []
+    },
+    {
+      "load": 6,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "damage": 6.0,
+        "attack_speed": 1.8
+      },
+      "unlocks": []
+    }
+  ],
+  "unlock_layers": {}
+}

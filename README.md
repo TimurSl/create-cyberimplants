@@ -7,8 +7,10 @@ Players **manufacture** implants on Create production lines, **install** them on
 **program** their behaviour with a cyberdeck. The cyberdeck can also read and drive Create machinery. Implant tiers
 make the existing abilities stronger; they never add duplicate items.
 
-> Status: **Layer 0 (foundation)**. The project scaffold, registries, data model and Synapse lexer exist; no
-> implant is playable yet. See [Implementation layers](docs/design/09-roadmap.md).
+> Status: **Layer 1 (function)**. All 44 Layer 1 implant types, the Implantation Rig, the Kinetic Charger, the
+> ISA-1 cyberdeck and the Implant Wheel are implemented. The Synapse language is compiled and unit-tested; the
+> NeoForge-dependent code has not yet been compiled against Minecraft (see the roadmap). See
+> [Implementation layers](docs/design/09-roadmap.md).
 
 ## Design specification
 
@@ -40,11 +42,12 @@ Requires JDK 21.
 ./gradlew runClient        # dev client
 ./gradlew runGameTestServer
 ./scripts/test-synapse.sh  # Synapse language tests only; needs just a JDK and Maven Central
+python3 scripts/gen_layer1_data.py  # regenerates stats, placeholder recipes, models, textures and lang keys
 ```
 
 The Maven repositories used are `maven.neoforged.net`, `maven.createmod.net` and `maven.tterrag.com`.
-The Create, Ponder, Flywheel and Registrate versions in `gradle.properties` are unverified pins; check them against
-the Create 1.21.1 README before the first build.
+The Create (6.0.8-169), Ponder and Flywheel pins in `gradle.properties` were checked against `maven.createmod.net`.
+The Registrate artifact could not be located from the authoring sandbox; confirm it on a machine with full access.
 
 ## Repository layout
 
@@ -52,12 +55,16 @@ the Create 1.21.1 README before the first build.
 src/main/java/dev/cyberimplants
   registry/        deferred registers (+ the implant_type registry)
   body/            BodyState attachment, slots, sync events
-  implant/         ImplantType, categories, tiers
   data/            implant stats codecs and reload listener
   network/         payloads
   config/          server and client config
   compat/create/   the only package allowed to touch Create
-  synapse/         scripting language (no Minecraft imports)
+  implant/         catalog of types, items, actions and one behaviour class per implant, by category
+  combat/          the damage mitigation pipeline
+  deck/            binds Synapse programs to the player (host, handles, storage, events)
+  client/          HUD, key bindings, client-side movement, optics overlays and screens
+  gametest/        Layer 1 GameTests
+  synapse/         scripting language (no Minecraft imports): lexer, parser, compiler, VM
 src/main/templates/META-INF/neoforge.mods.toml
 src/test/java      JUnit tests
 docs/design/       design specification
