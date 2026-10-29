@@ -72,10 +72,10 @@ parser and VM are Layer 1. NeoForge-dependent code has not yet been compiled aga
 | **UI** | Implant Wheel, Charge bar, Rig body screen, basic text editor for decks |
 
 *Status:* implemented in the repository. The Synapse parser, compiler and VM (ISA-1) are unit-tested
-(`./scripts/test-synapse.sh`). The NeoForge-dependent code was written without access to the Minecraft jars (the
-authoring sandbox blocked `piston-data.mojang.com`), so it has **not been compiled or run**; expect a round of
-compile fixes on the first `./gradlew build`. Create 6.0.8 signatures that the code relies on were checked against
-the real jar. Deliberate Layer 1 simplifications:
+(`./scripts/test-synapse.sh`). The NeoForge-dependent code compiles against Minecraft 1.21.1, NeoForge 21.1.172 and Create 6.0.8 (verified with
+`./gradlew build` on CI) and the Tier-free unit tests pass, but it has **never been run**: no GameTest, client or
+server session has executed it yet, so expect gameplay bugs. The Layer 1 GameTests exist but CI does not run them.
+Deliberate Layer 1 simplifications:
 
 - The Rig is a single block opened by right-click (no chair, no two-block form); operations are instant.
 - Movement abilities are applied by the client and validated by the server for Charge, cooldown and air-jump

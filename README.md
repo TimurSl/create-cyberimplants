@@ -9,7 +9,7 @@ make the existing abilities stronger; they never add duplicate items.
 
 > Status: **Layer 1 (function)**. All 44 Layer 1 implant types, the Implantation Rig, the Kinetic Charger, the
 > Neural Port, the ISA-1 cyberdeck and the Implant Wheel are implemented. The Synapse language is compiled and unit-tested; the
-> NeoForge-dependent code has not yet been compiled against Minecraft (see the roadmap). See
+> NeoForge-dependent code compiles on CI but has not been run in a game yet (see the roadmap). See
 > [Implementation layers](docs/design/09-roadmap.md).
 
 ## Design specification
@@ -47,7 +47,7 @@ python3 scripts/gen_layer1_data.py  # regenerates stats, placeholder recipes, mo
 
 The Maven repositories used are `maven.neoforged.net`, `maven.createmod.net` and `maven.tterrag.com`.
 The Create (6.0.8-169), Ponder and Flywheel pins in `gradle.properties` were checked against `maven.createmod.net`.
-The Registrate artifact could not be located from the authoring sandbox; confirm it on a machine with full access.
+Registrate is not a dependency: its artifact could not be found in either Maven repo, and this mod does not use it, so a dev run may need it added if Create asks for it.
 
 ## Repository layout
 
