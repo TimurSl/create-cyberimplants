@@ -7,7 +7,8 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
 /** Client -> server: a deck control command. */
-public record DeckCommandPayload(Op op, String program) implements CustomPacketPayload {
+/** {@code thread}: the Coprocessor thread to load into, or to unload (negative = all). */
+public record DeckCommandPayload(Op op, String program, int thread) implements CustomPacketPayload {
     public enum Op {
         /** Send the current {@link DeckStatusPayload}. */
         STATUS,
@@ -23,7 +24,12 @@ public record DeckCommandPayload(Op op, String program) implements CustomPacketP
     public static final StreamCodec<RegistryFriendlyByteBuf, DeckCommandPayload> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.idMapper(i -> Op.values()[Math.floorMod(i, Op.values().length)], Op::ordinal), DeckCommandPayload::op,
             ByteBufCodecs.stringUtf8(256), DeckCommandPayload::program,
+            ByteBufCodecs.VAR_INT, DeckCommandPayload::thread,
             DeckCommandPayload::new);
+
+    public DeckCommandPayload(Op op, String program) {
+        this(op, program, 0);
+    }
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

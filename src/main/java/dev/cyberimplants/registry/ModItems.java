@@ -47,6 +47,9 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> KINETIC_CHARGER =
             ITEMS.registerSimpleBlockItem("kinetic_charger", ModBlocks.KINETIC_CHARGER);
 
+    public static final DeferredItem<BlockItem> PROXIMITY_SENSOR =
+            ITEMS.registerSimpleBlockItem("proximity_sensor", ModBlocks.PROXIMITY_SENSOR);
+
     public static final DeferredItem<BlockItem> NEURAL_PORT =
             ITEMS.registerSimpleBlockItem("neural_port", ModBlocks.NEURAL_PORT);
 

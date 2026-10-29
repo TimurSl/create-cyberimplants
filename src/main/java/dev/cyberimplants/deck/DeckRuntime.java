@@ -10,7 +10,13 @@ import java.util.Random;
 /** A loaded program with its host, log and bookkeeping. Transient: rebuilt on login. */
 public final class DeckRuntime {
     private final String programName;
+    private final int thread;
     private final ProgramRunner runner;
+    /** Scripted activations waiting out the chassis' neural latency: due game tick -> action. */
+    final java.util.Deque<Pending> pending = new ArrayDeque<>();
+
+    record Pending(long dueTick, Runnable action) {
+    }
     private final Deque<String> log = new ArrayDeque<>();
     private final Random random;
     private final int logLimit;
@@ -24,11 +30,16 @@ public final class DeckRuntime {
     double cycleDebt;
     long bootTick;
 
-    DeckRuntime(String programName, ProgramRunner runner, long seed, int logLimit) {
+    DeckRuntime(String programName, int thread, ProgramRunner runner, long seed, int logLimit) {
         this.programName = programName;
+        this.thread = thread;
         this.runner = runner;
         this.random = new Random(seed);
         this.logLimit = logLimit;
+    }
+
+    public int thread() {
+        return thread;
     }
 
     public String programName() {

@@ -3,7 +3,10 @@ package dev.cyberimplants.client;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
 import dev.cyberimplants.config.ClientConfig;
+import dev.cyberimplants.body.Strain;
 import dev.cyberimplants.implant.Arms;
+import dev.cyberimplants.implant.ImplantActions;
+import dev.cyberimplants.implant.ImplantCatalog;
 import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.Toggles;
 import dev.cyberimplants.implant.limbs.BallisticModule;
@@ -71,8 +74,36 @@ final class Hud {
             g.drawString(font, Component.translatable("cyberimplants.hud.magazine", BallisticModule.magazine(player)), 6, y - 6, TEXT);
         }
 
+        cooldownStrip(g, font, body, width, height);
         vitals(g, font, player, body, width);
         scanReadout(g, font, mc, player);
+    }
+
+    /** One entry per Active or Toggle implant that is cooling down (or knocked offline by Strain): name, bar, seconds. */
+    private static void cooldownStrip(GuiGraphics g, Font font, BodyState body, int width, int height) {
+        int x = width / 2 - 91;
+        int y = height - 52;
+        for (ImplantCatalog.Entry e : ImplantCatalog.ALL) {
+            if (!body.has(e.id()) || !ImplantActions.wheelEligible(e.id())) {
+                continue;
+            }
+            boolean offline = Strain.offline(Minecraft.getInstance().player, e.id());
+            long remaining = body.cooldownRemaining(e.id());
+            if (remaining <= 0 && !offline) {
+                continue;
+            }
+            Component name = Component.translatable("item." + e.id().getNamespace() + "." + e.id().getPath());
+            String label = name.getString();
+            label = (label.length() > 4 ? label.substring(0, 4) : label) + " " + (offline ? "!!" : (remaining + 19) / 20 + "s");
+            g.drawString(font, label, x, y - 9, offline ? 0xFFFF6060 : TEXT);
+            long total = Math.max(1, Body.cooldownTicksFor(body, e.id()));
+            bar(g, x, y, 34, 3, offline ? 1.0 : 1.0 - (double) remaining / total, offline ? 0xFFFF6060 : 0xFF8090A0);
+            x += 40;
+            if (x > width / 2 + 91) {
+                x = width / 2 - 91;
+                y -= 16;
+            }
+        }
     }
 
     private static void thermalWash(GuiGraphics g, LocalPlayer player, int width, int height) {

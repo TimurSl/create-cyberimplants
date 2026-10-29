@@ -156,7 +156,7 @@ public class RigBlockEntity extends KineticBlockEntity {
         if (!rpmAtLeast(tier)) {
             return Component.translatable("cyberimplants.rig.low_rpm", MIN_RPM[tier - 1]);
         }
-        if (!tank.getFluid().containsFluid(gelFor(tier))) {
+        if (!(tank.getFluidAmount() >= GEL_PER_OPERATION && tank.getFluid().is(gelFor(tier).getFluid()))) {
             return Component.translatable("cyberimplants.rig.no_gel", GEL_PER_OPERATION, gelName(tier));
         }
         int total = (int) Math.round(SECONDS[tier - 1] * 20 * ServerConfig.RIG_TIME_MULTIPLIER.get());
@@ -258,14 +258,14 @@ public class RigBlockEntity extends KineticBlockEntity {
     // ---------------------------------------------------------------- persistence
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void write(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
+        super.write(tag, registries, clientPacket);
         tag.put("Gel", tank.writeToNBT(registries, new CompoundTag()));
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
+    protected void read(CompoundTag tag, HolderLookup.Provider registries, boolean clientPacket) {
+        super.read(tag, registries, clientPacket);
         tank.readFromNBT(registries, tag.getCompound("Gel"));
     }
 

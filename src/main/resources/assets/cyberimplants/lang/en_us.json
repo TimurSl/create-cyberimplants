@@ -217,5 +217,11 @@
   "block.cyberimplants.proximity_sensor": "Proximity Sensor",
   "item.cyberimplants.neuro_stabilizer": "Neuro-Stabilizer",
   "cyberimplants.rig.locked": "A redstone signal has locked the chair.",
-  "cyberimplants.use.offline": "Offline (neural glitch)"
+  "cyberimplants.use.offline": "Offline (neural glitch)",
+  "cyberimplants.deck.tab.programs": "Programs",
+  "cyberimplants.deck.tab.processes": "Processes",
+  "cyberimplants.deck.tab.log": "Log",
+  "cyberimplants.deck.thread": "Thread %s",
+  "cyberimplants.deck.threads": "Threads: %s | neural latency: %s ticks",
+  "cyberimplants.deck.idle": "No program is running."
 }

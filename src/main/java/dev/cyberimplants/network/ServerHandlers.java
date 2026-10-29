@@ -95,8 +95,8 @@ final class ServerHandlers {
     static void deckCommand(ServerPlayer player, DeckCommandPayload payload) {
         switch (payload.op()) {
             case STATUS -> DeckService.sendStatus(player, "");
-            case LOAD -> DeckService.loadCommand(player, payload.program());
-            case UNLOAD -> DeckService.unloadCommand(player);
+            case LOAD -> DeckService.loadCommand(player, payload.program(), payload.thread());
+            case UNLOAD -> DeckService.unloadCommand(player, payload.thread());
             case DELETE -> DeckService.deleteCommand(player, payload.program());
         }
     }

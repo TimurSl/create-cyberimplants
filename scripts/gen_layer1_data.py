@@ -242,7 +242,7 @@ def item_texture(name, category):
 
 
 def block_texture(kind):
-    colors = {"rig": ((0x70, 0x88, 0xA0), (0xC8, 0xE0, 0xF0)), "charger": ((0x4A, 0x5C, 0x70), (0x35, 0xD0, 0xFF)),
+    colors = {"sensor": ((0x58, 0x50, 0x70), (0xFF, 0x5A, 0x5A)), "rig": ((0x70, 0x88, 0xA0), (0xC8, 0xE0, 0xF0)), "charger": ((0x4A, 0x5C, 0x70), (0x35, 0xD0, 0xFF)),
               "port": ((0x3A, 0x48, 0x58), (0x3A, 0xC8, 0x9A))}[kind]
     base, accent = colors
     px = [[base + (255,) for _ in range(16)] for _ in range(16)]
@@ -375,7 +375,7 @@ def main():
         f.write(item_texture("Flechette Ammo", "limbs"))
 
     # ---- blocks
-    for name, kind in (("implantation_rig", "rig"), ("kinetic_charger", "charger"), ("neural_port", "port")):
+    for name, kind in (("implantation_rig", "rig"), ("kinetic_charger", "charger"), ("neural_port", "port"), ("proximity_sensor", "sensor")):
         tex = os.path.join(ROOT, "assets", MOD, "textures", "block", name + ".png")
         os.makedirs(os.path.dirname(tex), exist_ok=True)
         with open(tex, "wb") as f:
@@ -398,6 +398,15 @@ def main():
         "facing=west": {"model": port_model, "y": 270},
         "facing=down": {"model": port_model, "x": 90},
         "facing=up": {"model": port_model, "x": 270}}})
+    write_json("assets/%s/models/block/proximity_sensor.json" % MOD,
+               {"parent": "minecraft:block/cube_all", "textures": {"all": "%s:block/proximity_sensor" % MOD}})
+    write_json("assets/%s/models/item/proximity_sensor.json" % MOD, {"parent": "%s:block/proximity_sensor" % MOD})
+    write_json("assets/%s/blockstates/proximity_sensor.json" % MOD, {"variants": {"": {"model": "%s:block/proximity_sensor" % MOD}}})
+    write_json("data/%s/recipe/proximity_sensor.json" % MOD, {
+        "type": "minecraft:crafting_shaped", "category": "misc",
+        "key": {"E": {"item": "create:electron_tube"}, "A": {"item": "create:andesite_casing"}, "R": {"item": "minecraft:redstone"},
+                "S": {"item": "minecraft:spyglass"}},
+        "pattern": [" E ", "ASA", " R "], "result": {"id": "%s:proximity_sensor" % MOD, "count": 1}})
     write_json("assets/%s/models/item/implantation_rig.json" % MOD, {"parent": "%s:block/implantation_rig" % MOD})
     write_json("assets/%s/models/item/kinetic_charger.json" % MOD, {"parent": "%s:block/kinetic_charger" % MOD})
     write_json("assets/%s/blockstates/implantation_rig.json" % MOD, {"variants": {
@@ -409,14 +418,15 @@ def main():
         "axis=y": {"model": "%s:block/kinetic_charger" % MOD},
         "axis=x": {"model": "%s:block/kinetic_charger" % MOD},
         "axis=z": {"model": "%s:block/kinetic_charger" % MOD}}})
-    for name in ("implantation_rig", "kinetic_charger", "neural_port"):
+    for name in ("implantation_rig", "kinetic_charger", "neural_port", "proximity_sensor"):
         write_json("data/%s/loot_table/blocks/%s.json" % (MOD, name), {
             "type": "minecraft:block",
             "pools": [{"rolls": 1.0, "bonus_rolls": 0.0,
                        "entries": [{"type": "minecraft:item", "name": "%s:%s" % (MOD, name)}],
                        "conditions": [{"condition": "minecraft:survives_explosion"}]}]})
     write_json("data/minecraft/tags/block/mineable/pickaxe.json",
-               {"replace": False, "values": ["%s:implantation_rig" % MOD, "%s:kinetic_charger" % MOD, "%s:neural_port" % MOD]})
+               {"replace": False, "values": ["%s:implantation_rig" % MOD, "%s:kinetic_charger" % MOD, "%s:neural_port" % MOD,
+                                                      "%s:proximity_sensor" % MOD]})
 
     # ---- recipes
     for ident, (category, *_rest) in IMPLANTS.items():
@@ -555,6 +565,12 @@ LANG_STATIC = {
     "cyberimplants.ballistic.no_ammo": "No flechettes to load.",
     "cyberimplants.ballistic.reloading": "Reloading...",
     "cyberimplants.deck.title": "Cyberdeck",
+    "cyberimplants.deck.tab.programs": "Programs",
+    "cyberimplants.deck.tab.processes": "Processes",
+    "cyberimplants.deck.tab.log": "Log",
+    "cyberimplants.deck.thread": "Thread %s",
+    "cyberimplants.deck.threads": "Threads: %s | neural latency: %s ticks",
+    "cyberimplants.deck.idle": "No program is running.",
     "cyberimplants.deck.placeholder": "Write a Synapse program",
     "cyberimplants.deck.save": "Save",
     "cyberimplants.deck.load": "Load",

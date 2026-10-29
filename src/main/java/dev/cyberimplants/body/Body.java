@@ -103,11 +103,11 @@ public final class Body {
             return true;
         }
         BodyState s = BodyState.get(player);
-        amount *= chargeMultiplier(s);
-        if (s.charge() + 1e-9 < amount) {
+        double cost = amount * chargeMultiplier(s);
+        if (s.charge() + 1e-9 < cost) {
             return false;
         }
-        updateQuiet(player, st -> st.withCharge(st.charge() - amount, st.buffer()));
+        updateQuiet(player, st -> st.withCharge(st.charge() - cost, st.buffer()));
         return true;
     }
 
@@ -155,6 +155,12 @@ public final class Body {
         }
         double scaled = chargeEnabled() ? ticks : ticks * ServerConfig.CHARGE_DISABLED_COOLDOWN_MULTIPLIER.get();
         update(player, st -> st.withCooldown(type, st.onlineTicks() + Math.round(scaled)));
+    }
+
+    /** The full cooldown of an installed implant in a body state, for cooldown bars. */
+    public static int cooldownTicksFor(BodyState s, ResourceLocation type) {
+        int tier = s.tierOf(type);
+        return tier == 0 ? 0 : Stats.of(type, tier).cooldownTicks();
     }
 
     /** The tier-1..5 cooldown of an installed implant from its stats. */

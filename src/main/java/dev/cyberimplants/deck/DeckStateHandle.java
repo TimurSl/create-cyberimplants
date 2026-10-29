@@ -22,8 +22,15 @@ final class DeckStateHandle implements Handle {
         DeckHardware hw = DeckHardware.of(BodyState.get(player));
         return switch (member) {
             case "tier" -> (double) hw.chassisTier();
-            case "ram_free" -> r == null ? (double) hw.ramCells()
-                    : (double) Math.max(0, hw.ramCells() - r.runner().program().footprintCells());
+            case "threads" -> (double) hw.threads();
+            case "latency" -> new dev.cyberimplants.synapse.compiler.Ticks(hw.latencyTicks());
+            case "ram_free" -> {
+                int used = 0;
+                for (DeckRuntime other : DeckService.runtimes(player)) {
+                    used += other.runner().program().footprintCells();
+                }
+                yield (double) Math.max(0, hw.ramCells() - used);
+            }
             case "cycles_last_tick" -> r == null ? 0.0 : (double) r.lastCycles;
             case "dropped_events" -> r == null ? 0.0 : (double) r.runner().droppedEvents();
             default -> null;

@@ -12,8 +12,7 @@ public final class DeckEvents {
 
     /** {@code argument} selects handlers declared with that number ({@code ON health_below 30}). */
     public static void fire(ServerPlayer player, String event, Double argument, Map<String, Object> payload) {
-        DeckRuntime runtime = DeckService.runtime(player);
-        if (runtime != null) {
+        for (DeckRuntime runtime : DeckService.runtimes(player)) {
             runtime.runner().fire(event, argument, payload);
         }
     }

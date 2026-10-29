@@ -24,12 +24,15 @@ public record DeckStatusPayload(
         String loaded,
         int footprint,
         List<String> log,
-        String message) implements CustomPacketPayload {
+        String message,
+        int threads,
+        int latency,
+        List<String> processes) implements CustomPacketPayload {
 
     public static final Type<DeckStatusPayload> TYPE = new Type<>(CyberImplants.id("deck_status"));
 
     private static final StreamCodec<ByteBuf, List<String>> STRINGS =
-            ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(64));
+            ByteBufCodecs.STRING_UTF8.apply(ByteBufCodecs.list(600));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, DeckStatusPayload> STREAM_CODEC = StreamCodec.of(
             (buf, p) -> {
@@ -44,11 +47,15 @@ public record DeckStatusPayload(
                 buf.writeVarInt(p.footprint);
                 STRINGS.encode(buf, p.log);
                 ByteBufCodecs.STRING_UTF8.encode(buf, p.message);
+                buf.writeVarInt(p.threads);
+                buf.writeVarInt(p.latency);
+                STRINGS.encode(buf, p.processes);
             },
             buf -> new DeckStatusPayload(
                     buf.readBoolean(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(), buf.readVarInt(),
                     STRINGS.decode(buf), STRINGS.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf),
-                    buf.readVarInt(), STRINGS.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf)));
+                    buf.readVarInt(), STRINGS.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf),
+                    buf.readVarInt(), buf.readVarInt(), STRINGS.decode(buf)));
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

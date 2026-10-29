@@ -28,7 +28,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 /**
  * Neural Port: a small data plug placed against a face of a machine. {@code FACING} points at the machine. Its owner
  * right-clicks it to bind it to their deck; the port's name is the placing item's custom name (rename it in an anvil)
- * or "Port x y z". Layer 1 exposes the target's rotation speed, read-only.
+ * or "Port x y z". Layer 1 exposes the target's rotation speed; with a Machine Interface Tier II the deck can also drive the port's redstone output.
  */
 public class NeuralPortBlock extends Block implements EntityBlock {
     public static final MapCodec<NeuralPortBlock> CODEC = simpleCodec(NeuralPortBlock::new);
@@ -102,6 +102,20 @@ public class NeuralPortBlock extends Block implements EntityBlock {
             }
         }
         return InteractionResult.CONSUME;
+    }
+
+    @Override
+    protected boolean isSignalSource(BlockState state) {
+        return true;
+    }
+
+    /** Emits from every face except the attached one; {@code direction} points from the neighbour toward this block. */
+    @Override
+    protected int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+        if (direction == state.getValue(FACING) || !(level.getBlockEntity(pos) instanceof NeuralPortBlockEntity port)) {
+            return 0;
+        }
+        return port.redstoneOut();
     }
 
     @Override

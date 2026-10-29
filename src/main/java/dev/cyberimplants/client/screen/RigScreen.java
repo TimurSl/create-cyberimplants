@@ -158,7 +158,9 @@ public class RigScreen extends Screen {
         int load = Body.totalLoad(body);
         String loadText = Component.translatable("cyberimplants.rig.load", load, Math.round(capacity),
                 Math.round(capacity * (1 + margin))).getString();
-        g.drawString(font, loadText, 10, 18, load > capacity ? 0xFFFFB060 : 0xFF90FFB0);
+        boolean strained = Body.strained(body);
+        g.drawString(font, loadText + "  " + Component.translatable(strained ? "cyberimplants.load.strained" : "cyberimplants.load.stable").getString(),
+                10, 18, strained ? 0xFFFFB060 : 0xFF90FFB0);
         g.drawString(font, Component.translatable("cyberimplants.rig.inventory"), 10, 30 - 10 + 0, 0xFF9FD8FF);
     }
 
