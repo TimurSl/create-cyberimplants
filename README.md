@@ -13,6 +13,19 @@ make the existing abilities stronger; they never add duplicate items.
 > NeoForge-dependent code is compiled by CI but has not been run in a game yet (see the roadmap). See
 > [Implementation layers](docs/design/09-roadmap.md).
 
+## Interface
+
+Everything is drawn in one cyberpunk style without GUI textures (`client/CyberUi` and the vector toolkit in `client/ui`):
+
+- **Implantation Rig**: a surgical stool that straps you in for the length of an operation. Its screen shows a rotating
+  3D skeleton hologram with a node on every body slot; pick an implant and the slots it fits light up. The details panel
+  plays an animated preview of the implant's effect and compares its stats with what you have installed (or with the
+  next tier), lists its features and checks what the operation needs. During the operation the screen becomes a monitor
+  with stages and progress, and the stool projects a scanner ring around you.
+- **Implant Wheel**: a radial menu with item icons, cooldown sweeps and the battery in the hub.
+- Boot sequences, transitions, hover glows and interface sounds. Client config `ui.animations` and `ui.sounds` turn
+  them off; `hud.reduceScreenEffects` also disables the animations.
+
 ## Languages and in-game guide
 
 The mod ships `en_us` and `ru_ru` (Russian) language files. Every item, screen, message and the guide below is translated.

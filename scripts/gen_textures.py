@@ -303,6 +303,122 @@ def rig_bottom():
     return cv
 
 
+def rig_metal():
+    """Brushed steel trim of the stool: base plate and seat pan, with a cyan status strip."""
+    cv = Canvas()
+    for y in range(16):
+        for x in range(16):
+            cv.set(x, y, STEEL_LIGHT if (x * 3 + y * 7) % 11 == 0 else STEEL)
+    for x in range(16):
+        cv.set(x, 0, STEEL_HI)
+        cv.set(x, 15, OUTLINE)
+        cv.set(x, 4, dim(NEON["optical"], 0.55))  # seat pan edge (rows 4-5 of its sides)
+        cv.set(x, 5, NEON["optical"] if x % 4 else WHITE)
+        cv.set(x, 14, dim(NEON["optical"], 0.7))  # base plate edge
+    return cv
+
+
+def rig_column():
+    """Chrome hydraulic piston with a hazard collar."""
+    cv = Canvas()
+    shades = [OUTLINE, STEEL, STEEL_LIGHT, STEEL_HI, WHITE, STEEL_HI, STEEL_LIGHT, STEEL]
+    for y in range(16):
+        for x in range(16):
+            cv.set(x, y, shades[x % 8])
+    hazard(cv, 12, 14, NEON["mobility"])
+    for x in range(16):
+        cv.set(x, 11, OUTLINE)
+        cv.set(x, 15, OUTLINE)
+    return cv
+
+
+def rig_cushion():
+    """Quilted surgical cushion: dark padding, stitched diamonds, a neon rim and the medical cross."""
+    cv = Canvas()
+    pad, stitch = (0x16, 0x10, 0x22), (0x2E, 0x22, 0x44)
+    for y in range(16):
+        for x in range(16):
+            cv.set(x, y, stitch if (x + y) % 4 == 0 or (x - y) % 4 == 0 else pad)
+    for i in range(16):
+        for x, y in ((i, 0), (0, i)):
+            cv.set(x, y, NEON["circulatory"])
+        for x, y in ((i, 15), (15, i)):
+            cv.set(x, y, dim(NEON["circulatory"], 0.5))
+    cv.glyph(G["cross"], 5, 4, NEON["circulatory"], dim(NEON["circulatory"], 0.5))
+    return cv
+
+
+def rig_gearbox():
+    """The back of the stool where the shaft enters: a bolted frame around the bearing."""
+    cv = Canvas()
+    panel(cv, STEEL, NEON["skeletal"])
+    cv.rect(4, 4, 11, 11, OUTLINE)
+    cv.rect(5, 5, 10, 10, STEEL_DARK)
+    for i in range(4, 12):
+        cv.set(i, 4, NEON["skeletal"])
+        cv.set(4, i, NEON["skeletal"])
+    hazard(cv, 13, 13, NEON["mobility"])
+    return cv
+
+
+def rig_restraint():
+    """Padded restraint clamps and laser emitters: steel with a magenta lock LED."""
+    cv = Canvas()
+    panel(cv, STEEL_DARK, NEON["neural"], rivets=False)
+    cv.rect(2, 2, 13, 13, STEEL)
+    cv.rect(2, 6, 13, 9, (0x22, 0x18, 0x30))
+    for x in range(3, 13, 3):
+        cv.set(x, 7, NEON["neural"])
+        cv.set(x, 8, dim(NEON["neural"], 0.6))
+    cv.set(12, 3, WHITE)
+    cv.set(11, 3, NEON["circulatory"])
+    return cv
+
+
+def rig_model():
+    """The Implantation Rig as a surgical stool facing north: base, piston column with a foot ring, gearbox at the back
+    (the shaft enters from the south), a seat pan with a quilted cushion, restraint clamps, a low back bolster and four
+    laser emitters for the scanner the block entity renderer draws."""
+    tex = {"particle": "cyberimplants:block/implantation_rig_metal", "metal": "cyberimplants:block/implantation_rig_metal",
+           "column": "cyberimplants:block/implantation_rig_column", "cushion": "cyberimplants:block/implantation_rig_cushion",
+           "gearbox": "cyberimplants:block/implantation_rig_gearbox", "restraint": "cyberimplants:block/implantation_rig_restraint",
+           "side": "cyberimplants:block/implantation_rig", "bottom": "cyberimplants:block/implantation_rig_bottom"}
+
+    def box(frm, to, faces, name):
+        out = {}
+        for face in ("north", "south", "east", "west", "up", "down"):
+            t = faces.get(face, faces.get("*"))
+            if t is not None:
+                out[face] = {"texture": "#" + t}
+                if face == "down" and frm[1] == 0:
+                    out[face]["cullface"] = "down"
+        return {"name": name, "from": frm, "to": to, "faces": out}
+
+    elements = [
+        box([1, 0, 1], [15, 2, 15], {"*": "metal", "down": "bottom"}, "base"),
+        box([2, 2, 2], [14, 3, 14], {"*": "metal", "down": None}, "base_step"),
+        box([5, 3, 5], [11, 6, 11], {"*": "column", "down": None}, "piston_sleeve"),
+        box([6, 6, 6], [10, 10, 10], {"*": "column", "down": None, "up": None}, "piston"),
+        box([2, 5, 2], [14, 6, 3], {"*": "column"}, "foot_ring_front"),
+        box([2, 5, 3], [3, 6, 11], {"*": "column"}, "foot_ring_left"),
+        box([13, 5, 3], [14, 6, 11], {"*": "column"}, "foot_ring_right"),
+        box([3, 5, 7], [5, 6, 9], {"*": "column"}, "brace_left"),
+        box([11, 5, 7], [13, 6, 9], {"*": "column"}, "brace_right"),
+        box([7, 5, 3], [9, 6, 5], {"*": "column"}, "brace_front"),
+        box([4, 2, 11], [12, 10, 16], {"*": "side", "south": "gearbox", "down": None}, "gearbox"),
+        box([1, 10, 1], [15, 12, 15], {"*": "metal"}, "seat_pan"),
+        box([2, 12, 2], [14, 13, 14], {"*": "cushion", "down": None}, "cushion"),
+        box([0, 12, 4], [2, 15, 12], {"*": "restraint"}, "restraint_left"),
+        box([14, 12, 4], [16, 15, 12], {"*": "restraint"}, "restraint_right"),
+        box([3, 13, 13], [13, 15, 15], {"*": "cushion", "down": None}, "back_bolster"),
+        box([1, 12, 1], [2, 14, 2], {"*": "restraint", "down": None}, "emitter_nw"),
+        box([14, 12, 1], [15, 14, 2], {"*": "restraint", "down": None}, "emitter_ne"),
+        box([1, 12, 14], [2, 14, 15], {"*": "restraint", "down": None}, "emitter_sw"),
+        box([14, 12, 14], [15, 14, 15], {"*": "restraint", "down": None}, "emitter_se"),
+    ]
+    return {"parent": "minecraft:block/block", "textures": tex, "elements": elements}
+
+
 def charger_side():
     cv = Canvas()
     panel(cv, STEEL, NEON["optical"])
@@ -396,6 +512,9 @@ def main():
     save("textures/item/bio_interface_gel_bucket.png", bucket_icon((0x6F, 0xE0, 0xA8), (0x0E, 0x6A, 0x4A)).png())
     save("textures/item/neural_gel_bucket.png", bucket_icon((0xB4, 0x5C, 0xFF), (0x3E, 0x12, 0x7A)).png())
     for name, cv in (("implantation_rig", rig_side()), ("implantation_rig_top", rig_top()), ("implantation_rig_bottom", rig_bottom()),
+                     ("implantation_rig_metal", rig_metal()), ("implantation_rig_column", rig_column()),
+                     ("implantation_rig_cushion", rig_cushion()), ("implantation_rig_gearbox", rig_gearbox()),
+                     ("implantation_rig_restraint", rig_restraint()),
                      ("kinetic_charger", charger_side()), ("kinetic_charger_top", charger_top()),
                      ("neural_port", port_tex()), ("proximity_sensor", sensor_tex())):
         save("textures/block/%s.png" % name, cv.png())
@@ -410,9 +529,7 @@ def main():
     def model(path, obj):
         save(path, (json.dumps(obj, indent=2) + "\n").encode())
 
-    model("models/block/implantation_rig.json", {"parent": "minecraft:block/cube_bottom_top", "textures": {
-        "side": "cyberimplants:block/implantation_rig", "top": "cyberimplants:block/implantation_rig_top",
-        "bottom": "cyberimplants:block/implantation_rig_bottom"}})
+    model("models/block/implantation_rig.json", rig_model())
     model("models/block/kinetic_charger.json", {"parent": "minecraft:block/slab", "textures": {
         "bottom": "cyberimplants:block/implantation_rig_bottom", "top": "cyberimplants:block/kinetic_charger_top",
         "side": "cyberimplants:block/kinetic_charger"}})

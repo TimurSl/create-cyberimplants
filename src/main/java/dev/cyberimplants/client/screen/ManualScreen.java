@@ -3,6 +3,8 @@ package dev.cyberimplants.client.screen;
 import dev.cyberimplants.client.CyberUi;
 import dev.cyberimplants.client.CyberUi.CyberButton;
 import dev.cyberimplants.client.ModKeys;
+import dev.cyberimplants.client.ui.Anim;
+import dev.cyberimplants.client.ui.UiSounds;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -46,6 +48,8 @@ public class ManualScreen extends Screen {
 
     private int chapter;
     private int scroll;
+    /** When the current chapter was opened, for the page-turn slide. */
+    private float chapterAt = Anim.now();
     private final List<Line> lines = new ArrayList<>();
 
     public ManualScreen() {
@@ -84,6 +88,8 @@ public class ManualScreen extends Screen {
         if (next != chapter) {
             chapter = next;
             scroll = 0;
+            chapterAt = Anim.now();
+            UiSounds.select();
             rebuildWidgets();
         }
     }
@@ -212,6 +218,11 @@ public class ManualScreen extends Screen {
                 left, top - 20, CyberUi.MAGENTA, true);
 
         g.enableScissor(left - 4, top, left + pageWidth() + 4, pageBottom() - 2);
+        // Page turn: the new chapter slides in from the right and fades up.
+        float turn = Anim.easeOutCubic(Anim.progress(chapterAt, 0.28f));
+        g.pose().pushPose();
+        g.pose().translate((1 - turn) * 14, 0, 0);
+        g.setColor(1f, 1f, 1f, Math.max(0.05f, turn));
         int y = top + 2;
         int end = Math.min(lines.size(), scroll + visibleLines());
         for (int i = scroll; i < end; i++) {
@@ -240,6 +251,8 @@ public class ManualScreen extends Screen {
             }
             y += line.kind() == Kind.GAP ? LINE_H / 2 + 1 : LINE_H;
         }
+        g.setColor(1f, 1f, 1f, 1f);
+        g.pose().popPose();
         g.disableScissor();
 
         // The scroll bar: a thin meter on the right of the page.

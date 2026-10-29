@@ -3,6 +3,9 @@ package dev.cyberimplants.client.screen;
 import dev.cyberimplants.client.ClientDeckState;
 import dev.cyberimplants.client.CyberUi;
 import dev.cyberimplants.client.CyberUi.CyberButton;
+import dev.cyberimplants.client.ui.Anim;
+import dev.cyberimplants.client.ui.BootSequence;
+import dev.cyberimplants.client.ui.UiSounds;
 import dev.cyberimplants.network.DeckCommandPayload;
 import dev.cyberimplants.network.DeckStatusPayload;
 import dev.cyberimplants.network.UploadProgramPayload;
@@ -39,9 +42,28 @@ public class DeckScreen extends Screen {
     /** The thread Load targets (0 = the Processor's, 1.. = Coprocessor threads). */
     private int thread;
     private boolean requested;
+    /** The full boot log plays on the first opening of a session, a short flash after that. */
+    private static boolean bootedOnce;
+    private final BootSequence boot;
 
     public DeckScreen() {
         super(Component.translatable("cyberimplants.deck.title"));
+        boot = new BootSequence(List.of(
+                Component.translatable("cyberimplants.deck.boot.bios").getString(),
+                Component.translatable("cyberimplants.deck.boot.isa").getString(),
+                Component.translatable("cyberimplants.deck.boot.mount").getString(),
+                Component.translatable("cyberimplants.deck.boot.ready").getString()), bootedOnce ? 0.3f : 0.9f);
+        bootedOnce = true;
+        UiSounds.boot();
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if (!boot.done()) {
+            boot.skip();
+            return true;
+        }
+        return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
@@ -167,11 +189,17 @@ public class DeckScreen extends Screen {
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         super.render(g, mouseX, mouseY, partialTick);
+        renderContent(g);
+        drawBoot(g);
+    }
+
+    private void renderContent(GuiGraphics g) {
         CyberUi.title(g, font, title, width - font.width(title) - 14, 8, CyberUi.CYAN);
         DeckStatusPayload status = ClientDeckState.get();
         int editorX = tab == TAB_PROGRAMS ? 10 + LIST_W + 8 : 10;
         if (status == null) {
-            g.drawString(font, Component.translatable("cyberimplants.deck.waiting"), editorX, 26, CyberUi.TEXT_DIM);
+            String dots = ".".repeat(1 + (int) (Anim.now() * 3) % 3);
+            g.drawString(font, Component.translatable("cyberimplants.deck.waiting").getString() + dots, editorX, 26, CyberUi.TEXT_DIM);
             return;
         }
         String hardware = status.booted()
@@ -216,6 +244,12 @@ public class DeckScreen extends Screen {
         if (!status.loaded().isEmpty()) {
             g.drawString(font, Component.translatable("cyberimplants.deck.running", status.loaded(), status.footprint()),
                     10, height - 20, CyberUi.GREEN);
+        }
+    }
+
+    private void drawBoot(GuiGraphics g) {
+        if (!boot.done()) {
+            boot.render(g, font, 0, 0, width, height, CyberUi.GREEN);
         }
     }
 }

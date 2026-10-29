@@ -1,9 +1,14 @@
 package dev.cyberimplants.client;
 
 import dev.cyberimplants.CyberImplants;
+import dev.cyberimplants.compat.create.block.RigRenderer;
+import dev.cyberimplants.registry.ModBlockEntities;
+import dev.cyberimplants.registry.ModEntities;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.renderer.entity.NoopRenderer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
@@ -16,6 +21,7 @@ public final class ClientSetup {
         modBus.addListener(ClientSetup::registerKeys);
         modBus.addListener(ClientSetup::registerGuiLayers);
         modBus.addListener(ClientFluids::register);
+        modBus.addListener(ClientSetup::registerRenderers);
         NeoForge.EVENT_BUS.addListener(ClientSetup::onClientTick);
         NeoForge.EVENT_BUS.addListener(ClientSetup::onMovementInput);
     }
@@ -30,6 +36,11 @@ public final class ClientSetup {
         event.registerAbove(VanillaGuiLayers.HOTBAR, CyberImplants.id("hud"), Hud::render);
     }
 
+    private static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerBlockEntityRenderer(ModBlockEntities.RIG.get(), RigRenderer::new);
+        event.registerEntityRenderer(ModEntities.RIG_SEAT.get(), NoopRenderer::new);
+    }
+
     private static void onClientTick(ClientTickEvent.Post event) {
         ClientBodyState.tick();
         ClientInput.tick();
@@ -38,6 +49,7 @@ public final class ClientSetup {
     }
 
     private static void onMovementInput(MovementInputUpdateEvent event) {
+        ClientRig.onMovementInput(event.getInput());
         ClientMovement.onMovementInput(event.getInput());
     }
 

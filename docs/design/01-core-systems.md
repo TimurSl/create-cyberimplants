@@ -114,6 +114,14 @@ a surgical chair with an articulated arm head. Full block spec is in
 5. If rotation drops below the minimum, the gel runs out, or the patient stands up mid-operation, the operation
    **aborts**. The patient takes 4 HP damage and the implant is returned to them.
 
+*As implemented:* the Rig is a one-block surgical stool (gearbox and shaft at the back). When an operation starts it
+straps the patient onto the cushion (an invisible, locked seat entity): movement input is dropped on the client and the
+server refuses the dismount, so "standing up" can only happen through outside means such as an ender pearl, which
+aborts. Dying or disconnecting always frees the patient, and the seat is never saved. The screen is a 3D skeleton
+hologram with a node per slot, an animated preview and stats comparison of the implant in focus, and an operation
+monitor; the block entity syncs the running operation, gel and speed to clients, and its renderer draws a scanner ring
+and laser emitters around the patient.
+
 Removal returns the implant item with its tier intact. Per-implant configuration (Nanocoating formula, AES
 conditions, etc.) is stored on the player, not on the item, so swapping hardware does not erase settings.
 

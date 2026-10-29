@@ -14,6 +14,7 @@ public final class ModRegistries {
         ModCreativeTabs.TABS.register(modBus);
         ModBlocks.BLOCKS.register(modBus);
         ModBlockEntities.BLOCK_ENTITY_TYPES.register(modBus);
+        ModEntities.ENTITY_TYPES.register(modBus);
         ModFluids.FLUID_TYPES.register(modBus);
         ModFluids.FLUIDS.register(modBus);
         ModMenus.MENU_TYPES.register(modBus);
