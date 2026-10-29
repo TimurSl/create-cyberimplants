@@ -5,10 +5,11 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "dash_blocks": 6.0,
+        "dash_blocks": 6,
+        "buff_speed": 0.2,
         "buff_ticks": 40,
         "sprint_gain_per_second": 8.0,
-        "decay_per_second": 5.0
+        "decay_per_second": 5
       },
       "unlocks": []
     },
@@ -17,10 +18,11 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "dash_blocks": 6.0,
-        "buff_ticks": 40,
+        "dash_blocks": 8,
+        "buff_speed": 0.25,
+        "buff_ticks": 60,
         "sprint_gain_per_second": 8.0,
-        "decay_per_second": 5.0
+        "decay_per_second": 4
       },
       "unlocks": []
     },
@@ -29,10 +31,11 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "dash_blocks": 6.0,
-        "buff_ticks": 40,
+        "dash_blocks": 10,
+        "buff_speed": 0.3,
+        "buff_ticks": 60,
         "sprint_gain_per_second": 8.0,
-        "decay_per_second": 5.0
+        "decay_per_second": 3
       },
       "unlocks": []
     },
@@ -41,10 +44,11 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "dash_blocks": 6.0,
-        "buff_ticks": 40,
+        "dash_blocks": 12,
+        "buff_speed": 0.4,
+        "buff_ticks": 80,
         "sprint_gain_per_second": 8.0,
-        "decay_per_second": 5.0
+        "decay_per_second": 2
       },
       "unlocks": []
     },
@@ -53,10 +57,11 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "dash_blocks": 6.0,
-        "buff_ticks": 40,
+        "dash_blocks": 16,
+        "buff_speed": 0.5,
+        "buff_ticks": 100,
         "sprint_gain_per_second": 8.0,
-        "decay_per_second": 5.0
+        "decay_per_second": 1
       },
       "unlocks": []
     }

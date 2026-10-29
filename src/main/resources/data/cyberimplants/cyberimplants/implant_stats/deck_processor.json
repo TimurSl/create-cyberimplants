@@ -6,7 +6,8 @@
       "cooldown_ticks": 0,
       "values": {
         "cycles_per_tick": 20,
-        "isa": 1
+        "isa": 1,
+        "min_every_ticks": 20
       },
       "unlocks": []
     },
@@ -15,8 +16,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "cycles_per_tick": 20,
-        "isa": 1
+        "cycles_per_tick": 40,
+        "isa": 2,
+        "min_every_ticks": 10
       },
       "unlocks": []
     },
@@ -25,8 +27,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "cycles_per_tick": 20,
-        "isa": 1
+        "cycles_per_tick": 80,
+        "isa": 3,
+        "min_every_ticks": 5
       },
       "unlocks": []
     },
@@ -35,8 +38,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "cycles_per_tick": 20,
-        "isa": 1
+        "cycles_per_tick": 160,
+        "isa": 4,
+        "min_every_ticks": 2
       },
       "unlocks": []
     },
@@ -45,8 +49,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "cycles_per_tick": 20,
-        "isa": 1
+        "cycles_per_tick": 320,
+        "isa": 5,
+        "min_every_ticks": 1
       },
       "unlocks": []
     }

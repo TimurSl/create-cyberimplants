@@ -6,7 +6,8 @@
       "cooldown_ticks": 0,
       "values": {
         "range": 24,
-        "max_tags": 1
+        "max_tags": 1,
+        "persistence_ticks": 200
       },
       "unlocks": []
     },
@@ -15,8 +16,9 @@
       "charge_cost": 3,
       "cooldown_ticks": 0,
       "values": {
-        "range": 24,
-        "max_tags": 1
+        "range": 32,
+        "max_tags": 2,
+        "persistence_ticks": 400
       },
       "unlocks": []
     },
@@ -25,8 +27,9 @@
       "charge_cost": 3,
       "cooldown_ticks": 0,
       "values": {
-        "range": 24,
-        "max_tags": 1
+        "range": 48,
+        "max_tags": 3,
+        "persistence_ticks": 800
       },
       "unlocks": []
     },
@@ -35,8 +38,9 @@
       "charge_cost": 3,
       "cooldown_ticks": 0,
       "values": {
-        "range": 24,
-        "max_tags": 1
+        "range": 64,
+        "max_tags": 5,
+        "persistence_ticks": 1800
       },
       "unlocks": []
     },
@@ -45,8 +49,9 @@
       "charge_cost": 3,
       "cooldown_ticks": 0,
       "values": {
-        "range": 24,
-        "max_tags": 1
+        "range": 96,
+        "max_tags": 8,
+        "persistence_ticks": -1
       },
       "unlocks": []
     }

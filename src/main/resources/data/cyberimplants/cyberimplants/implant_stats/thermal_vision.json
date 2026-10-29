@@ -6,6 +6,7 @@
       "cooldown_ticks": 0,
       "values": {
         "range": 16,
+        "wall_penetration": 2,
         "upkeep_per_second": 1.0
       },
       "unlocks": []
@@ -15,7 +16,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "range": 16,
+        "range": 24,
+        "wall_penetration": 4,
         "upkeep_per_second": 1.0
       },
       "unlocks": []
@@ -25,7 +27,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "range": 16,
+        "range": 32,
+        "wall_penetration": 8,
         "upkeep_per_second": 1.0
       },
       "unlocks": []
@@ -35,7 +38,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "range": 16,
+        "range": 40,
+        "wall_penetration": 12,
         "upkeep_per_second": 1.0
       },
       "unlocks": []
@@ -45,7 +49,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "range": 16,
+        "range": 48,
+        "wall_penetration": 64,
         "upkeep_per_second": 1.0
       },
       "unlocks": []

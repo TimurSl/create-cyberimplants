@@ -39,9 +39,15 @@ public class ImplantItem extends Item {
     public static ItemStack stackOf(ResourceLocation typeId, int tier) {
         Item item = ModItems.itemFor(typeId);
         ItemStack stack = new ItemStack(item);
-        if (tier != 1) {
-            stack.set(ModDataComponents.TIER.get(), tier);
-        }
+        stack.set(ModDataComponents.TIER.get(), tier);
+        return stack;
+    }
+
+    /** Tier I carries its component explicitly so upgrade recipes can match "this implant at tier N". */
+    @Override
+    public ItemStack getDefaultInstance() {
+        ItemStack stack = super.getDefaultInstance();
+        stack.set(ModDataComponents.TIER.get(), 1);
         return stack;
     }
 

@@ -5,48 +5,53 @@
       "charge_cost": 80,
       "cooldown_ticks": 36000,
       "values": {
-        "health_restored": 2.0,
-        "resistance_ticks": 40
+        "health_restored": 2,
+        "resistance_ticks": 40,
+        "resistance_amplifier": 0
       },
       "unlocks": []
     },
     {
       "load": 4,
-      "charge_cost": 80,
-      "cooldown_ticks": 36000,
+      "charge_cost": 100,
+      "cooldown_ticks": 30000,
       "values": {
-        "health_restored": 2.0,
-        "resistance_ticks": 40
+        "health_restored": 4,
+        "resistance_ticks": 40,
+        "resistance_amplifier": 1
       },
       "unlocks": []
     },
     {
       "load": 5,
-      "charge_cost": 80,
-      "cooldown_ticks": 36000,
+      "charge_cost": 120,
+      "cooldown_ticks": 24000,
       "values": {
-        "health_restored": 2.0,
-        "resistance_ticks": 40
+        "health_restored": 6,
+        "resistance_ticks": 60,
+        "resistance_amplifier": 1
       },
       "unlocks": []
     },
     {
       "load": 5,
-      "charge_cost": 80,
-      "cooldown_ticks": 36000,
+      "charge_cost": 140,
+      "cooldown_ticks": 18000,
       "values": {
-        "health_restored": 2.0,
-        "resistance_ticks": 40
+        "health_restored": 8,
+        "resistance_ticks": 60,
+        "resistance_amplifier": 2
       },
       "unlocks": []
     },
     {
       "load": 6,
-      "charge_cost": 80,
-      "cooldown_ticks": 36000,
+      "charge_cost": 160,
+      "cooldown_ticks": 12000,
       "values": {
-        "health_restored": 2.0,
-        "resistance_ticks": 40
+        "health_restored": 10,
+        "resistance_ticks": 80,
+        "resistance_amplifier": 3
       },
       "unlocks": []
     }

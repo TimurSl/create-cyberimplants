@@ -19,6 +19,8 @@ public final class ImplantIds {
     public static final ResourceLocation DECK_PROCESSOR = id("deck_processor");
     public static final ResourceLocation DECK_RAM = id("deck_ram");
     public static final ResourceLocation DECK_STORAGE = id("deck_storage");
+    public static final ResourceLocation DECK_COPROCESSOR = id("deck_coprocessor");
+    public static final ResourceLocation DECK_MACHINE_INTERFACE = id("deck_machine_interface");
 
     // C. Skeletal & Muscular
     public static final ResourceLocation REINFORCED_SKELETON = id("reinforced_skeleton");

@@ -6,8 +6,9 @@
       "cooldown_ticks": 0,
       "values": {
         "attack_speed": 0.05,
+        "item_use_speed": 0.1,
         "walk_speed": 0.02,
-        "item_use_speed": 0.1
+        "shield_raise_ticks": 5
       },
       "unlocks": []
     },
@@ -16,9 +17,10 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "attack_speed": 0.05,
-        "walk_speed": 0.02,
-        "item_use_speed": 0.1
+        "attack_speed": 0.1,
+        "item_use_speed": 0.15,
+        "walk_speed": 0.03,
+        "shield_raise_ticks": 4
       },
       "unlocks": []
     },
@@ -27,9 +29,10 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "attack_speed": 0.05,
-        "walk_speed": 0.02,
-        "item_use_speed": 0.1
+        "attack_speed": 0.15,
+        "item_use_speed": 0.25,
+        "walk_speed": 0.04,
+        "shield_raise_ticks": 3
       },
       "unlocks": []
     },
@@ -38,9 +41,10 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "attack_speed": 0.05,
-        "walk_speed": 0.02,
-        "item_use_speed": 0.1
+        "attack_speed": 0.2,
+        "item_use_speed": 0.35,
+        "walk_speed": 0.05,
+        "shield_raise_ticks": 2
       },
       "unlocks": []
     },
@@ -49,9 +53,10 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "attack_speed": 0.05,
-        "walk_speed": 0.02,
-        "item_use_speed": 0.1
+        "attack_speed": 0.25,
+        "item_use_speed": 0.5,
+        "walk_speed": 0.06,
+        "shield_raise_ticks": 0
       },
       "unlocks": []
     }

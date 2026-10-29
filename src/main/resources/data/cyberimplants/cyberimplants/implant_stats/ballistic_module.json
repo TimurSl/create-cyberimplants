@@ -5,7 +5,7 @@
       "charge_cost": 2,
       "cooldown_ticks": 20,
       "values": {
-        "damage": 3.0,
+        "damage": 3,
         "velocity": 2.0,
         "magazine": 4,
         "reload_ticks": 40
@@ -15,11 +15,11 @@
     {
       "load": 4,
       "charge_cost": 2,
-      "cooldown_ticks": 20,
+      "cooldown_ticks": 16,
       "values": {
-        "damage": 3.0,
-        "velocity": 2.0,
-        "magazine": 4,
+        "damage": 4,
+        "velocity": 2.5,
+        "magazine": 6,
         "reload_ticks": 40
       },
       "unlocks": []
@@ -27,11 +27,11 @@
     {
       "load": 4,
       "charge_cost": 2,
-      "cooldown_ticks": 20,
+      "cooldown_ticks": 13,
       "values": {
-        "damage": 3.0,
-        "velocity": 2.0,
-        "magazine": 4,
+        "damage": 5,
+        "velocity": 3.0,
+        "magazine": 8,
         "reload_ticks": 40
       },
       "unlocks": []
@@ -39,11 +39,11 @@
     {
       "load": 5,
       "charge_cost": 2,
-      "cooldown_ticks": 20,
+      "cooldown_ticks": 10,
       "values": {
-        "damage": 3.0,
-        "velocity": 2.0,
-        "magazine": 4,
+        "damage": 6,
+        "velocity": 3.5,
+        "magazine": 12,
         "reload_ticks": 40
       },
       "unlocks": []
@@ -51,11 +51,11 @@
     {
       "load": 6,
       "charge_cost": 2,
-      "cooldown_ticks": 20,
+      "cooldown_ticks": 8,
       "values": {
-        "damage": 3.0,
-        "velocity": 2.0,
-        "magazine": 4,
+        "damage": 8,
+        "velocity": 4.0,
+        "magazine": 16,
         "reload_ticks": 40
       },
       "unlocks": []

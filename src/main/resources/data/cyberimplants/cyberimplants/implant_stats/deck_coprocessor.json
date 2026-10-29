@@ -1,0 +1,55 @@
+{
+  "tiers": [
+    {
+      "load": 1,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "extra_threads": 1,
+        "cycles_per_tick": 10
+      },
+      "unlocks": []
+    },
+    {
+      "load": 1,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "extra_threads": 1,
+        "cycles_per_tick": 20
+      },
+      "unlocks": []
+    },
+    {
+      "load": 1,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "extra_threads": 2,
+        "cycles_per_tick": 40
+      },
+      "unlocks": []
+    },
+    {
+      "load": 1,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "extra_threads": 2,
+        "cycles_per_tick": 80
+      },
+      "unlocks": []
+    },
+    {
+      "load": 1,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "extra_threads": 3,
+        "cycles_per_tick": 160
+      },
+      "unlocks": []
+    }
+  ],
+  "unlock_layers": {}
+}

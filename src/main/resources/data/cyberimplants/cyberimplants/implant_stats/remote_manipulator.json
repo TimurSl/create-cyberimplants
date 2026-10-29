@@ -12,36 +12,36 @@
     {
       "load": 3,
       "charge_cost": 1,
-      "cooldown_ticks": 15,
+      "cooldown_ticks": 12,
       "values": {
-        "range": 6
+        "range": 10
       },
       "unlocks": []
     },
     {
       "load": 4,
       "charge_cost": 1,
-      "cooldown_ticks": 15,
+      "cooldown_ticks": 10,
       "values": {
-        "range": 6
+        "range": 14
       },
       "unlocks": []
     },
     {
       "load": 4,
       "charge_cost": 1,
-      "cooldown_ticks": 15,
+      "cooldown_ticks": 8,
       "values": {
-        "range": 6
+        "range": 20
       },
       "unlocks": []
     },
     {
       "load": 5,
       "charge_cost": 1,
-      "cooldown_ticks": 15,
+      "cooldown_ticks": 6,
       "values": {
-        "range": 6
+        "range": 28
       },
       "unlocks": []
     }

@@ -4,35 +4,55 @@
       "load": 2,
       "charge_cost": 0,
       "cooldown_ticks": 0,
-      "values": {},
+      "values": {
+        "virtual_ports": 0,
+        "range": 8,
+        "overlay_upkeep_per_second": 0.5
+      },
       "unlocks": []
     },
     {
       "load": 2,
       "charge_cost": 0,
       "cooldown_ticks": 0,
-      "values": {},
+      "values": {
+        "virtual_ports": 1,
+        "range": 12,
+        "overlay_upkeep_per_second": 0.5
+      },
       "unlocks": []
     },
     {
       "load": 3,
       "charge_cost": 0,
       "cooldown_ticks": 0,
-      "values": {},
+      "values": {
+        "virtual_ports": 2,
+        "range": 16,
+        "overlay_upkeep_per_second": 0.5
+      },
       "unlocks": []
     },
     {
       "load": 3,
       "charge_cost": 0,
       "cooldown_ticks": 0,
-      "values": {},
+      "values": {
+        "virtual_ports": 4,
+        "range": 24,
+        "overlay_upkeep_per_second": 0.5
+      },
       "unlocks": []
     },
     {
       "load": 4,
       "charge_cost": 0,
       "cooldown_ticks": 0,
-      "values": {},
+      "values": {
+        "virtual_ports": 8,
+        "range": 32,
+        "overlay_upkeep_per_second": 0.5
+      },
       "unlocks": []
     }
   ],

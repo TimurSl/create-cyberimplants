@@ -5,7 +5,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "balanced": 0.04
+        "balanced": 0.04,
+        "specialised": 0.15
       },
       "unlocks": []
     },
@@ -14,7 +15,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "balanced": 0.04
+        "balanced": 0.06,
+        "specialised": 0.2
       },
       "unlocks": []
     },
@@ -23,7 +25,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "balanced": 0.04
+        "balanced": 0.08,
+        "specialised": 0.3
       },
       "unlocks": []
     },
@@ -32,7 +35,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "balanced": 0.04
+        "balanced": 0.1,
+        "specialised": 0.4
       },
       "unlocks": []
     },
@@ -41,7 +45,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "balanced": 0.04
+        "balanced": 0.12,
+        "specialised": 0.5
       },
       "unlocks": []
     }

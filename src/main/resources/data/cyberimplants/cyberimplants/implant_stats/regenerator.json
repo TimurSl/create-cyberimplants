@@ -16,9 +16,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "heal_per_second": 0.25,
-        "lockout_ticks": 160,
-        "charge_per_hp": 2.0
+        "heal_per_second": 0.35,
+        "lockout_ticks": 120,
+        "charge_per_hp": 1.75
       },
       "unlocks": []
     },
@@ -27,9 +27,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "heal_per_second": 0.25,
-        "lockout_ticks": 160,
-        "charge_per_hp": 2.0
+        "heal_per_second": 0.5,
+        "lockout_ticks": 100,
+        "charge_per_hp": 1.5
       },
       "unlocks": []
     },
@@ -38,9 +38,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "heal_per_second": 0.25,
-        "lockout_ticks": 160,
-        "charge_per_hp": 2.0
+        "heal_per_second": 0.65,
+        "lockout_ticks": 80,
+        "charge_per_hp": 1.25
       },
       "unlocks": []
     },
@@ -49,9 +49,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "heal_per_second": 0.25,
-        "lockout_ticks": 160,
-        "charge_per_hp": 2.0
+        "heal_per_second": 0.85,
+        "lockout_ticks": 60,
+        "charge_per_hp": 1.0
       },
       "unlocks": []
     }

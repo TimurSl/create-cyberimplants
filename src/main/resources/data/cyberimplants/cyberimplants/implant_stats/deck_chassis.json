@@ -6,8 +6,11 @@
       "cooldown_ticks": 0,
       "values": {
         "module_sockets": 3,
+        "latency_ticks": 4,
+        "base_threads": 1,
         "macro_keys": 2,
-        "log_lines": 20
+        "log_lines": 20,
+        "max_coprocessors": 1
       },
       "unlocks": []
     },
@@ -16,9 +19,12 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "module_sockets": 3,
-        "macro_keys": 2,
-        "log_lines": 20
+        "module_sockets": 4,
+        "latency_ticks": 3,
+        "base_threads": 1,
+        "macro_keys": 4,
+        "log_lines": 50,
+        "max_coprocessors": 1
       },
       "unlocks": []
     },
@@ -27,9 +33,12 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "module_sockets": 3,
-        "macro_keys": 2,
-        "log_lines": 20
+        "module_sockets": 5,
+        "latency_ticks": 2,
+        "base_threads": 1,
+        "macro_keys": 4,
+        "log_lines": 100,
+        "max_coprocessors": 2
       },
       "unlocks": []
     },
@@ -38,9 +47,12 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "module_sockets": 3,
-        "macro_keys": 2,
-        "log_lines": 20
+        "module_sockets": 6,
+        "latency_ticks": 1,
+        "base_threads": 1,
+        "macro_keys": 4,
+        "log_lines": 200,
+        "max_coprocessors": 2
       },
       "unlocks": []
     },
@@ -49,9 +61,12 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "module_sockets": 3,
-        "macro_keys": 2,
-        "log_lines": 20
+        "module_sockets": 8,
+        "latency_ticks": 0,
+        "base_threads": 1,
+        "macro_keys": 4,
+        "log_lines": 500,
+        "max_coprocessors": 3
       },
       "unlocks": []
     }

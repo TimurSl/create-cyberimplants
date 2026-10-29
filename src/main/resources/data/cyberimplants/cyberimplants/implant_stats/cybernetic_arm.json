@@ -5,8 +5,11 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
+        "sockets": 1,
         "break_speed": 0.1,
-        "sockets": 1
+        "reach": 0,
+        "harvest_level": 0,
+        "bilateral_break_speed": 0.1
       },
       "unlocks": []
     },
@@ -15,8 +18,11 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "break_speed": 0.1,
-        "sockets": 1
+        "sockets": 1,
+        "break_speed": 0.2,
+        "reach": 0.5,
+        "harvest_level": 1,
+        "bilateral_break_speed": 0.1
       },
       "unlocks": []
     },
@@ -25,8 +31,11 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "break_speed": 0.1,
-        "sockets": 1
+        "sockets": 2,
+        "break_speed": 0.3,
+        "reach": 0.5,
+        "harvest_level": 2,
+        "bilateral_break_speed": 0.1
       },
       "unlocks": []
     },
@@ -35,8 +44,11 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "break_speed": 0.1,
-        "sockets": 1
+        "sockets": 2,
+        "break_speed": 0.4,
+        "reach": 1.0,
+        "harvest_level": 3,
+        "bilateral_break_speed": 0.1
       },
       "unlocks": []
     },
@@ -45,8 +57,11 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "break_speed": 0.1,
-        "sockets": 1
+        "sockets": 3,
+        "break_speed": 0.6,
+        "reach": 1.5,
+        "harvest_level": 4,
+        "bilateral_break_speed": 0.1
       },
       "unlocks": []
     }

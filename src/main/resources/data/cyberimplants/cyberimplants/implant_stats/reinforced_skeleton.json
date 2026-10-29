@@ -6,7 +6,8 @@
       "cooldown_ticks": 0,
       "values": {
         "blunt_flat": 0.5,
-        "machinery": 0.2
+        "machinery": 0.2,
+        "max_health": 0
       },
       "unlocks": []
     },
@@ -15,8 +16,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "blunt_flat": 0.5,
-        "machinery": 0.2
+        "blunt_flat": 1.0,
+        "machinery": 0.3,
+        "max_health": 0
       },
       "unlocks": []
     },
@@ -25,8 +27,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "blunt_flat": 0.5,
-        "machinery": 0.2
+        "blunt_flat": 1.5,
+        "machinery": 0.4,
+        "max_health": 2
       },
       "unlocks": []
     },
@@ -35,8 +38,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "blunt_flat": 0.5,
-        "machinery": 0.2
+        "blunt_flat": 2.0,
+        "machinery": 0.55,
+        "max_health": 4
       },
       "unlocks": []
     },
@@ -45,8 +49,9 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "blunt_flat": 0.5,
-        "machinery": 0.2
+        "blunt_flat": 2.5,
+        "machinery": 0.7,
+        "max_health": 6
       },
       "unlocks": []
     }

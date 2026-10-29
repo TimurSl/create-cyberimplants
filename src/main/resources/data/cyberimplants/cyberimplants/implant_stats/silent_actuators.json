@@ -4,35 +4,55 @@
       "load": 2,
       "charge_cost": 0,
       "cooldown_ticks": 0,
-      "values": {},
+      "values": {
+        "suppression_level": 1,
+        "sneak_speed": 0,
+        "sneak_detection_reduction": 0.1
+      },
       "unlocks": []
     },
     {
       "load": 2,
       "charge_cost": 0,
       "cooldown_ticks": 0,
-      "values": {},
+      "values": {
+        "suppression_level": 2,
+        "sneak_speed": 0.1,
+        "sneak_detection_reduction": 0.15
+      },
       "unlocks": []
     },
     {
       "load": 3,
       "charge_cost": 0,
       "cooldown_ticks": 0,
-      "values": {},
+      "values": {
+        "suppression_level": 3,
+        "sneak_speed": 0.15,
+        "sneak_detection_reduction": 0.2
+      },
       "unlocks": []
     },
     {
       "load": 3,
       "charge_cost": 0,
       "cooldown_ticks": 0,
-      "values": {},
+      "values": {
+        "suppression_level": 4,
+        "sneak_speed": 0.25,
+        "sneak_detection_reduction": 0.3
+      },
       "unlocks": []
     },
     {
       "load": 4,
       "charge_cost": 0,
       "cooldown_ticks": 0,
-      "values": {},
+      "values": {
+        "suppression_level": 5,
+        "sneak_speed": 0.35,
+        "sneak_detection_reduction": 0.4
+      },
       "unlocks": []
     }
   ],

@@ -15,53 +15,53 @@
     },
     {
       "load": 6,
-      "charge_cost": 40,
-      "cooldown_ticks": 1200,
+      "charge_cost": 45,
+      "cooldown_ticks": 1000,
       "values": {
-        "duration_ticks": 80,
+        "duration_ticks": 120,
         "upkeep_per_second": 2.0,
-        "detect_still": 0.5,
-        "detect_moving": 0.8,
-        "aggro_drop_ticks": 60
+        "detect_still": 0.4,
+        "detect_moving": 0.7,
+        "aggro_drop_ticks": 50
       },
       "unlocks": []
     },
     {
       "load": 7,
-      "charge_cost": 40,
-      "cooldown_ticks": 1200,
+      "charge_cost": 50,
+      "cooldown_ticks": 800,
       "values": {
-        "duration_ticks": 80,
+        "duration_ticks": 160,
         "upkeep_per_second": 2.0,
-        "detect_still": 0.5,
-        "detect_moving": 0.8,
-        "aggro_drop_ticks": 60
+        "detect_still": 0.25,
+        "detect_moving": 0.6,
+        "aggro_drop_ticks": 40
       },
       "unlocks": []
     },
     {
       "load": 8,
-      "charge_cost": 40,
-      "cooldown_ticks": 1200,
+      "charge_cost": 55,
+      "cooldown_ticks": 700,
       "values": {
-        "duration_ticks": 80,
+        "duration_ticks": 200,
         "upkeep_per_second": 2.0,
-        "detect_still": 0.5,
-        "detect_moving": 0.8,
-        "aggro_drop_ticks": 60
+        "detect_still": 0.15,
+        "detect_moving": 0.5,
+        "aggro_drop_ticks": 30
       },
       "unlocks": []
     },
     {
       "load": 9,
-      "charge_cost": 40,
-      "cooldown_ticks": 1200,
+      "charge_cost": 60,
+      "cooldown_ticks": 500,
       "values": {
-        "duration_ticks": 80,
+        "duration_ticks": 280,
         "upkeep_per_second": 2.0,
-        "detect_still": 0.5,
-        "detect_moving": 0.8,
-        "aggro_drop_ticks": 60
+        "detect_still": 0.05,
+        "detect_moving": 0.35,
+        "aggro_drop_ticks": 0
       },
       "unlocks": []
     }

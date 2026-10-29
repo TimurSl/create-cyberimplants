@@ -5,7 +5,7 @@
       "charge_cost": 3,
       "cooldown_ticks": 0,
       "values": {
-        "damage": 2.0,
+        "damage": 2,
         "internal_cooldown_ticks": 30
       },
       "unlocks": []
@@ -15,8 +15,8 @@
       "charge_cost": 3,
       "cooldown_ticks": 0,
       "values": {
-        "damage": 2.0,
-        "internal_cooldown_ticks": 30
+        "damage": 3,
+        "internal_cooldown_ticks": 25
       },
       "unlocks": []
     },
@@ -25,8 +25,8 @@
       "charge_cost": 3,
       "cooldown_ticks": 0,
       "values": {
-        "damage": 2.0,
-        "internal_cooldown_ticks": 30
+        "damage": 4,
+        "internal_cooldown_ticks": 20
       },
       "unlocks": []
     },
@@ -35,8 +35,8 @@
       "charge_cost": 3,
       "cooldown_ticks": 0,
       "values": {
-        "damage": 2.0,
-        "internal_cooldown_ticks": 30
+        "damage": 5,
+        "internal_cooldown_ticks": 15
       },
       "unlocks": []
     },
@@ -45,8 +45,8 @@
       "charge_cost": 3,
       "cooldown_ticks": 0,
       "values": {
-        "damage": 2.0,
-        "internal_cooldown_ticks": 30
+        "damage": 6,
+        "internal_cooldown_ticks": 10
       },
       "unlocks": []
     }

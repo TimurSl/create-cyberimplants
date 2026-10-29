@@ -14,7 +14,7 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "kb": 4
+        "kb": 8
       },
       "unlocks": []
     },
@@ -23,7 +23,7 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "kb": 4
+        "kb": 16
       },
       "unlocks": []
     },
@@ -32,7 +32,7 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "kb": 4
+        "kb": 32
       },
       "unlocks": []
     },
@@ -41,7 +41,7 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "kb": 4
+        "kb": 64
       },
       "unlocks": []
     }

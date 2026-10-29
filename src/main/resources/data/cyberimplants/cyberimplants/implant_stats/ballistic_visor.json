@@ -15,8 +15,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "tracking_radius": 8,
-        "max_projectiles": 3
+        "tracking_radius": 12,
+        "max_projectiles": 5
       },
       "unlocks": []
     },
@@ -25,8 +25,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "tracking_radius": 8,
-        "max_projectiles": 3
+        "tracking_radius": 16,
+        "max_projectiles": 8
       },
       "unlocks": []
     },
@@ -35,8 +35,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "tracking_radius": 8,
-        "max_projectiles": 3
+        "tracking_radius": 24,
+        "max_projectiles": 12
       },
       "unlocks": []
     },
@@ -45,8 +45,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "tracking_radius": 8,
-        "max_projectiles": 3
+        "tracking_radius": 32,
+        "max_projectiles": 20
       },
       "unlocks": []
     }

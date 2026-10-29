@@ -15,8 +15,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "stamina_ticks": 60,
-        "climb_speed": 2.0
+        "stamina_ticks": 100,
+        "climb_speed": 2.5
       },
       "unlocks": []
     },
@@ -25,8 +25,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "stamina_ticks": 60,
-        "climb_speed": 2.0
+        "stamina_ticks": 160,
+        "climb_speed": 3.0
       },
       "unlocks": []
     },
@@ -35,8 +35,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "stamina_ticks": 60,
-        "climb_speed": 2.0
+        "stamina_ticks": 240,
+        "climb_speed": 3.5
       },
       "unlocks": []
     },
@@ -45,8 +45,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "stamina_ticks": 60,
-        "climb_speed": 2.0
+        "stamina_ticks": 400,
+        "climb_speed": 4.5
       },
       "unlocks": []
     }

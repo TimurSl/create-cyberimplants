@@ -5,8 +5,8 @@
       "charge_cost": 15,
       "cooldown_ticks": 60,
       "values": {
-        "max_vertical": 4.0,
-        "max_horizontal": 6.0,
+        "max_vertical": 4,
+        "max_horizontal": 6,
         "full_charge_ticks": 30
       },
       "unlocks": []
@@ -16,42 +16,42 @@
       "charge_cost": 15,
       "cooldown_ticks": 60,
       "values": {
-        "max_vertical": 4.0,
-        "max_horizontal": 6.0,
-        "full_charge_ticks": 30
+        "max_vertical": 6,
+        "max_horizontal": 9,
+        "full_charge_ticks": 25
       },
       "unlocks": []
     },
     {
       "load": 5,
       "charge_cost": 15,
-      "cooldown_ticks": 60,
+      "cooldown_ticks": 50,
       "values": {
-        "max_vertical": 4.0,
-        "max_horizontal": 6.0,
-        "full_charge_ticks": 30
+        "max_vertical": 8,
+        "max_horizontal": 12,
+        "full_charge_ticks": 20
       },
       "unlocks": []
     },
     {
       "load": 5,
       "charge_cost": 15,
-      "cooldown_ticks": 60,
+      "cooldown_ticks": 50,
       "values": {
-        "max_vertical": 4.0,
-        "max_horizontal": 6.0,
-        "full_charge_ticks": 30
+        "max_vertical": 10,
+        "max_horizontal": 16,
+        "full_charge_ticks": 16
       },
       "unlocks": []
     },
     {
       "load": 6,
       "charge_cost": 15,
-      "cooldown_ticks": 60,
+      "cooldown_ticks": 40,
       "values": {
-        "max_vertical": 4.0,
-        "max_horizontal": 6.0,
-        "full_charge_ticks": 30
+        "max_vertical": 14,
+        "max_horizontal": 22,
+        "full_charge_ticks": 12
       },
       "unlocks": []
     }

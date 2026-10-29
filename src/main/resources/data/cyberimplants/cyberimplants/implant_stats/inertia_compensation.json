@@ -5,6 +5,7 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
+        "turn_speed_kept": 0.3,
         "knockback_resistance": 0.1
       },
       "unlocks": []
@@ -14,7 +15,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "knockback_resistance": 0.1
+        "turn_speed_kept": 0.45,
+        "knockback_resistance": 0.15
       },
       "unlocks": []
     },
@@ -23,7 +25,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "knockback_resistance": 0.1
+        "turn_speed_kept": 0.6,
+        "knockback_resistance": 0.2
       },
       "unlocks": []
     },
@@ -32,7 +35,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "knockback_resistance": 0.1
+        "turn_speed_kept": 0.75,
+        "knockback_resistance": 0.3
       },
       "unlocks": []
     },
@@ -41,7 +45,8 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "knockback_resistance": 0.1
+        "turn_speed_kept": 0.9,
+        "knockback_resistance": 0.4
       },
       "unlocks": []
     }

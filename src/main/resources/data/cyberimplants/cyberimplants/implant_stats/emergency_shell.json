@@ -15,48 +15,48 @@
     {
       "load": 3,
       "charge_cost": 30,
-      "cooldown_ticks": 2400,
+      "cooldown_ticks": 2000,
       "values": {
-        "trigger_health": 0.2,
-        "reduction": 0.4,
-        "duration_ticks": 40,
-        "movement_penalty": 0.4
+        "trigger_health": 0.25,
+        "reduction": 0.5,
+        "duration_ticks": 50,
+        "movement_penalty": 0.35
       },
       "unlocks": []
     },
     {
       "load": 4,
       "charge_cost": 30,
-      "cooldown_ticks": 2400,
+      "cooldown_ticks": 1800,
       "values": {
-        "trigger_health": 0.2,
-        "reduction": 0.4,
-        "duration_ticks": 40,
-        "movement_penalty": 0.4
+        "trigger_health": 0.25,
+        "reduction": 0.6,
+        "duration_ticks": 60,
+        "movement_penalty": 0.3
       },
       "unlocks": []
     },
     {
       "load": 4,
       "charge_cost": 30,
-      "cooldown_ticks": 2400,
+      "cooldown_ticks": 1500,
       "values": {
-        "trigger_health": 0.2,
-        "reduction": 0.4,
-        "duration_ticks": 40,
-        "movement_penalty": 0.4
+        "trigger_health": 0.3,
+        "reduction": 0.7,
+        "duration_ticks": 80,
+        "movement_penalty": 0.2
       },
       "unlocks": []
     },
     {
       "load": 5,
       "charge_cost": 30,
-      "cooldown_ticks": 2400,
+      "cooldown_ticks": 1200,
       "values": {
-        "trigger_health": 0.2,
-        "reduction": 0.4,
-        "duration_ticks": 40,
-        "movement_penalty": 0.4
+        "trigger_health": 0.3,
+        "reduction": 0.8,
+        "duration_ticks": 100,
+        "movement_penalty": 0.1
       },
       "unlocks": []
     }

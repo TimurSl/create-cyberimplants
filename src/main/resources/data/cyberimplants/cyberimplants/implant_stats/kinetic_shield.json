@@ -5,7 +5,7 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "capacity": 4.0,
+        "capacity": 4,
         "absorb_share": 0.5,
         "recharge_delay_ticks": 160,
         "recharge_rate": 0.5,
@@ -19,10 +19,10 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "capacity": 4.0,
-        "absorb_share": 0.5,
-        "recharge_delay_ticks": 160,
-        "recharge_rate": 0.5,
+        "capacity": 6,
+        "absorb_share": 0.6,
+        "recharge_delay_ticks": 140,
+        "recharge_rate": 0.75,
         "charge_per_hp": 3.0,
         "emergency_cooldown_ticks": 900
       },
@@ -33,10 +33,10 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "capacity": 4.0,
-        "absorb_share": 0.5,
-        "recharge_delay_ticks": 160,
-        "recharge_rate": 0.5,
+        "capacity": 8,
+        "absorb_share": 0.7,
+        "recharge_delay_ticks": 120,
+        "recharge_rate": 1.0,
         "charge_per_hp": 3.0,
         "emergency_cooldown_ticks": 900
       },
@@ -47,10 +47,10 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "capacity": 4.0,
-        "absorb_share": 0.5,
-        "recharge_delay_ticks": 160,
-        "recharge_rate": 0.5,
+        "capacity": 10,
+        "absorb_share": 0.8,
+        "recharge_delay_ticks": 100,
+        "recharge_rate": 1.25,
         "charge_per_hp": 3.0,
         "emergency_cooldown_ticks": 900
       },
@@ -61,10 +61,10 @@
       "charge_cost": 0,
       "cooldown_ticks": 0,
       "values": {
-        "capacity": 4.0,
-        "absorb_share": 0.5,
-        "recharge_delay_ticks": 160,
-        "recharge_rate": 0.5,
+        "capacity": 14,
+        "absorb_share": 0.9,
+        "recharge_delay_ticks": 80,
+        "recharge_rate": 1.75,
         "charge_per_hp": 3.0,
         "emergency_cooldown_ticks": 900
       },
