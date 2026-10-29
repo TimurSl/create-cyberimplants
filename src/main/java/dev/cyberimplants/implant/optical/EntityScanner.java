@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.optical;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.data.Stats;
 import dev.cyberimplants.data.TierStats;
@@ -12,8 +13,6 @@ import dev.cyberimplants.implant.UseResult;
 import dev.cyberimplants.network.ScanResultPayload;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -59,6 +58,7 @@ public final class EntityScanner {
         List<ScanResultPayload.Marker> markers = new ArrayList<>();
         for (LivingEntity e : found) {
             String kind = EntityKinds.classify(e);
+            ImplantFx.scanMark(player, e, kind);
             markers.add(new ScanResultPayload.Marker(e.getId(), kind,
                     BuiltInRegistries.ENTITY_TYPE.getKey(e.getType()).toString(), (float) e.distanceTo(player)));
             DeckEvents.fire(player, "enemy_detected", Map.of(
@@ -67,8 +67,7 @@ public final class EntityScanner {
                     "kind", kind));
         }
         PacketDistributor.sendToPlayer(player, new ScanResultPayload(markers, revealTicks));
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.AMETHYST_BLOCK_RESONATE, SoundSource.PLAYERS, 0.8f, 1.6f);
+        ImplantFx.scanPulse(player, radius, markers.size());
     }
 
     private EntityScanner() {

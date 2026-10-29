@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.subdermal;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -7,11 +8,8 @@ import dev.cyberimplants.data.Stats;
 import dev.cyberimplants.data.TierStats;
 import dev.cyberimplants.implant.Attrs;
 import dev.cyberimplants.implant.ImplantIds;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -60,7 +58,8 @@ public final class EmergencyShell {
         if (!Body.spendEmergency(player, stats.chargeCost())) {
             return false;
         }
-        ACTIVE_UNTIL.put(player.getUUID(), player.level().getGameTime() + (long) stats.value("duration_ticks", 40));
+        int duration = (int) stats.value("duration_ticks", 40);
+        ACTIVE_UNTIL.put(player.getUUID(), player.level().getGameTime() + duration);
         Attrs.multiplied(player, Attributes.MOVEMENT_SPEED, "shell_slow", -stats.value("movement_penalty", 0.4), true);
         if (Stats.unlocked(ImplantIds.EMERGENCY_SHELL, tier, "knockback_immune")) {
             Attrs.added(player, Attributes.KNOCKBACK_RESISTANCE, "shell_knockback", 1.0, true);
@@ -68,9 +67,7 @@ public final class EmergencyShell {
         if (Stats.unlocked(ImplantIds.EMERGENCY_SHELL, tier, "cleanses")) {
             cleanse(player);
         }
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.ANVIL_PLACE, SoundSource.PLAYERS, 0.8f, 1.5f);
-        player.serverLevel().sendParticles(ParticleTypes.CRIT, player.getX(), player.getY() + 1.0, player.getZ(), 20, 0.4, 0.6, 0.4, 0.1);
+        ImplantFx.shellOn(player, duration);
         return true;
     }
 
@@ -88,6 +85,9 @@ public final class EmergencyShell {
         if (ACTIVE_UNTIL.remove(player.getUUID()) != null) {
             Attrs.multiplied(player, Attributes.MOVEMENT_SPEED, "shell_slow", 0, false);
             Attrs.added(player, Attributes.KNOCKBACK_RESISTANCE, "shell_knockback", 0, false);
+            if (!player.hasDisconnected()) {
+                ImplantFx.shellOff(player);
+            }
             if (BodyState.get(player).has(ImplantIds.EMERGENCY_SHELL)) {
                 Body.startCooldown(player, ImplantIds.EMERGENCY_SHELL, Body.cooldownTicks(player, ImplantIds.EMERGENCY_SHELL));
             }
@@ -117,6 +117,8 @@ public final class EmergencyShell {
         Long until = ACTIVE_UNTIL.get(player.getUUID());
         if (until != null && (!player.isAlive() || player.level().getGameTime() >= until)) {
             end(player);
+        } else if (until != null) {
+            ImplantFx.shellHold(player, until - player.level().getGameTime());
         }
     }
 

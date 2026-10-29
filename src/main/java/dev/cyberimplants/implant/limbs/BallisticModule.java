@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.limbs;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -10,8 +11,6 @@ import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.registry.ModItems;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.Arrow;
@@ -73,8 +72,7 @@ public final class BallisticModule {
         flechette.setBaseDamage(stats.value("damage", 3.0) / velocity);
         flechette.pickup = AbstractArrow.Pickup.DISALLOWED;
         player.level().addFreshEntity(flechette);
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.CROSSBOW_SHOOT, SoundSource.PLAYERS, 0.6f, 1.8f);
+        ImplantFx.ballisticFire(player);
     }
 
     /** Explicit reload request (a full magazine reload from the inventory). */
@@ -95,8 +93,7 @@ public final class BallisticModule {
         int loaded = taken;
         RELOAD_DONE.put(player.getUUID(), player.level().getGameTime() + ticks);
         Body.update(player, s -> s.withData(MAGAZINE_KEY, loaded));
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.CROSSBOW_LOADING_END, SoundSource.PLAYERS, 0.8f, 1.0f);
+        ImplantFx.ballisticReload(player);
         player.displayClientMessage(Component.translatable("cyberimplants.ballistic.reloading"), true);
     }
 

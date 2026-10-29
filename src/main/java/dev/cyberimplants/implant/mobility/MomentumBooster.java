@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.mobility;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -11,8 +12,6 @@ import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.UseContext;
 import dev.cyberimplants.implant.UseResult;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -60,8 +59,7 @@ public final class MomentumBooster {
             int amplifier = Math.max(0, (int) Math.round(stats.value("buff_speed", 0.20) / 0.2) - 1);
             player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, buffTicks, amplifier));
             Body.update(player, s -> s.withData(KEY, 0));
-            player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.FIREWORK_ROCKET_LAUNCH, SoundSource.PLAYERS, 0.8f, 1.2f);
+            ImplantFx.dash(player, fraction);
             return UseResult.OK;
         }
     };
@@ -86,8 +84,12 @@ public final class MomentumBooster {
         if (next != gauge) {
             Body.updateQuiet(player, s -> s.withData(KEY, next));
             if (gauge < 100.0 && next >= 100.0) {
+                ImplantFx.momentumFull(player);
                 DeckEvents.fire(player, "momentum_full", Map.of());
             }
+        }
+        if (next >= 100.0 && player.isSprinting() && player.tickCount % 2 == 0) {
+            ImplantFx.momentumTrail(player);
         }
     }
 

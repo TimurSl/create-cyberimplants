@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.subdermal;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -73,12 +74,16 @@ public final class ShockCircuit {
         // Magic damage ignores armor; half the discharge is meant to pierce, so deal it as magic.
         float damage = (float) stats.value("damage", 2.0);
         shock(level, player, attacker, damage, tier);
+        ImplantFx.shock(player, attacker, false);
         if (Stats.unlocked(ImplantIds.SHOCK_CIRCUIT, tier, "chain_one")) {
             // Tier III: the discharge arcs to one more hostile within 4 blocks.
             attacker.level().getEntitiesOfClass(LivingEntity.class, attacker.getBoundingBox().inflate(CHAIN_RANGE),
                             e -> e != player && e != attacker && e.isAlive() && e instanceof Enemy)
                     .stream().min(Comparator.comparingDouble(e -> e.distanceToSqr(attacker)))
-                    .ifPresent(next -> shock(level, player, next, damage, tier));
+                    .ifPresent(next -> {
+                        shock(level, player, next, damage, tier);
+                        ImplantFx.shockChain(player, attacker, next);
+                    });
         }
         if (attacker instanceof Creeper creeper && !creeper.isPowered()) {
             LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level);

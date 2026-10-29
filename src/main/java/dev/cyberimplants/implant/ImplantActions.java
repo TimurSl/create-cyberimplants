@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.body.BodyState;
 import dev.cyberimplants.body.Strain;
 import dev.cyberimplants.deck.DeckService;
@@ -68,6 +69,7 @@ public final class ImplantActions {
     public static void fizzle(ServerPlayer player, ResourceLocation id, UseResult result) {
         player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                 SoundEvents.DISPENSER_FAIL, SoundSource.PLAYERS, 0.6f, 1.4f);
+        ImplantFx.fizzle(player);
         player.displayClientMessage(Component.translatable("item." + id.getNamespace() + "." + id.getPath())
                 .append(": ").append(Component.translatable(result.translationKey())), true);
     }

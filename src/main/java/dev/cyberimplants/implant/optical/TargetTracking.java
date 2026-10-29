@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.optical;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -13,8 +14,6 @@ import dev.cyberimplants.implant.UseContext;
 import dev.cyberimplants.implant.UseResult;
 import dev.cyberimplants.network.TrackedTargetPayload;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -100,8 +99,7 @@ public final class TargetTracking {
             }
         }
         PacketDistributor.sendToPlayer(player, new TrackedTargetPayload(entity.getId()));
-        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                SoundEvents.EXPERIENCE_ORB_PICKUP, SoundSource.PLAYERS, 0.6f, 1.9f);
+        ImplantFx.tag(player, entity);
         DeckEvents.fire(player, "target_tagged", Map.of("entity", EntityHandle.of(player, entity)));
         return UseResult.OK;
     }
@@ -138,6 +136,8 @@ public final class TargetTracking {
         double range = Stats.value(player, ImplantIds.TARGET_TRACKING, "range", 24) * 1.25;
         if (target == null || !target.isAlive() || target.distanceTo(player) > range) {
             untag(player);
+        } else {
+            ImplantFx.tagHold(player, target);
         }
     }
 

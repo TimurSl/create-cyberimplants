@@ -24,6 +24,8 @@ public final class ClientSetup {
         modBus.addListener(ClientSetup::registerRenderers);
         NeoForge.EVENT_BUS.addListener(ClientSetup::onClientTick);
         NeoForge.EVENT_BUS.addListener(ClientSetup::onMovementInput);
+        NeoForge.EVENT_BUS.addListener(ClientFx::onCameraAngles);
+        NeoForge.EVENT_BUS.addListener(ClientFx::onFov);
     }
 
     private static void registerKeys(RegisterKeyMappingsEvent event) {
@@ -33,6 +35,8 @@ public final class ClientSetup {
     }
 
     private static void registerGuiLayers(RegisterGuiLayersEvent event) {
+        // Screen effects sit under the crosshair and the HUD, so washes never hide the readouts.
+        event.registerBelow(VanillaGuiLayers.CROSSHAIR, CyberImplants.id("screen_fx"), ClientFx::render);
         event.registerAbove(VanillaGuiLayers.HOTBAR, CyberImplants.id("hud"), Hud::render);
     }
 
@@ -46,6 +50,7 @@ public final class ClientSetup {
         ClientInput.tick();
         ClientMovement.tick();
         ClientOptics.tick();
+        ClientFx.tick();
     }
 
     private static void onMovementInput(MovementInputUpdateEvent event) {

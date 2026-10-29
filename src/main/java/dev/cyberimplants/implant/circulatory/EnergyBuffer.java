@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.circulatory;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -34,6 +35,9 @@ public final class EnergyBuffer {
         }
         double add = Math.min(cap - s.buffer(), Stats.of(ImplantIds.ENERGY_BUFFER, tier).value("fill_rate", 1.0) * 0.5);
         Body.updateQuiet(player, st -> st.withCharge(st.charge(), st.buffer() + add));
+        if (s.buffer() + add >= cap - 1.0E-6) {
+            ImplantFx.bufferFull(player);
+        }
     }
 
     private EnergyBuffer() {

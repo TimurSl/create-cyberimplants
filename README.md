@@ -23,6 +23,10 @@ Everything is drawn in one cyberpunk style without GUI textures (`client/CyberUi
   next tier), lists its features and checks what the operation needs. During the operation the screen becomes a monitor
   with stages and progress, and the stool projects a scanner ring around you.
 - **Implant Wheel**: a radial menu with item icons, cooldown sweeps and the battery in the hub.
+- **Implant effects**: every active effect has its own particles and layered sounds that nearby players see and hear
+  (the Sandevistan dome and afterimages, a scanner ping wave, shield hex flares, shock arcs, dash trails ...), and the
+  user gets a screen effect on top: a green time-dilation wash, cloak static, the Defibrillator flash, screen shake and
+  FOV kicks. Entity Scanner, Thermal Vision and Target Tracking outline their targets through walls.
 - Boot sequences, transitions, hover glows and interface sounds. Client config `ui.animations` and `ui.sounds` turn
   them off; `hud.reduceScreenEffects` also disables the animations.
 

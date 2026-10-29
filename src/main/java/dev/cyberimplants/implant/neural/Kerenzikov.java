@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.neural;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -51,6 +52,7 @@ public final class Kerenzikov {
         Body.startCooldown(player, ImplantIds.KERENZIKOV, stats.cooldownTicks());
         double direction = Math.toDegrees(Math.atan2(dirZ, dirX));
         openWindow(player, tier, direction);
+        ImplantFx.kerenzikovDodge(player, dirX, dirZ);
         DeckEvents.fire(player, "dodge", Map.of("direction", direction));
         return true;
     }

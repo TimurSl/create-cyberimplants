@@ -10,6 +10,8 @@ import dev.cyberimplants.body.InstalledImplant;
 import dev.cyberimplants.config.Layers;
 import dev.cyberimplants.config.ServerConfig;
 import dev.cyberimplants.content.RigSeatEntity;
+import dev.cyberimplants.fx.ImplantFx;
+import dev.cyberimplants.fx.ScreenFx;
 import dev.cyberimplants.implant.ImplantItem;
 import dev.cyberimplants.registry.ModFluids;
 import net.minecraft.core.BlockPos;
@@ -27,6 +29,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
@@ -304,20 +307,51 @@ public class RigBlockEntity extends KineticBlockEntity {
         }
     }
 
-    /** Sparks from the surgical arms and a low hum while the Rig works. */
+    /**
+     * Sparks from the surgical arms, a scanner glow sweeping the patient, a low hum and the whine of the tools while the
+     * Rig works, a chime at each of the five stages and a burst of light when it is done.
+     */
     private void effects(ServerLevel server, Operation op) {
         double x = worldPosition.getX() + 0.5;
         double y = worldPosition.getY() + RigSeatEntity.SEAT_HEIGHT;
         double z = worldPosition.getZ() + 0.5;
+        double sweep = 0.3 + 1.4 * (0.5 + 0.5 * Math.sin(elapsed * 0.15));
         if (elapsed % 4 == 0) {
-            double sweep = 0.3 + 1.4 * (0.5 + 0.5 * Math.sin(elapsed * 0.15));
             server.sendParticles(ParticleTypes.ELECTRIC_SPARK, x, y + sweep, z, 3, 0.3, 0.05, 0.3, 0.02);
+        }
+        if (elapsed % 3 == 0) {
+            // The scanner ring, in particles, so it also shows with Flywheel or a culled renderer.
+            ImplantFx.ring(server, ImplantFx.dust(op.install() ? ImplantFx.CYAN : ImplantFx.MAGENTA, 0.7f),
+                    new Vec3(x, y + sweep, z), 0.55, 10);
+        }
+        if (elapsed % 10 == 5) {
+            // The four laser emitters on the seat corners.
+            for (int i = 0; i < 4; i++) {
+                double ex = worldPosition.getX() + (i % 2 == 0 ? 0.1 : 0.9);
+                double ez = worldPosition.getZ() + (i < 2 ? 0.1 : 0.9);
+                server.sendParticles(ParticleTypes.END_ROD, ex, worldPosition.getY() + 0.9, ez, 1, 0, 0, 0, 0);
+            }
         }
         if (elapsed % 40 == 0) {
             server.playSound(null, worldPosition, SoundEvents.BEACON_AMBIENT, SoundSource.BLOCKS, 0.5f, 1.8f);
         }
+        if (elapsed % 25 == 12) {
+            // The surgical tools at work.
+            server.playSound(null, worldPosition, SoundEvents.BEEHIVE_WORK, SoundSource.BLOCKS, 0.6f, 1.8f);
+            server.playSound(null, worldPosition, SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 0.15f, 1.9f);
+        }
+        int stage = 5 * elapsed / Math.max(1, op.total());
+        int previous = 5 * (elapsed - 1) / Math.max(1, op.total());
+        if (stage != previous && stage < 5) {
+            server.playSound(null, worldPosition, SoundEvents.NOTE_BLOCK_CHIME.value(), SoundSource.BLOCKS, 0.5f, 1.0f + stage * 0.15f);
+            server.sendParticles(ParticleTypes.ELECTRIC_SPARK, x, y + 1.0, z, 16, 0.3, 0.6, 0.3, 0.12);
+        }
         if (elapsed == op.total() - 1) {
             server.sendParticles(ParticleTypes.END_ROD, x, y + 0.9, z, 24, 0.35, 0.6, 0.35, 0.03);
+            server.sendParticles(ParticleTypes.FLASH, x, y + 1.0, z, 1, 0, 0, 0, 0);
+            ImplantFx.shockwave(server, ParticleTypes.END_ROD, new Vec3(x, worldPosition.getY() + 0.1, z), 24, 0.15);
+            ImplantFx.ring(server, ImplantFx.dust(ImplantFx.GREEN, 1.4f), new Vec3(x, worldPosition.getY() + 0.1, z), 0.9, 24);
+            ImplantFx.sphere(server, ImplantFx.dust(ImplantFx.CYAN, 0.9f), new Vec3(x, y + 0.9, z), 0.8, 40);
         }
     }
 
@@ -338,6 +372,8 @@ public class RigBlockEntity extends KineticBlockEntity {
             player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
                     SoundEvents.UI_STONECUTTER_TAKE_RESULT, SoundSource.PLAYERS, 1.0f, 0.8f);
             player.level().playSound(null, worldPosition, SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.BLOCKS, 1.0f, 1.2f);
+            player.level().playSound(null, worldPosition, SoundEvents.BEACON_POWER_SELECT, SoundSource.BLOCKS, 0.7f, 1.5f);
+            ImplantFx.screen(player, ScreenFx.HEAL, 20, 1f);
         } else {
             player.displayClientMessage(Component.translatable(result.translationKey()), true);
         }
@@ -349,6 +385,17 @@ public class RigBlockEntity extends KineticBlockEntity {
     private void abort(ServerPlayer player, String reason, boolean hurt) {
         player.displayClientMessage(Component.translatable("cyberimplants.rig.abort." + reason), true);
         player.level().playSound(null, worldPosition, SoundEvents.ITEM_BREAK, SoundSource.BLOCKS, 0.8f, 0.6f);
+        if (level instanceof ServerLevel server) {
+            double x = worldPosition.getX() + 0.5;
+            double y = worldPosition.getY() + RigSeatEntity.SEAT_HEIGHT + 0.8;
+            double z = worldPosition.getZ() + 0.5;
+            server.playSound(null, worldPosition, SoundEvents.LIGHTNING_BOLT_IMPACT, SoundSource.BLOCKS, 0.4f, 1.6f);
+            server.sendParticles(ParticleTypes.ELECTRIC_SPARK, x, y, z, 30, 0.4, 0.5, 0.4, 0.3);
+            server.sendParticles(ParticleTypes.LARGE_SMOKE, x, y, z, 10, 0.3, 0.4, 0.3, 0.02);
+            if (hurt) {
+                ImplantFx.screen(player, ScreenFx.GLITCH, 16, 1f);
+            }
+        }
         finish();
         if (hurt) {
             player.hurt(player.damageSources().generic(), ABORT_DAMAGE);

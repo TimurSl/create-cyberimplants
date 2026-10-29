@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.circulatory;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -78,6 +79,7 @@ public final class Ers {
         }
         if (fired > 0) {
             Body.startCooldown(player, ImplantIds.ERS, stats.cooldownTicks());
+            ImplantFx.ers(player, fired);
             DeckEvents.fire(player, "ers_fired", Map.of());
         }
     }

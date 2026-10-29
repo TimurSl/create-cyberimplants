@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.optical;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -22,12 +23,14 @@ public final class ThermalVision {
         public UseResult use(ServerPlayer player, UseContext ctx) {
             if (Toggles.isOn(player, ImplantIds.THERMAL_VISION)) {
                 Toggles.set(player, ImplantIds.THERMAL_VISION, false);
+                ImplantFx.opticToggle(player, false);
                 return UseResult.OK;
             }
             if (!Body.canAfford(player, Stats.of(player, ImplantIds.THERMAL_VISION).value("upkeep_per_second", 1.0))) {
                 return UseResult.NO_CHARGE;
             }
             Toggles.set(player, ImplantIds.THERMAL_VISION, true);
+            ImplantFx.opticToggle(player, true);
             return UseResult.OK;
         }
 

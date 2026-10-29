@@ -1,5 +1,6 @@
 package dev.cyberimplants.implant.optical;
 
+import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
@@ -11,8 +12,6 @@ import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.UseContext;
 import dev.cyberimplants.implant.UseResult;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Mob;
@@ -59,8 +58,7 @@ public final class OpticalCamouflage {
             ACTIVE.put(player.getUUID(), new Camo(now, now + duration));
             // A faint shimmer: invisibility without particles.
             player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, duration, 0, false, false, false));
-            player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
-                    SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 0.5f, 1.8f);
+            ImplantFx.camoOn(player, duration);
             return UseResult.OK;
         }
 
@@ -85,6 +83,9 @@ public final class OpticalCamouflage {
             return false;
         }
         player.removeEffect(MobEffects.INVISIBILITY);
+        if (!player.hasDisconnected()) {
+            ImplantFx.camoOff(player, !reason.equals("manual") && !reason.equals("expired"));
+        }
         if (BodyState.get(player).has(ImplantIds.OPTICAL_CAMOUFLAGE)) {
             Body.startCooldown(player, ImplantIds.OPTICAL_CAMOUFLAGE, Body.cooldownTicks(player, ImplantIds.OPTICAL_CAMOUFLAGE));
         }
@@ -113,6 +114,9 @@ public final class OpticalCamouflage {
         if (!player.isAlive() || now >= camo.end) {
             end(player, "expired");
             return;
+        }
+        if (player.tickCount % 3 == 0) {
+            ImplantFx.camoShimmer(player);
         }
         TierStats stats = Stats.of(ImplantIds.OPTICAL_CAMOUFLAGE, BodyState.get(player).tierOf(ImplantIds.OPTICAL_CAMOUFLAGE));
         // Upkeep: 2 C per second on top of the activation cost.
