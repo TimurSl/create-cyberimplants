@@ -21,6 +21,16 @@ public interface Host {
 
     boolean toggle(String implant);
 
+    /** ISA-2: persistent implant setting (e.g. {@code CONFIGURE nano formula = "blast"}). */
+    default boolean configure(String implant, String key, Object value) {
+        return false;
+    }
+
+    /** ISA-2: a Remote Manipulator action on a bound port or position. {@code argument} is null except SET_VALUE. */
+    default boolean manipulate(Object target, String action, Object argument) {
+        return false;
+    }
+
     boolean scan();
 
     boolean tag(Object entity);

@@ -128,7 +128,7 @@ class ParserTest {
     void higherIsaFeaturesAreRejectedWithTheLevelThatIntroducesThem() {
         assertIsaError("PROGRAM \"x\"\nON boot:\n    WHILE TRUE:\n        LOG 1\n", "ISA-2");
         assertIsaError("PROGRAM \"x\"\nEVERY 2s:\n    LOG 1\n", "ISA-2");
-        assertIsaError("PROGRAM \"x\"\nCHANNEL c = link \"A\"\n", "ISA-2");
+        assertIsaError("PROGRAM \"x\"\nCHANNEL c = link \"A\"\n", "Remote Sensor Uplink");
         assertIsaError("PROGRAM \"x\"\nON boot:\n    CONFIGURE aes x = 1\n", "ISA-2");
         assertIsaError("PROGRAM \"x\"\nON boot:\n    FOR i IN xs:\n        LOG i\n", "ISA-3");
         assertIsaError("PROGRAM \"x\"\nFUNC f(x):\n    RETURN x\n", "ISA-3");
