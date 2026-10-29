@@ -1,0 +1,65 @@
+{
+  "tiers": [
+    {
+      "load": 3,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "dash_blocks": 6.0,
+        "buff_ticks": 40,
+        "sprint_gain_per_second": 8.0,
+        "decay_per_second": 5.0
+      },
+      "unlocks": []
+    },
+    {
+      "load": 3,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "dash_blocks": 6.0,
+        "buff_ticks": 40,
+        "sprint_gain_per_second": 8.0,
+        "decay_per_second": 5.0
+      },
+      "unlocks": []
+    },
+    {
+      "load": 4,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "dash_blocks": 6.0,
+        "buff_ticks": 40,
+        "sprint_gain_per_second": 8.0,
+        "decay_per_second": 5.0
+      },
+      "unlocks": []
+    },
+    {
+      "load": 4,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "dash_blocks": 6.0,
+        "buff_ticks": 40,
+        "sprint_gain_per_second": 8.0,
+        "decay_per_second": 5.0
+      },
+      "unlocks": []
+    },
+    {
+      "load": 5,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "dash_blocks": 6.0,
+        "buff_ticks": 40,
+        "sprint_gain_per_second": 8.0,
+        "decay_per_second": 5.0
+      },
+      "unlocks": []
+    }
+  ],
+  "unlock_layers": {}
+}

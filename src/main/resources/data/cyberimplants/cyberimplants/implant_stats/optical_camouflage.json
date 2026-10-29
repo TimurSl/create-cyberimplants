@@ -1,0 +1,70 @@
+{
+  "tiers": [
+    {
+      "load": 6,
+      "charge_cost": 40,
+      "cooldown_ticks": 1200,
+      "values": {
+        "duration_ticks": 80,
+        "upkeep_per_second": 2.0,
+        "detect_still": 0.5,
+        "detect_moving": 0.8,
+        "aggro_drop_ticks": 60
+      },
+      "unlocks": []
+    },
+    {
+      "load": 6,
+      "charge_cost": 40,
+      "cooldown_ticks": 1200,
+      "values": {
+        "duration_ticks": 80,
+        "upkeep_per_second": 2.0,
+        "detect_still": 0.5,
+        "detect_moving": 0.8,
+        "aggro_drop_ticks": 60
+      },
+      "unlocks": []
+    },
+    {
+      "load": 7,
+      "charge_cost": 40,
+      "cooldown_ticks": 1200,
+      "values": {
+        "duration_ticks": 80,
+        "upkeep_per_second": 2.0,
+        "detect_still": 0.5,
+        "detect_moving": 0.8,
+        "aggro_drop_ticks": 60
+      },
+      "unlocks": []
+    },
+    {
+      "load": 8,
+      "charge_cost": 40,
+      "cooldown_ticks": 1200,
+      "values": {
+        "duration_ticks": 80,
+        "upkeep_per_second": 2.0,
+        "detect_still": 0.5,
+        "detect_moving": 0.8,
+        "aggro_drop_ticks": 60
+      },
+      "unlocks": []
+    },
+    {
+      "load": 9,
+      "charge_cost": 40,
+      "cooldown_ticks": 1200,
+      "values": {
+        "duration_ticks": 80,
+        "upkeep_per_second": 2.0,
+        "detect_still": 0.5,
+        "detect_moving": 0.8,
+        "aggro_drop_ticks": 60
+      },
+      "unlocks": []
+    }
+  ],
+  "unlock_layers": {}
+}

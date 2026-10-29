@@ -1,0 +1,27 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "cyberimplants:block/neural_port"
+    },
+    "facing=east": {
+      "model": "cyberimplants:block/neural_port",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "cyberimplants:block/neural_port",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "cyberimplants:block/neural_port",
+      "y": 270
+    },
+    "facing=down": {
+      "model": "cyberimplants:block/neural_port",
+      "x": 90
+    },
+    "facing=up": {
+      "model": "cyberimplants:block/neural_port",
+      "x": 270
+    }
+  }
+}

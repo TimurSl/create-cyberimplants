@@ -1,0 +1,55 @@
+{
+  "tiers": [
+    {
+      "load": 2,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "tracking_radius": 8,
+        "max_projectiles": 3
+      },
+      "unlocks": []
+    },
+    {
+      "load": 3,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "tracking_radius": 8,
+        "max_projectiles": 3
+      },
+      "unlocks": []
+    },
+    {
+      "load": 3,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "tracking_radius": 8,
+        "max_projectiles": 3
+      },
+      "unlocks": []
+    },
+    {
+      "load": 4,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "tracking_radius": 8,
+        "max_projectiles": 3
+      },
+      "unlocks": []
+    },
+    {
+      "load": 4,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "tracking_radius": 8,
+        "max_projectiles": 3
+      },
+      "unlocks": []
+    }
+  ],
+  "unlock_layers": {}
+}

@@ -14,7 +14,12 @@ public enum BodyRegion implements StringRepresentable {
     RIGHT_ARM("right_arm", 1),
     CIRCULATORY("circulatory", 3),
     INTEGUMENT("integument", 2),
-    LEGS("legs", 2);
+    LEGS("legs", 2),
+    /** Layer 1: the cyberdeck chassis' module sockets. A T1 chassis has three. */
+    DECK("deck", 3),
+    /** The single module socket of a left / right Cybernetic Arm frame (Layer 1; later tiers add sockets). */
+    LEFT_SOCKET("left_socket", 1),
+    RIGHT_SOCKET("right_socket", 1);
 
     public static final Codec<BodyRegion> CODEC = StringRepresentable.fromEnum(BodyRegion::values);
 

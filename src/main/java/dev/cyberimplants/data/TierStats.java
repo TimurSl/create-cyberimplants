@@ -24,6 +24,9 @@ public record TierStats(int load, double chargeCost, int cooldownTicks, Map<Stri
             Codec.STRING.listOf().optionalFieldOf("unlocks", List.of()).forGetter(TierStats::unlocks)
     ).apply(i, TierStats::new));
 
+    /** Used when an implant has no stats file; every number reads as its fallback. */
+    public static final TierStats EMPTY = new TierStats(0, 0, 0, Map.of(), List.of());
+
     public TierStats {
         values = Map.copyOf(values);
         unlocks = List.copyOf(unlocks);

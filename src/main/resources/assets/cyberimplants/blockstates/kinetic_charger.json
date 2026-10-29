@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "cyberimplants:block/kinetic_charger"
+    },
+    "axis=x": {
+      "model": "cyberimplants:block/kinetic_charger"
+    },
+    "axis=z": {
+      "model": "cyberimplants:block/kinetic_charger"
+    }
+  }
+}

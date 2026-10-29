@@ -11,6 +11,7 @@ public final class ModRegistries {
         ModDataComponents.DATA_COMPONENTS.register(modBus);
         ModAttachments.ATTACHMENT_TYPES.register(modBus);
         ModItems.ITEMS.register(modBus);
+        ModCreativeTabs.TABS.register(modBus);
         ModBlocks.BLOCKS.register(modBus);
         ModBlockEntities.BLOCK_ENTITY_TYPES.register(modBus);
         ModFluids.FLUID_TYPES.register(modBus);

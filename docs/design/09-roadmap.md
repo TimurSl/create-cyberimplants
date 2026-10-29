@@ -71,6 +71,27 @@ parser and VM are Layer 1. NeoForge-dependent code has not yet been compiled aga
 | **Crafting** | One placeholder recipe per implant from vanilla and basic Create items (Mechanical Crafters). No tiers. |
 | **UI** | Implant Wheel, Charge bar, Rig body screen, basic text editor for decks |
 
+*Status:* implemented in the repository. The Synapse parser, compiler and VM (ISA-1) are unit-tested
+(`./scripts/test-synapse.sh`). The NeoForge-dependent code compiles against Minecraft 1.21.1, NeoForge 21.1.172 and Create 6.0.8 (verified with
+`./gradlew build` on CI) and the Tier-free unit tests pass, but it has **never been run**: no GameTest, client or
+server session has executed it yet, so expect gameplay bugs. The Layer 1 GameTests exist but CI does not run them.
+Deliberate Layer 1 simplifications:
+
+- The Rig is a single block opened by right-click (no chair, no two-block form); operations are instant.
+- Movement abilities are applied by the client and validated by the server for Charge, cooldown and air-jump
+  counts only; there is no position validation yet (Layer 4).
+- Sandevistan skips ticks on the server only; clients still extrapolate frozen entities.
+- Optical overlays use vanilla glow outlines and particles; there is no custom world rendering yet.
+- The Ballistic Module fires a vanilla arrow entity named for its damage; it has its own key (`G`) instead of
+  the hold-use interaction.
+- Every implant has stat files for five tiers, but tiers II-V repeat the Tier I numbers (only Load differs).
+- Deck: Chassis, Processor, RAM and Storage are installed into three module sockets through the Rig; the editor
+  is a single screen without tabs. Coprocessor, Machine Interface and Remote Sensor Uplink arrive in Layers 2-3.
+- Neural Port (rotation read-only): the chassis has the Machine Interface's Tier I limits built in (2 bound ports,
+  16 blocks). Right-click your own port to bind or unbind it; name it by renaming the item in an anvil before
+  placing. Scripts declare it with `DEVICE press = port "Name"` and read `press.speed`, `press.abs_speed`,
+  `press.online`; `ON rotational_speed_changed FROM press` fires when the speed changes.
+
 *Exit criteria:* a survival player can build a Core and at least one implant per category and use each one's core
 ability. Example program 1 in [Synapse §1](04-synapse-language.md#1-a-first-look) runs. Damage-pipeline and
 Sandevistan-field GameTests pass.

@@ -1,0 +1,55 @@
+{
+  "tiers": [
+    {
+      "load": 4,
+      "charge_cost": 80,
+      "cooldown_ticks": 36000,
+      "values": {
+        "health_restored": 2.0,
+        "resistance_ticks": 40
+      },
+      "unlocks": []
+    },
+    {
+      "load": 4,
+      "charge_cost": 80,
+      "cooldown_ticks": 36000,
+      "values": {
+        "health_restored": 2.0,
+        "resistance_ticks": 40
+      },
+      "unlocks": []
+    },
+    {
+      "load": 5,
+      "charge_cost": 80,
+      "cooldown_ticks": 36000,
+      "values": {
+        "health_restored": 2.0,
+        "resistance_ticks": 40
+      },
+      "unlocks": []
+    },
+    {
+      "load": 5,
+      "charge_cost": 80,
+      "cooldown_ticks": 36000,
+      "values": {
+        "health_restored": 2.0,
+        "resistance_ticks": 40
+      },
+      "unlocks": []
+    },
+    {
+      "load": 6,
+      "charge_cost": 80,
+      "cooldown_ticks": 36000,
+      "values": {
+        "health_restored": 2.0,
+        "resistance_ticks": 40
+      },
+      "unlocks": []
+    }
+  ],
+  "unlock_layers": {}
+}

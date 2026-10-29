@@ -1,0 +1,60 @@
+{
+  "tiers": [
+    {
+      "load": 4,
+      "charge_cost": 15,
+      "cooldown_ticks": 60,
+      "values": {
+        "max_vertical": 4.0,
+        "max_horizontal": 6.0,
+        "full_charge_ticks": 30
+      },
+      "unlocks": []
+    },
+    {
+      "load": 4,
+      "charge_cost": 15,
+      "cooldown_ticks": 60,
+      "values": {
+        "max_vertical": 4.0,
+        "max_horizontal": 6.0,
+        "full_charge_ticks": 30
+      },
+      "unlocks": []
+    },
+    {
+      "load": 5,
+      "charge_cost": 15,
+      "cooldown_ticks": 60,
+      "values": {
+        "max_vertical": 4.0,
+        "max_horizontal": 6.0,
+        "full_charge_ticks": 30
+      },
+      "unlocks": []
+    },
+    {
+      "load": 5,
+      "charge_cost": 15,
+      "cooldown_ticks": 60,
+      "values": {
+        "max_vertical": 4.0,
+        "max_horizontal": 6.0,
+        "full_charge_ticks": 30
+      },
+      "unlocks": []
+    },
+    {
+      "load": 6,
+      "charge_cost": 15,
+      "cooldown_ticks": 60,
+      "values": {
+        "max_vertical": 4.0,
+        "max_horizontal": 6.0,
+        "full_charge_ticks": 30
+      },
+      "unlocks": []
+    }
+  ],
+  "unlock_layers": {}
+}

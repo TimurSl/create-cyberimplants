@@ -1,0 +1,60 @@
+{
+  "tiers": [
+    {
+      "load": 4,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "module_sockets": 3,
+        "macro_keys": 2,
+        "log_lines": 20
+      },
+      "unlocks": []
+    },
+    {
+      "load": 5,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "module_sockets": 3,
+        "macro_keys": 2,
+        "log_lines": 20
+      },
+      "unlocks": []
+    },
+    {
+      "load": 6,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "module_sockets": 3,
+        "macro_keys": 2,
+        "log_lines": 20
+      },
+      "unlocks": []
+    },
+    {
+      "load": 7,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "module_sockets": 3,
+        "macro_keys": 2,
+        "log_lines": 20
+      },
+      "unlocks": []
+    },
+    {
+      "load": 8,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "module_sockets": 3,
+        "macro_keys": 2,
+        "log_lines": 20
+      },
+      "unlocks": []
+    }
+  ],
+  "unlock_layers": {}
+}

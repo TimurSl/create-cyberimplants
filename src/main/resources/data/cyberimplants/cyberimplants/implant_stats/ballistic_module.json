@@ -1,0 +1,65 @@
+{
+  "tiers": [
+    {
+      "load": 3,
+      "charge_cost": 2,
+      "cooldown_ticks": 20,
+      "values": {
+        "damage": 3.0,
+        "velocity": 2.0,
+        "magazine": 4,
+        "reload_ticks": 40
+      },
+      "unlocks": []
+    },
+    {
+      "load": 4,
+      "charge_cost": 2,
+      "cooldown_ticks": 20,
+      "values": {
+        "damage": 3.0,
+        "velocity": 2.0,
+        "magazine": 4,
+        "reload_ticks": 40
+      },
+      "unlocks": []
+    },
+    {
+      "load": 4,
+      "charge_cost": 2,
+      "cooldown_ticks": 20,
+      "values": {
+        "damage": 3.0,
+        "velocity": 2.0,
+        "magazine": 4,
+        "reload_ticks": 40
+      },
+      "unlocks": []
+    },
+    {
+      "load": 5,
+      "charge_cost": 2,
+      "cooldown_ticks": 20,
+      "values": {
+        "damage": 3.0,
+        "velocity": 2.0,
+        "magazine": 4,
+        "reload_ticks": 40
+      },
+      "unlocks": []
+    },
+    {
+      "load": 6,
+      "charge_cost": 2,
+      "cooldown_ticks": 20,
+      "values": {
+        "damage": 3.0,
+        "velocity": 2.0,
+        "magazine": 4,
+        "reload_ticks": 40
+      },
+      "unlocks": []
+    }
+  ],
+  "unlock_layers": {}
+}

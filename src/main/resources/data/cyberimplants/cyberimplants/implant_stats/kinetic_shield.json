@@ -1,0 +1,75 @@
+{
+  "tiers": [
+    {
+      "load": 4,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "capacity": 4.0,
+        "absorb_share": 0.5,
+        "recharge_delay_ticks": 160,
+        "recharge_rate": 0.5,
+        "charge_per_hp": 3.0,
+        "emergency_cooldown_ticks": 900
+      },
+      "unlocks": []
+    },
+    {
+      "load": 4,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "capacity": 4.0,
+        "absorb_share": 0.5,
+        "recharge_delay_ticks": 160,
+        "recharge_rate": 0.5,
+        "charge_per_hp": 3.0,
+        "emergency_cooldown_ticks": 900
+      },
+      "unlocks": []
+    },
+    {
+      "load": 5,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "capacity": 4.0,
+        "absorb_share": 0.5,
+        "recharge_delay_ticks": 160,
+        "recharge_rate": 0.5,
+        "charge_per_hp": 3.0,
+        "emergency_cooldown_ticks": 900
+      },
+      "unlocks": []
+    },
+    {
+      "load": 6,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "capacity": 4.0,
+        "absorb_share": 0.5,
+        "recharge_delay_ticks": 160,
+        "recharge_rate": 0.5,
+        "charge_per_hp": 3.0,
+        "emergency_cooldown_ticks": 900
+      },
+      "unlocks": []
+    },
+    {
+      "load": 7,
+      "charge_cost": 0,
+      "cooldown_ticks": 0,
+      "values": {
+        "capacity": 4.0,
+        "absorb_share": 0.5,
+        "recharge_delay_ticks": 160,
+        "recharge_rate": 0.5,
+        "charge_per_hp": 3.0,
+        "emergency_cooldown_ticks": 900
+      },
+      "unlocks": []
+    }
+  ],
+  "unlock_layers": {}
+}
