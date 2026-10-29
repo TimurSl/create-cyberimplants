@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [main]
+    branches: [main, claude/trusting-mendel-ym1zde]
   pull_request:
 
 permissions:
