@@ -65,12 +65,17 @@ public final class PassiveModifiers {
                 frameStats.value("break_speed", 0.10) + bilateral, frame > 0);
         Attrs.added(player, Attributes.BLOCK_INTERACTION_RANGE, "arm_reach", frameStats.value("reach", 0.0), frame > 0);
 
-        int bladeTier = Arms.moduleTier(s, main, RETRACTABLE_BLADE);
+        // The blade may sit in either arm's socket; it strikes through the main hand, so that hand must be empty.
+        int bladeMain = Arms.moduleTier(s, main, RETRACTABLE_BLADE);
+        int bladeOff = Arms.moduleTier(s, Arms.other(main), RETRACTABLE_BLADE);
+        int bladeTier = Math.max(bladeMain, bladeOff);
         boolean bladeOut = bladeTier > 0 && handEmpty && Toggles.isOn(player, RETRACTABLE_BLADE);
+        boolean dualBlades = bladeOut && bladeMain > 0 && bladeOff > 0 && player.getOffhandItem().isEmpty();
         var blade = Stats.of(RETRACTABLE_BLADE, Math.max(bladeTier, 1));
         // The player's base attack damage is 1 and base attack speed 4.
         Attrs.added(player, Attributes.ATTACK_DAMAGE, "blade_damage", blade.value("damage", 6.0) - 1.0, bladeOut);
         Attrs.added(player, Attributes.ATTACK_SPEED, "blade_speed", blade.value("attack_speed", 1.8) - 4.0, bladeOut);
+        Attrs.multiplied(player, Attributes.ATTACK_SPEED, "blade_dual_speed", blade.value("dual_attack_speed", 0.15), dualBlades);
 
         // G. Armor Plating
         int plating = s.tierOf(ARMOR_PLATING);

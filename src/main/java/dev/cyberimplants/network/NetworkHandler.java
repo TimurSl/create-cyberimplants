@@ -12,7 +12,7 @@ import java.util.function.BiConsumer;
 
 public final class NetworkHandler {
     /** Bump when a payload's wire format changes incompatibly. */
-    public static final String PROTOCOL_VERSION = "3";
+    public static final String PROTOCOL_VERSION = "4";
 
     public static void registerPayloads(RegisterPayloadHandlersEvent event) {
         PayloadRegistrar registrar = event.registrar(PROTOCOL_VERSION);
@@ -30,6 +30,8 @@ public final class NetworkHandler {
                 (payload, context) -> context.enqueueWork(() -> ClientPayloads.trackedTarget(payload.entityId())));
         registrar.playToClient(DeckStatusPayload.TYPE, DeckStatusPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(() -> ClientPayloads.deckStatus(payload)));
+        registrar.playToClient(AppearancePayload.TYPE, AppearancePayload.STREAM_CODEC,
+                (payload, context) -> context.enqueueWork(() -> ClientPayloads.appearance(payload)));
         registrar.playToClient(ScreenFxPayload.TYPE, ScreenFxPayload.STREAM_CODEC,
                 (payload, context) -> context.enqueueWork(() -> ClientPayloads.screenFx(payload)));
 

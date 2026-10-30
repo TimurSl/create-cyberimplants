@@ -76,6 +76,8 @@ public class ManualScreen extends Screen {
                 b -> openChapter(chapter + 1)));
         addRenderableWidget(CyberButton.of(width - 90, bottom, 80, 18, Component.translatable("gui.done"),
                 b -> onClose(), CyberUi.MAGENTA));
+        addRenderableWidget(CyberButton.of(width - 174, bottom, 80, 18, Component.translatable("cyberimplants.settings"),
+                b -> dev.cyberimplants.client.ClientSetup.openSettings(this)));
         layoutText();
     }
 

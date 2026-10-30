@@ -28,7 +28,7 @@ public final class CyberImplants {
         modBus.addListener((FMLCommonSetupEvent event) -> event.enqueueWork(CreateCompat::init));
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            dev.cyberimplants.client.ClientSetup.init(modBus);
+            dev.cyberimplants.client.ClientSetup.init(modBus, container);
         }
 
         container.registerConfig(ModConfig.Type.SERVER, ServerConfig.SPEC);
