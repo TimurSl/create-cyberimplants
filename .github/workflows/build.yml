@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [main, ccr-dffa77d7-nw9un2]
+    branches: [main]
   pull_request:
 
 permissions:
@@ -32,7 +32,6 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
       - run: ./gradlew build --no-daemon
       - uses: actions/upload-artifact@v4
-        continue-on-error: true
         with:
           name: create-cyberimplants-jar
           path: build/libs/*.jar
