@@ -87,15 +87,15 @@ public final class ShockCircuit {
             LivingEntity from = attacker;
             Set<LivingEntity> hit = new HashSet<>(Set.of(player, attacker));
             for (int i = 0; i < chain; i++) {
-                LivingEntity source = from;
-                LivingEntity next = source.level().getEntitiesOfClass(LivingEntity.class, source.getBoundingBox().inflate(CHAIN_RANGE),
+                LivingEntity arcFrom = from;
+                LivingEntity next = arcFrom.level().getEntitiesOfClass(LivingEntity.class, arcFrom.getBoundingBox().inflate(CHAIN_RANGE),
                                 e -> !hit.contains(e) && e.isAlive() && e instanceof Enemy)
-                        .stream().min(Comparator.comparingDouble(e -> e.distanceToSqr(source))).orElse(null);
+                        .stream().min(Comparator.comparingDouble(e -> e.distanceToSqr(arcFrom))).orElse(null);
                 if (next == null) {
                     break;
                 }
                 shock(level, player, next, damage, tier);
-                ImplantFx.shockChain(player, source, next);
+                ImplantFx.shockChain(player, arcFrom, next);
                 hit.add(next);
                 from = next;
             }
