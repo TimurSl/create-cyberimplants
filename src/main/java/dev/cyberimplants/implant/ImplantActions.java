@@ -6,6 +6,7 @@ import dev.cyberimplants.body.Strain;
 import dev.cyberimplants.deck.DeckService;
 import dev.cyberimplants.data.Stats;
 import dev.cyberimplants.implant.circulatory.Regenerator;
+import dev.cyberimplants.implant.limbs.CyberArm;
 import dev.cyberimplants.implant.limbs.RemoteManipulator;
 import dev.cyberimplants.implant.limbs.RetractableBlade;
 import dev.cyberimplants.implant.mobility.MagneticSoles;
@@ -37,15 +38,18 @@ public final class ImplantActions {
             Map.entry(ImplantIds.MAGNETIC_SOLES, MagneticSoles.ACTION),
             Map.entry(ImplantIds.MOMENTUM_BOOSTER, MomentumBooster.ACTION),
             Map.entry(ImplantIds.REGENERATOR, Regenerator.BURST),
-            Map.entry(ImplantIds.EMERGENCY_SHELL, EmergencyShell.MANUAL));
+            Map.entry(ImplantIds.EMERGENCY_SHELL, EmergencyShell.MANUAL),
+            Map.entry(ImplantIds.CYBERNETIC_ARM, CyberArm.HAPTIC));
 
     /**
      * Actions of Passive or Triggered implants that only exist once the installed tier has the unlock row
-     * (scripts/unlocks.py, ACTION_UNLOCKS): Regenerator Burst and the manual Emergency Shell (Layer 5).
+     * (scripts/unlocks.py, ACTION_UNLOCKS): Regenerator Burst, the manual Emergency Shell and the Cybernetic Arm's
+     * Haptic precision toggle (Layer 5).
      */
     private static final Map<ResourceLocation, String> ACTION_UNLOCKS = Map.of(
             ImplantIds.REGENERATOR, "burst",
-            ImplantIds.EMERGENCY_SHELL, "manual_activation");
+            ImplantIds.EMERGENCY_SHELL, "manual_activation",
+            ImplantIds.CYBERNETIC_ARM, "haptic_precision");
 
     public static ImplantAction get(ResourceLocation id) {
         return ACTIONS.get(id);

@@ -185,6 +185,15 @@ public final class OpticalCamouflage {
         return true;
     }
 
+    /**
+     * An Entity Scanner Tier V pulse (implant reading) breaks a cloak of Tier IV or lower. A Tier V cloak withstands it.
+     * Returns whether the cloak was broken.
+     */
+    public static boolean revealByScan(ServerPlayer player) {
+        return ACTIVE.containsKey(player.getUUID()) && BodyState.get(player).tierOf(ImplantIds.OPTICAL_CAMOUFLAGE) <= 4
+                && end(player, "scanned");
+    }
+
     @SubscribeEvent
     public static void onDamaged(LivingDamageEvent.Post event) {
         if (event.getEntity() instanceof ServerPlayer player) {

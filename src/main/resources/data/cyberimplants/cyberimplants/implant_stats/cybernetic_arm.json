@@ -63,8 +63,12 @@
         "harvest_level": 4,
         "bilateral_break_speed": 0.1
       },
-      "unlocks": []
+      "unlocks": [
+        "haptic_precision"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "haptic_precision": 5
+  }
 }

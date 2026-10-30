@@ -42,6 +42,7 @@ public final class ClientSetup {
         modBus.addListener(ClientSetup::registerRenderers);
         NeoForge.EVENT_BUS.addListener(ClientSetup::onClientTick);
         NeoForge.EVENT_BUS.addListener(ClientSetup::onMovementInput);
+        NeoForge.EVENT_BUS.addListener(ClientMovement::onJump);
         NeoForge.EVENT_BUS.addListener(ClientFx::onCameraAngles);
         NeoForge.EVENT_BUS.addListener(ClientFx::onFov);
         NeoForge.EVENT_BUS.addListener(ImplantRender::onRenderArm);

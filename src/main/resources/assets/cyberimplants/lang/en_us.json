@@ -615,5 +615,19 @@
   "item.cyberimplants.cryo_coolant_bucket": "Cryo-Coolant Bucket",
   "fluid_type.cyberimplants.nanite_suspension": "Nanite Suspension",
   "block.cyberimplants.nanite_suspension": "Nanite Suspension",
-  "item.cyberimplants.nanite_suspension_bucket": "Nanite Suspension Bucket"
+  "item.cyberimplants.nanite_suspension_bucket": "Nanite Suspension Bucket",
+  "cyberimplants.unlock.combat_predictor.precog": "Precog: a ghost shows where each tracked target will be after the prediction horizon",
+  "cyberimplants.unlock.kinetic_tendons.elastic_recoil": "Elastic Recoil: jumping within 3 ticks of landing gives +30% jump height",
+  "cyberimplants.unlock.cybernetic_arm.haptic_precision": "Haptic precision (Implant Wheel or deck): toggles silk touch for the empty hand",
+  "cyberimplants.unlock.microgrip.ceiling_hang": "Ceiling hang: cling to the underside of blocks (stamina drains x1.5)",
+  "cyberimplants.unlock.entity_scanner.auto_scan": "Passive auto-scan at half radius (every 4 s, 3 s at Tier IV, 2 s at Tier V)",
+  "cyberimplants.unlock.entity_scanner.implant_reading": "Implant reading: shows other players' implant categories and breaks Optical Camouflage up to Tier IV",
+  "cyberimplants.unlock.thermal_vision.heat_trails": "Heat trails: footprints of players and mobs stay visible for 10 s",
+  "cyberimplants.unlock.hydraulic_legs.ground_slam": "Ground slam: Sneak mid-air dives down; 3 damage to everything within 3 blocks on landing",
+  "cyberimplants.unlock.hydraulic_legs.slam_scaling": "Slam damage +1 per 4 blocks fallen (max +6) and launches hit mobs upward",
+  "cyberimplants.unlock.hydraulic_legs.rebound": "Rebound: jumping within 0.5 s of a slam chains into a free full-charge leap",
+  "cyberimplants.unlock.silent_actuators.ghost_step": "Ghost step: no heat trails, and Entity Scanner auto-scan ignores you while you stand still",
+  "cyberimplants.unlock.inertial_stabilizer.redirect": "Redirect: tap Sprint mid-air to turn your velocity toward where you look, once per airtime (10 Charge)",
+  "cyberimplants.arm.haptic_on": "Haptic precision: on (empty hand mines with silk touch)",
+  "cyberimplants.arm.haptic_off": "Haptic precision: off"
 }

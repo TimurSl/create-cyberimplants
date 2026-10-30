@@ -20,6 +20,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.function.Predicate;
@@ -37,6 +38,21 @@ final class ClientMovement {
     private static boolean clinging;
     private static boolean soleAttached;
     private static int soleReport;
+    private static boolean wasOnGround;
+    private static int landedTick = -1000;
+    private static boolean wasSneaking;
+    private static boolean slamming;
+    private static double slamStartY;
+    private static int reboundUntil = -1000;
+    private static boolean wasSprintDown;
+    private static boolean redirectUsed;
+
+    /** Elastic Recoil: a jump this many ticks after landing is higher. */
+    private static final int ELASTIC_WINDOW_TICKS = 3;
+    /** +30% jump height is sqrt(1.3) of the take-off speed. */
+    private static final double ELASTIC_VELOCITY = Math.sqrt(1.3);
+    /** Rebound: the jump must follow the slam's landing within 0.5 s. */
+    private static final int REBOUND_WINDOW_TICKS = 10;
 
     static void tick() {
         Minecraft mc = Minecraft.getInstance();
@@ -54,6 +70,10 @@ final class ClientMovement {
         boolean grounded = p.onGround() || p.onClimbable() || p.isInWater() || p.isInLava();
         if (grounded) {
             airJumpsUsed = 0;
+            redirectUsed = false;
+        }
+        if (p.onGround() && !wasOnGround) {
+            landedTick = p.tickCount;
         }
 
         dodge(mc, p, body);
@@ -61,8 +81,12 @@ final class ClientMovement {
         hydraulicLegs(mc, p, body);
         microgrip(p, body, input);
         magneticSoles(p, body, input);
+        groundSlam(p, body, input, grounded);
         airControl(p, body, input, grounded);
+        redirect(mc, p, body, grounded);
         wasJumping = input.jumping;
+        wasSneaking = input.shiftKeyDown;
+        wasOnGround = p.onGround();
     }
 
     private static void reset() {
@@ -71,6 +95,8 @@ final class ClientMovement {
         clinging = false;
         soleAttached = false;
         wasJumping = false;
+        slamming = false;
+        redirectUsed = false;
     }
 
     // ---------------------------------------------------------------- Kerenzikov
@@ -186,7 +212,7 @@ final class ClientMovement {
         boolean want = tier > 0 && input.shiftKeyDown && !p.onGround() && !p.isInWater() && grip > 0
                 && gripSurface(p, st -> st.is(Tags.UNGRIPPABLE) || (tier < 3 && st.is(Tags.UNGRIPPABLE_SMOOTH)), true);
         if (!want) {
-            clinging = false;
+            clinging = tier > 0 && ceilingHang(p, stats, tier, input);
             return;
         }
         clinging = true;
@@ -198,6 +224,37 @@ final class ClientMovement {
         if (grip == 0) {
             p.displayClientMessage(Component.translatable("cyberimplants.microgrip.exhausted"), true);
         }
+    }
+
+    /**
+     * Tier V Ceiling hang (Layer 5): Sneak under a grippable block to cling to its underside and crawl along it at
+     * half the climb speed. Stamina drains x1.5 (alternately 1 and 2 ticks of grip per tick).
+     */
+    private static boolean ceilingHang(LocalPlayer p, TierStats stats, int tier, Input input) {
+        if (!Stats.unlocked(ImplantIds.MICROGRIP, tier, "ceiling_hang") || !input.shiftKeyDown || p.onGround()
+                || p.isInWater() || grip <= 0) {
+            return false;
+        }
+        Level level = p.level();
+        BlockPos above = BlockPos.containing(p.getX(), p.getBoundingBox().maxY + 0.2, p.getZ());
+        BlockState state = level.getBlockState(above);
+        if (state.isAir() || state.getCollisionShape(level, above).isEmpty() || state.is(Tags.UNGRIPPABLE)) {
+            return false;
+        }
+        grip = Math.max(0, grip - (p.tickCount % 2 == 0 ? 2 : 1));
+        double crawl = stats.value("climb_speed", 2.0) / 40.0;
+        double yaw = Math.toRadians(p.getYRot());
+        Vec3 forward = new Vec3(-Math.sin(yaw), 0, Math.cos(yaw));
+        Vec3 left = new Vec3(Math.cos(yaw), 0, Math.sin(yaw));
+        Vec3 move = forward.scale(input.forwardImpulse).add(left.scale(input.leftImpulse));
+        move = move.lengthSqr() < 1.0E-4 ? Vec3.ZERO : move.normalize().scale(crawl);
+        // A little lift cancels the next tick's gravity; the ceiling stops the rest.
+        p.setDeltaMovement(move.x, 0.08, move.z);
+        p.fallDistance = 0;
+        if (grip == 0) {
+            p.displayClientMessage(Component.translatable("cyberimplants.microgrip.exhausted"), true);
+        }
+        return true;
     }
 
     // ---------------------------------------------------------------- Magnetic Soles
@@ -248,6 +305,72 @@ final class ClientMovement {
         return false;
     }
 
+    // ---------------------------------------------------------------- Hydraulic Legs: ground slam and Rebound
+
+    /**
+     * Tier III Ground slam: pressing Sneak mid-air (with at least two blocks of air below) dives down; the server
+     * deals the landing damage. Tier V Rebound: a jump within 0.5 s of the landing is a free full-charge leap.
+     */
+    private static void groundSlam(LocalPlayer p, BodyState body, Input input, boolean grounded) {
+        int tier = body.tierOf(ImplantIds.HYDRAULIC_LEGS);
+        if (tier == 0) {
+            slamming = false;
+            return;
+        }
+        if (slamming) {
+            if (grounded) {
+                slamming = false;
+                float fall = (float) Math.max(0.0, slamStartY - p.getY());
+                PacketDistributor.sendToServer(new MovementAbilityPayload(MovementAbilityPayload.Kind.SLAM_LAND, fall, 0));
+                if (Stats.unlocked(ImplantIds.HYDRAULIC_LEGS, tier, "rebound")) {
+                    reboundUntil = p.tickCount + REBOUND_WINDOW_TICKS;
+                }
+            } else {
+                Vec3 m = p.getDeltaMovement();
+                p.setDeltaMovement(m.x * 0.6, Math.min(m.y, -1.5), m.z * 0.6);
+            }
+            return;
+        }
+        if (p.onGround() && input.jumping && !wasJumping && !input.shiftKeyDown && p.tickCount <= reboundUntil) {
+            reboundUntil = -1000;
+            reboundLeap(p, Stats.of(ImplantIds.HYDRAULIC_LEGS, tier));
+            return;
+        }
+        if (grounded || !input.shiftKeyDown || wasSneaking || clinging || soleAttached || p.isFallFlying()
+                || p.getAbilities().flying || p.isPassenger() || !Stats.unlocked(ImplantIds.HYDRAULIC_LEGS, tier, "ground_slam")
+                || !airBelow(p, 2)) {
+            return;
+        }
+        slamming = true;
+        slamStartY = p.getY();
+        Vec3 m = p.getDeltaMovement();
+        p.setDeltaMovement(m.x * 0.3, -1.5, m.z * 0.3);
+        PacketDistributor.sendToServer(new MovementAbilityPayload(MovementAbilityPayload.Kind.SLAM_START, 0, 0));
+    }
+
+    private static void reboundLeap(LocalPlayer p, TierStats stats) {
+        double vy = HydraulicLegs.launchSpeedForHeight(stats.value("max_vertical", 4));
+        double flightTicks = Math.max(1.0, 2.0 * vy / 0.08);
+        double horizontal = stats.value("max_horizontal", 6) / flightTicks;
+        Vec3 look = p.getLookAngle();
+        Vec3 flat = new Vec3(look.x, 0, look.z);
+        flat = flat.lengthSqr() < 1.0E-4 ? Vec3.ZERO : flat.normalize();
+        p.setDeltaMovement(flat.x * horizontal, vy, flat.z * horizontal);
+        PacketDistributor.sendToServer(new MovementAbilityPayload(MovementAbilityPayload.Kind.LEAP, 1.0f, 1.0f));
+    }
+
+    /** Whether the {@code blocks} blocks under the player's feet have no collision. */
+    private static boolean airBelow(LocalPlayer p, int blocks) {
+        Level level = p.level();
+        for (int i = 1; i <= blocks; i++) {
+            BlockPos pos = BlockPos.containing(p.getX(), p.getY() - i, p.getZ());
+            if (!level.getBlockState(pos).getCollisionShape(level, pos).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     // ---------------------------------------------------------------- Inertial Stabilizer
 
     private static void airControl(LocalPlayer p, BodyState body, Input input, boolean grounded) {
@@ -266,6 +389,44 @@ final class ClientMovement {
         Vec3 left = new Vec3(Math.cos(yaw), 0, Math.sin(yaw));
         Vec3 dir = forward.scale(f).add(left.scale(l)).normalize().scale(extra);
         p.setDeltaMovement(p.getDeltaMovement().add(dir));
+    }
+
+    /**
+     * Tier V Redirect (Layer 5): tapping Sprint mid-air turns the current velocity toward the look direction, once per
+     * airtime. The server bills the Charge.
+     */
+    private static void redirect(Minecraft mc, LocalPlayer p, BodyState body, boolean grounded) {
+        boolean down = mc.options.keySprint.isDown();
+        boolean pressed = down && !wasSprintDown;
+        wasSprintDown = down;
+        int tier = body.tierOf(ImplantIds.INERTIAL_STABILIZER);
+        if (!pressed || grounded || redirectUsed || p.isFallFlying() || p.getAbilities().flying || clinging || soleAttached
+                || slamming || !Stats.unlocked(ImplantIds.INERTIAL_STABILIZER, tier, "redirect")
+                || !affordable(body, Stats.of(ImplantIds.INERTIAL_STABILIZER, tier).value("redirect_charge", 10.0))) {
+            return;
+        }
+        redirectUsed = true;
+        double speed = Math.max(p.getDeltaMovement().length(), 0.4);
+        Vec3 look = p.getLookAngle().scale(speed);
+        p.setDeltaMovement(look);
+        p.fallDistance = 0;
+        PacketDistributor.sendToServer(new MovementAbilityPayload(MovementAbilityPayload.Kind.REDIRECT, (float) look.x, (float) look.z));
+    }
+
+    // ---------------------------------------------------------------- Kinetic Tendons
+
+    /** Tier V Elastic Recoil (Layer 5): a jump within 3 ticks of landing is 30% higher. Jumps are client-authoritative. */
+    static void onJump(LivingEvent.LivingJumpEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (event.getEntity() != mc.player || mc.player == null) {
+            return;
+        }
+        LocalPlayer p = mc.player;
+        int tier = ClientBodyState.get().tierOf(ImplantIds.KINETIC_TENDONS);
+        if (p.tickCount - landedTick <= ELASTIC_WINDOW_TICKS && Stats.unlocked(ImplantIds.KINETIC_TENDONS, tier, "elastic_recoil")) {
+            Vec3 m = p.getDeltaMovement();
+            p.setDeltaMovement(m.x, m.y * ELASTIC_VELOCITY, m.z);
+        }
     }
 
     // ---------------------------------------------------------------- input event

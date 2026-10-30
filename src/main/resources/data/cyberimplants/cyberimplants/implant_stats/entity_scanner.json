@@ -7,7 +7,8 @@
       "values": {
         "radius": 12,
         "reveal_ticks": 60,
-        "max_markers": 8
+        "max_markers": 8,
+        "auto_scan_ticks": 0
       },
       "unlocks": []
     },
@@ -18,7 +19,8 @@
       "values": {
         "radius": 16,
         "reveal_ticks": 80,
-        "max_markers": 12
+        "max_markers": 12,
+        "auto_scan_ticks": 0
       },
       "unlocks": []
     },
@@ -29,9 +31,12 @@
       "values": {
         "radius": 24,
         "reveal_ticks": 100,
-        "max_markers": 16
+        "max_markers": 16,
+        "auto_scan_ticks": 80
       },
-      "unlocks": []
+      "unlocks": [
+        "auto_scan"
+      ]
     },
     {
       "load": 4,
@@ -40,9 +45,12 @@
       "values": {
         "radius": 32,
         "reveal_ticks": 120,
-        "max_markers": 24
+        "max_markers": 24,
+        "auto_scan_ticks": 60
       },
-      "unlocks": []
+      "unlocks": [
+        "auto_scan"
+      ]
     },
     {
       "load": 5,
@@ -51,10 +59,17 @@
       "values": {
         "radius": 48,
         "reveal_ticks": 160,
-        "max_markers": 32
+        "max_markers": 32,
+        "auto_scan_ticks": 40
       },
-      "unlocks": []
+      "unlocks": [
+        "auto_scan",
+        "implant_reading"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "auto_scan": 3,
+    "implant_reading": 5
+  }
 }

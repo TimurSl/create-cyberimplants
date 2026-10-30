@@ -9,14 +9,21 @@ import dev.cyberimplants.data.Stats;
 import dev.cyberimplants.implant.ImplantActions;
 import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.Synergies;
+import dev.cyberimplants.implant.Toggles;
 import dev.cyberimplants.implant.UseContext;
 import dev.cyberimplants.implant.UseResult;
 import dev.cyberimplants.implant.circulatory.Regenerator;
+import dev.cyberimplants.implant.limbs.CyberArm;
+import dev.cyberimplants.implant.mobility.HydraulicLegs;
+import dev.cyberimplants.implant.mobility.InertialStabilizer;
+import dev.cyberimplants.implant.optical.EntityScanner;
 import dev.cyberimplants.implant.subdermal.EmergencyShell;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -78,6 +85,75 @@ public final class Layer5Tests {
         double base = (10 - 3) * Synergies.FALL_MOMENTUM_PER_BLOCK;
         helper.assertTrue(Math.abs(Synergies.fallMomentum(tier4, 10) - base * Synergies.DAMPENER_MOMENTUM_FACTOR) < 1.0E-6, "Tier IV dampeners give x1.5");
         helper.assertTrue(Math.abs(Synergies.fallMomentum(tier5, 10) - base * Synergies.RECOIL_STORAGE_FACTOR) < 1.0E-6, "Tier V Recoil Storage gives x2");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void remainingTierFiveRowsNeedTierFive(GameTestHelper helper) {
+        Object[][] rows = {
+                {ImplantIds.KINETIC_TENDONS, "elastic_recoil"}, {ImplantIds.MICROGRIP, "ceiling_hang"},
+                {ImplantIds.THERMAL_VISION, "heat_trails"}, {ImplantIds.ENTITY_SCANNER, "implant_reading"},
+                {ImplantIds.COMBAT_PREDICTOR, "precog"}, {ImplantIds.HYDRAULIC_LEGS, "rebound"},
+                {ImplantIds.INERTIAL_STABILIZER, "redirect"}, {ImplantIds.SILENT_ACTUATORS, "ghost_step"},
+                {ImplantIds.CYBERNETIC_ARM, "haptic_precision"}};
+        for (Object[] row : rows) {
+            ResourceLocation id = (ResourceLocation) row[0];
+            String unlock = (String) row[1];
+            helper.assertTrue(!Stats.unlocked(id, 4, unlock), id + " has no " + unlock + " at Tier IV");
+            helper.assertTrue(Stats.unlocked(id, 5, unlock), id + " has " + unlock + " at Tier V");
+        }
+        helper.assertTrue(Stats.unlocked(ImplantIds.HYDRAULIC_LEGS, 3, "ground_slam") && !Stats.unlocked(ImplantIds.HYDRAULIC_LEGS, 3, "slam_scaling"),
+                "the slam arrives at Tier III, its scaling at Tier IV");
+        helper.assertTrue(Stats.unlocked(ImplantIds.ENTITY_SCANNER, 3, "auto_scan"), "auto-scan arrives at Tier III");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void slamDamageScalesFromTierFour(GameTestHelper helper) {
+        helper.assertTrue(HydraulicLegs.slamDamage(10, false) == 3.0f, "Tier III slams deal a flat 3");
+        helper.assertTrue(HydraulicLegs.slamDamage(10, true) == 5.0f, "Tier IV adds 1 per 4 blocks");
+        helper.assertTrue(HydraulicLegs.slamDamage(100, true) == 9.0f, "the bonus stops at +6");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void armHarvestLevels(GameTestHelper helper) {
+        helper.assertTrue(!CyberArm.harvests(0, Blocks.STONE.defaultBlockState()), "a Tier I frame harvests nothing");
+        helper.assertTrue(CyberArm.harvests(1, Blocks.STONE.defaultBlockState()), "stone level mines stone");
+        helper.assertTrue(!CyberArm.harvests(1, Blocks.IRON_ORE.defaultBlockState()), "stone level cannot mine iron ore");
+        helper.assertTrue(CyberArm.harvests(2, Blocks.IRON_ORE.defaultBlockState()), "iron level mines iron ore");
+        helper.assertTrue(!CyberArm.harvests(2, Blocks.OBSIDIAN.defaultBlockState()) && CyberArm.harvests(3, Blocks.OBSIDIAN.defaultBlockState()),
+                "obsidian needs the diamond level");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void hapticPrecisionIsAWheelToggle(GameTestHelper helper) {
+        helper.assertTrue(!ImplantActions.wheelEligible(ImplantIds.CYBERNETIC_ARM, 4), "a Tier IV frame has nothing to toggle");
+        helper.assertTrue(ImplantActions.wheelEligible(ImplantIds.CYBERNETIC_ARM, 5), "a Tier V frame has Haptic precision");
+        ServerPlayer player = player(helper, BodyState.EMPTY.withImplant(new SlotId(BodyRegion.RIGHT_ARM, 0),
+                new InstalledImplant(ImplantIds.CYBERNETIC_ARM, 5)));
+        helper.assertTrue(ImplantActions.use(player, ImplantIds.CYBERNETIC_ARM, UseContext.MANUAL).ok(), "the toggle switches on");
+        helper.assertTrue(Toggles.isOn(player, ImplantIds.CYBERNETIC_ARM), "Haptic precision is on");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void scannerReadsImplantCategories(GameTestHelper helper) {
+        ServerPlayer player = player(helper, BodyState.EMPTY
+                .withImplant(new SlotId(BodyRegion.OCULAR, 0), new InstalledImplant(ImplantIds.THERMAL_VISION, 1))
+                .withImplant(new SlotId(BodyRegion.LEGS, 0), new InstalledImplant(ImplantIds.SILENT_ACTUATORS, 1)));
+        helper.assertTrue(EntityScanner.implantLetters(player).equals("EH"), "optics and mobility read as E and H, the Core is left out");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void redirectOncePerAirtime(GameTestHelper helper) {
+        ServerPlayer player = player(helper, BodyState.EMPTY.withImplant(new SlotId(BodyRegion.LEGS, 0),
+                new InstalledImplant(ImplantIds.INERTIAL_STABILIZER, 5)));
+        player.setOnGround(false);
+        helper.assertTrue(InertialStabilizer.redirect(player), "the first redirect in the air works");
+        helper.assertTrue(!InertialStabilizer.redirect(player), "the second one in the same airtime is refused");
         helper.succeed();
     }
 

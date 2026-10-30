@@ -8,6 +8,9 @@ import os
 LANG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src", "main", "resources", "assets", "cyberimplants", "lang")
 
 UI = {  # key: (english, russian)
+    "cyberimplants.arm.haptic_on": ("Haptic precision: on (empty hand mines with silk touch)",
+                                    "Тактильная точность: вкл. (пустая рука добывает с шёлковым касанием)"),
+    "cyberimplants.arm.haptic_off": ("Haptic precision: off", "Тактильная точность: выкл."),
     "entity.cyberimplants.rig_seat": ("Rig Seat", "Сиденье кресла"),
     "cyberimplants.rig.cannot_seat": ("The Rig could not strap you in.", "Кресло не смогло вас зафиксировать."),
     "cyberimplants.rig.abort.moved": ("Operation aborted: the patient left the chair.", "Операция прервана: пациент покинул кресло."),

@@ -53,8 +53,12 @@
         "wall_penetration": 64,
         "upkeep_per_second": 1.0
       },
-      "unlocks": []
+      "unlocks": [
+        "heat_trails"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "heat_trails": 5
+  }
 }

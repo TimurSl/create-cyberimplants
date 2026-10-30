@@ -5,6 +5,7 @@ import dev.cyberimplants.body.BodyRegion;
 import dev.cyberimplants.body.BodyState;
 import dev.cyberimplants.body.InstalledImplant;
 import dev.cyberimplants.body.SlotId;
+import dev.cyberimplants.implant.mobility.SilentActuators;
 import dev.cyberimplants.implant.neural.Sandevistan;
 import dev.cyberimplants.network.AppearancePayload;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,8 +20,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * What other people can see of a body: arm hardware per side, glowing optics, neural ports, a deck along the spine and
- * whether a Sandevistan is running. Packed into an int, sent to the owner and to every player tracking them whenever
+ * What other people can see of a body: arm hardware per side, glowing optics, neural ports, a deck along the spine,
+ * whether a Sandevistan is running and whether the body leaves heat trails. Packed into an int, sent to the owner and to every player tracking them whenever
  * it changes; the client draws implant models and Sandevistan afterimages from it.
  */
 @EventBusSubscriber(modid = CyberImplants.MOD_ID)
@@ -42,6 +43,8 @@ public final class Appearance {
     public static final int MOBILITY = 1 << 13;
     public static final int SUBDERMAL = 1 << 14;
     public static final int SANDEVISTAN = 1 << 15;
+    /** Silent Actuators Tier V Ghost step: leaves no Thermal Vision heat trails. */
+    public static final int GHOST_STEP = 1 << 16;
 
     private static final Map<UUID, Integer> LAST_SENT = new ConcurrentHashMap<>();
 
@@ -85,6 +88,9 @@ public final class Appearance {
         }
         if (Sandevistan.isActive(player)) {
             bits |= SANDEVISTAN;
+        }
+        if (SilentActuators.ghostStep(player)) {
+            bits |= GHOST_STEP;
         }
         return bits;
     }

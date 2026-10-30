@@ -16,12 +16,18 @@ public record MovementAbilityPayload(Kind kind, float a, float b) implements Cus
         DODGE,
         /** Enhanced Tendons air jump. */
         AIR_JUMP,
-        /** Hydraulic Legs leap; a = charge fraction. */
+        /** Hydraulic Legs leap; a = charge fraction, b = 1 for a Tier V Rebound. */
         LEAP,
         /** Magnetic Soles: still attached (refresh). */
         SOLES_ATTACHED,
         /** Magnetic Soles: detached. */
-        SOLES_DETACHED
+        SOLES_DETACHED,
+        /** Hydraulic Legs ground slam: the dive started. */
+        SLAM_START,
+        /** Hydraulic Legs ground slam: landed; a = blocks fallen as the client measured them. */
+        SLAM_LAND,
+        /** Inertial Stabilizer Redirect; a, b = new horizontal velocity x, z. */
+        REDIRECT
     }
 
     public static final Type<MovementAbilityPayload> TYPE = new Type<>(CyberImplants.id("movement_ability"));

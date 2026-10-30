@@ -341,7 +341,11 @@ final class Hud {
             y += 10;
             for (ScanResultPayload.Marker m : markers) {
                 String name = m.type().contains(":") ? m.type().substring(m.type().indexOf(':') + 1) : m.type();
-                g.drawString(font, String.format("%s  [%s]  %.0fm", name, m.kind(), m.distance()), 6, y, kindColor(m.kind()));
+                String line = String.format("%s  [%s]  %.0fm", name, m.kind(), m.distance());
+                if (!m.implants().isEmpty()) {
+                    line += "  {" + m.implants() + "}";
+                }
+                g.drawString(font, line, 6, y, kindColor(m.kind()));
                 y += 9;
             }
         }

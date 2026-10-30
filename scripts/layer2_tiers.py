@@ -65,7 +65,8 @@ TIERS = {
         "damage": [3, 4, 5, 6, 8], "velocity": [2.0, 2.5, 3.0, 3.5, 4.0], "magazine": [4, 6, 8, 12, 16], "reload_ticks": 40}),
     # ---- E. Optical
     "entity_scanner": ([3, 3, 4, 4, 5], [5, 5, 6, 6, 8], [200, 160, 120, 100, 80], {
-        "radius": [12, 16, 24, 32, 48], "reveal_ticks": [60, 80, 100, 120, 160], "max_markers": [8, 12, 16, 24, 32]}),
+        "radius": [12, 16, 24, 32, 48], "reveal_ticks": [60, 80, 100, 120, 160], "max_markers": [8, 12, 16, 24, 32],
+        "auto_scan_ticks": [0, 0, 80, 60, 40]}),
     "thermal_vision": ([2, 3, 3, 4, 4], 0, 0, {
         "range": [16, 24, 32, 40, 48], "wall_penetration": [2, 4, 8, 12, 64], "upkeep_per_second": 1.0}),
     "machine_analyzer": ([2, 2, 3, 3, 4], 0, 0, {
@@ -117,7 +118,8 @@ TIERS = {
     "magnetic_soles": ([2, 2, 3, 3, 4], 0, 0, {
         "upkeep_per_second": 0.5, "wall_walk_speed": [0.5, 0.65, 0.8, 0.9, 1.0]}),
     "inertial_stabilizer": ([2, 3, 3, 4, 4], 0, 0, {
-        "air_control": [0.25, 0.5, 0.75, 1.0, 1.5], "wall_impact_reduction": [0.2, 0.4, 0.6, 0.8, 1.0]}),
+        "air_control": [0.25, 0.5, 0.75, 1.0, 1.5], "wall_impact_reduction": [0.2, 0.4, 0.6, 0.8, 1.0],
+        "redirect_charge": 10.0}),
     "momentum_booster": ([3, 3, 4, 4, 5], 0, 0, {
         "dash_blocks": [6, 8, 10, 12, 16], "buff_speed": [0.20, 0.25, 0.30, 0.40, 0.50], "buff_ticks": [40, 60, 60, 80, 100],
         "sprint_gain_per_second": 8.0, "decay_per_second": [5, 4, 3, 2, 1]}),

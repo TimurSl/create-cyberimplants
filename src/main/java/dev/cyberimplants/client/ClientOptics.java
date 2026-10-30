@@ -3,11 +3,13 @@ package dev.cyberimplants.client;
 import dev.cyberimplants.body.BodyState;
 import dev.cyberimplants.config.Layers;
 import dev.cyberimplants.data.Stats;
+import dev.cyberimplants.implant.Appearance;
 import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.Toggles;
 import dev.cyberimplants.network.ScanResultPayload;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.entity.Entity;
@@ -21,7 +23,11 @@ import net.minecraft.world.item.TridentItem;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -42,8 +48,23 @@ public final class ClientOptics {
 
     public static void setScan(ScanResultPayload payload) {
         Minecraft mc = Minecraft.getInstance();
+        long now = mc.level == null ? 0 : mc.level.getGameTime();
+        if (payload.passive() && now < scanExpires) {
+            // An auto-scan adds to a manual pulse's markers (refreshing the ones it saw) and never shortens the reveal.
+            List<ScanResultPayload.Marker> merged = new ArrayList<>(payload.markers());
+            Set<Integer> fresh = new HashSet<>();
+            payload.markers().forEach(m -> fresh.add(m.entityId()));
+            for (ScanResultPayload.Marker m : scanMarkers) {
+                if (!fresh.contains(m.entityId())) {
+                    merged.add(m);
+                }
+            }
+            scanMarkers = merged;
+            scanExpires = Math.max(scanExpires, now + payload.revealTicks());
+            return;
+        }
         scanMarkers = payload.markers();
-        scanExpires = (mc.level == null ? 0 : mc.level.getGameTime()) + payload.revealTicks();
+        scanExpires = now + payload.revealTicks();
     }
 
     public static void setTracked(int entityId) {
@@ -81,9 +102,11 @@ public final class ClientOptics {
             }
         }
         applyGlow(mc, wanted);
+        heatTrails(mc, player, body);
 
         if (!body.installed().isEmpty() && player.tickCount % 2 == 0) {
             leadIndicator(mc, player, body);
+            precog(mc, player, body);
             if (player.tickCount % 3 == 0) {
                 projectileArcs(mc, player, body);
             }
@@ -158,6 +181,60 @@ public final class ClientOptics {
         }
     }
 
+    // ---------------------------------------------------------------- Thermal Vision heat trails
+
+    /** A footprint: where and when a warm body stepped. */
+    private record Footprint(double x, double y, double z, long time) {
+    }
+
+    private static final int TRAIL_TICKS = 200;
+    private static final int MAX_FOOTPRINTS = 768;
+    private static final Deque<Footprint> FOOTPRINTS = new ArrayDeque<>();
+    private static final Map<Integer, Vec3> LAST_STEP = new HashMap<>();
+
+    /**
+     * Tier V heat trails (Layer 5): warm bodies on the ground leave footprints that fade over 10 s. Undead are cold and
+     * Silent Actuators Ghost-step users leave none.
+     */
+    private static void heatTrails(Minecraft mc, LocalPlayer player, BodyState body) {
+        long now = mc.level.getGameTime();
+        while (!FOOTPRINTS.isEmpty() && now - FOOTPRINTS.peekFirst().time() > TRAIL_TICKS) {
+            FOOTPRINTS.pollFirst();
+        }
+        int tier = body.tierOf(ImplantIds.THERMAL_VISION);
+        if (!Toggles.isOn(player, ImplantIds.THERMAL_VISION) || !Stats.unlocked(ImplantIds.THERMAL_VISION, tier, "heat_trails")) {
+            FOOTPRINTS.clear();
+            LAST_STEP.clear();
+            return;
+        }
+        double range = Stats.of(ImplantIds.THERMAL_VISION, tier).value("range", 48);
+        if (player.tickCount % 4 == 0) {
+            for (LivingEntity e : mc.level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(range),
+                    x -> x != player && x.isAlive() && x.onGround() && !x.getType().is(EntityTypeTags.UNDEAD)
+                            && !ClientAppearance.has(x, Appearance.GHOST_STEP))) {
+                Vec3 last = LAST_STEP.get(e.getId());
+                if (last == null || last.distanceToSqr(e.position()) > 0.8 * 0.8) {
+                    LAST_STEP.put(e.getId(), e.position());
+                    FOOTPRINTS.addLast(new Footprint(e.getX(), e.getY() + 0.05, e.getZ(), now));
+                    if (FOOTPRINTS.size() > MAX_FOOTPRINTS) {
+                        FOOTPRINTS.pollFirst();
+                    }
+                }
+            }
+            if (LAST_STEP.size() > 256) {
+                LAST_STEP.clear();
+            }
+        }
+        if (player.tickCount % 5 == 0) {
+            for (Footprint f : FOOTPRINTS) {
+                float heat = 1.0f - (float) (now - f.time()) / TRAIL_TICKS;
+                // Hot footprints glow orange and cool toward a dim red.
+                Vector3f color = new Vector3f(1.0f, 0.25f + 0.45f * heat, 0.1f * heat);
+                mc.level.addParticle(new DustParticleOptions(color, 0.4f + 0.6f * heat), f.x(), f.y(), f.z(), 0, 0, 0);
+            }
+        }
+    }
+
     // ---------------------------------------------------------------- Combat Predictor
 
     private static void leadIndicator(Minecraft mc, LocalPlayer player, BodyState body) {
@@ -203,6 +280,44 @@ public final class ClientOptics {
         // Compensate for the arrow's drop over the flight time (0.05 b/t^2).
         aim = aim.add(0, 0.5 * 0.05 * t * t, 0);
         mc.level.addParticle(ParticleTypes.END_ROD, aim.x, aim.y, aim.z, 0, 0, 0);
+    }
+
+    /**
+     * Tier V Precog (Layer 5): a ghost outline where the tracked target (and the target under the crosshair) will be
+     * after the prediction horizon, extrapolated from its current velocity.
+     */
+    private static void precog(Minecraft mc, LocalPlayer player, BodyState body) {
+        int tier = body.tierOf(ImplantIds.COMBAT_PREDICTOR);
+        if (!Stats.unlocked(ImplantIds.COMBAT_PREDICTOR, tier, "precog")) {
+            return;
+        }
+        double horizon = Stats.of(ImplantIds.COMBAT_PREDICTOR, tier).value("horizon_ticks", 40);
+        Set<Entity> targets = new HashSet<>();
+        if (trackedId >= 0 && body.has(ImplantIds.TARGET_TRACKING) && mc.level.getEntity(trackedId) instanceof LivingEntity tagged
+                && tagged.isAlive()) {
+            targets.add(tagged);
+        }
+        if (mc.crosshairPickEntity instanceof LivingEntity looked && looked.isAlive()) {
+            targets.add(looked);
+        }
+        Vector3f violet = new Vector3f(0.7f, 0.36f, 1.0f);
+        for (Entity e : targets) {
+            Vec3 velocity = new Vec3(e.getX() - e.xo, e.onGround() ? 0 : e.getY() - e.yo, e.getZ() - e.zo);
+            if (velocity.lengthSqr() < 1.0E-4) {
+                continue;
+            }
+            Vec3 ghost = e.position().add(velocity.scale(horizon));
+            double w = e.getBbWidth() / 2.0;
+            double h = e.getBbHeight();
+            for (int corner = 0; corner < 4; corner++) {
+                double cx = ghost.x + (corner % 2 == 0 ? -w : w);
+                double cz = ghost.z + (corner < 2 ? -w : w);
+                for (double y = 0; y <= h; y += 0.4) {
+                    mc.level.addParticle(new DustParticleOptions(violet, 0.6f), cx, ghost.y + y, cz, 0, 0, 0);
+                }
+            }
+            mc.level.addParticle(ParticleTypes.END_ROD, ghost.x, ghost.y + h + 0.2, ghost.z, 0, 0, 0);
+        }
     }
 
     /** Muzzle speed in blocks per tick of whatever ranged weapon is held, or 0 if none. */

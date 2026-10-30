@@ -615,5 +615,19 @@
   "item.cyberimplants.cryo_coolant_bucket": "Ведро криохладагента",
   "fluid_type.cyberimplants.nanite_suspension": "Нанитовая суспензия",
   "block.cyberimplants.nanite_suspension": "Нанитовая суспензия",
-  "item.cyberimplants.nanite_suspension_bucket": "Ведро нанитовой суспензии"
+  "item.cyberimplants.nanite_suspension_bucket": "Ведро нанитовой суспензии",
+  "cyberimplants.unlock.combat_predictor.precog": "Предвидение: призрак показывает, где будет каждая отслеживаемая цель по истечении горизонта прогноза",
+  "cyberimplants.unlock.kinetic_tendons.elastic_recoil": "Упругая отдача: прыжок в течение 3 тиков после приземления на 30% выше",
+  "cyberimplants.unlock.cybernetic_arm.haptic_precision": "Тактильная точность (колесо имплантов или дек): переключает шёлковое касание для пустой руки",
+  "cyberimplants.unlock.microgrip.ceiling_hang": "Потолочный хват: цепляйтесь за нижнюю сторону блоков (выносливость тратится x1,5)",
+  "cyberimplants.unlock.entity_scanner.auto_scan": "Пассивное автосканирование на половине радиуса (каждые 4 с, 3 с на Tier IV, 2 с на Tier V)",
+  "cyberimplants.unlock.entity_scanner.implant_reading": "Чтение имплантов: показывает категории имплантов других игроков и снимает Оптический камуфляж до Tier IV",
+  "cyberimplants.unlock.thermal_vision.heat_trails": "Тепловые следы: следы игроков и мобов видны 10 с",
+  "cyberimplants.unlock.hydraulic_legs.ground_slam": "Удар о землю: Присесть в воздухе — нырок вниз; 3 урона всем в радиусе 3 блоков при приземлении",
+  "cyberimplants.unlock.hydraulic_legs.slam_scaling": "Урон удара +1 за каждые 4 блока падения (макс. +6), задетые мобы подбрасываются",
+  "cyberimplants.unlock.hydraulic_legs.rebound": "Отскок: прыжок в течение 0,5 с после удара — бесплатный прыжок на полном заряде",
+  "cyberimplants.unlock.silent_actuators.ghost_step": "Шаг призрака: никаких тепловых следов, автосканирование Сканера существ не видит вас, пока вы стоите",
+  "cyberimplants.unlock.inertial_stabilizer.redirect": "Перенаправление: нажмите Бег в воздухе, чтобы повернуть скорость туда, куда смотрите, раз за полёт (10 заряда)",
+  "cyberimplants.arm.haptic_on": "Тактильная точность: вкл. (пустая рука добывает с шёлковым касанием)",
+  "cyberimplants.arm.haptic_off": "Тактильная точность: выкл."
 }

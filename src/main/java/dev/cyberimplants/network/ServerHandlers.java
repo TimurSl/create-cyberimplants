@@ -11,6 +11,7 @@ import dev.cyberimplants.implant.UseContext;
 import dev.cyberimplants.implant.limbs.BallisticModule;
 import dev.cyberimplants.implant.mobility.EnhancedTendons;
 import dev.cyberimplants.implant.mobility.HydraulicLegs;
+import dev.cyberimplants.implant.mobility.InertialStabilizer;
 import dev.cyberimplants.implant.mobility.MagneticSoles;
 import dev.cyberimplants.implant.neural.Kerenzikov;
 import net.minecraft.network.chat.Component;
@@ -48,7 +49,7 @@ final class ServerHandlers {
         boolean ok = switch (payload.kind()) {
             case DODGE -> Kerenzikov.dodge(player, payload.a(), payload.b());
             case AIR_JUMP -> EnhancedTendons.airJump(player);
-            case LEAP -> HydraulicLegs.leap(player, payload.a());
+            case LEAP -> payload.b() > 0.5f ? HydraulicLegs.rebound(player) : HydraulicLegs.leap(player, payload.a());
             case SOLES_ATTACHED -> {
                 MagneticSoles.reportAttached(player);
                 yield true;
@@ -57,6 +58,9 @@ final class ServerHandlers {
                 MagneticSoles.detach(player);
                 yield true;
             }
+            case SLAM_START -> HydraulicLegs.slamStart(player);
+            case SLAM_LAND -> HydraulicLegs.slamLand(player, payload.a());
+            case REDIRECT -> InertialStabilizer.redirect(player);
         };
         if (!ok) {
             // The client already applied the ability; tell it where the server thinks it stands.

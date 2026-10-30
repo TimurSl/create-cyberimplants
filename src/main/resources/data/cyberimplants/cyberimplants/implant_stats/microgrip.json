@@ -48,8 +48,12 @@
         "stamina_ticks": 400,
         "climb_speed": 4.5
       },
-      "unlocks": []
+      "unlocks": [
+        "ceiling_hang"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "ceiling_hang": 5
+  }
 }
