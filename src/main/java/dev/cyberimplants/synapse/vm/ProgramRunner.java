@@ -14,7 +14,9 @@ import java.util.Set;
 /**
  * Runs one loaded program: queues handler tasks as events arrive and executes them within a per-tick cycle budget
  * (docs/design/03-cyberdeck.md, section 3.5). One runner is one thread; a deck with Coprocessors runs several. Tasks
- * that {@code WAIT} sleep without blocking the queue; {@code EVERY} timers and {@code DEBOUNCE} are kept here.
+ * that {@code WAIT} sleep without blocking the queue; {@code EVERY} timers and {@code DEBOUNCE} are kept here. ISA-5:
+ * tasks in an {@code AWAIT ANY} park until a matching event (or their timeout), and {@code PERSIST VAR}s are restored
+ * from the host on start and handed back to it whenever they change.
  */
 public final class ProgramRunner {
     public enum State { RUNNING, STOPPED, CRASHED }
@@ -34,6 +36,10 @@ public final class ProgramRunner {
     private record Sleeper(Task task, CompiledHandler handler, long wakeAt) {
     }
 
+    /** A task parked in {@code AWAIT ANY}; {@code deadline} is {@link Long#MAX_VALUE} without a timeout. */
+    private record Awaiter(Task task, CompiledHandler handler, long deadline) {
+    }
+
     private final CompiledProgram program;
     private final Host host;
     private final Map<String, Object> globals = new HashMap<>();
@@ -43,6 +49,8 @@ public final class ProgramRunner {
 
     private final int ramCells;
     private final List<Sleeper> sleeping = new ArrayList<>();
+    private final List<Awaiter> awaiting = new ArrayList<>();
+    private Map<String, Object> lastPersisted = Map.of();
     private final Map<CompiledHandler, Long> lastFired = new HashMap<>();
     private final Map<CompiledHandler, Long> nextTimer = new HashMap<>();
 
@@ -78,7 +86,12 @@ public final class ProgramRunner {
     }
 
     public int queued() {
-        return queue.size() + sleeping.size() + (current == null ? 0 : 1);
+        return queue.size() + sleeping.size() + awaiting.size() + woken.size() + (current == null ? 0 : 1);
+    }
+
+    /** Tasks parked in an {@code AWAIT ANY}. */
+    public int awaiting() {
+        return awaiting.size();
     }
 
     /** Tasks that are sleeping in a {@code WAIT}. */
@@ -98,6 +111,9 @@ public final class ProgramRunner {
         for (Sleeper s : sleeping) {
             cells += s.task().frameCells();
         }
+        for (Awaiter a : awaiting) {
+            cells += a.task().frameCells();
+        }
         return cells;
     }
 
@@ -114,6 +130,8 @@ public final class ProgramRunner {
         globals.clear();
         queue.clear();
         sleeping.clear();
+        awaiting.clear();
+        woken.clear();
         lastFired.clear();
         nextTimer.clear();
         current = null;
@@ -131,6 +149,7 @@ public final class ProgramRunner {
             state = State.CRASHED;
             return;
         }
+        restorePersisted();
         fire("boot", null, Map.of());
     }
 
@@ -138,6 +157,8 @@ public final class ProgramRunner {
         state = State.STOPPED;
         queue.clear();
         sleeping.clear();
+        awaiting.clear();
+        woken.clear();
         current = null;
         currentHandler = null;
     }
@@ -159,6 +180,7 @@ public final class ProgramRunner {
         if (state != State.RUNNING) {
             return;
         }
+        resumeAwaiters(event, argument, payload);
         for (CompiledHandler h : program.handlers()) {
             if (!h.event().equals(event)) {
                 continue;
@@ -187,6 +209,30 @@ public final class ProgramRunner {
             lastFired.put(h, tickCounter);
             enqueue(h, payload);
         }
+    }
+
+    /** Every task awaiting this event resumes with it (its payload plus {@code name}) at the front of the line. */
+    private void resumeAwaiters(String event, Double argument, Map<String, Object> payload) {
+        Map<String, Object> result = null;
+        for (int i = 0; i < awaiting.size(); i++) {
+            Awaiter a = awaiting.get(i);
+            if (a.task().awaiting() == null || !a.task().awaiting().matches(event, argument)) {
+                continue;
+            }
+            if (result == null) {
+                result = new HashMap<>(payload);
+                result.put("name", event);
+            }
+            awaiting.remove(i--);
+            a.task().resume(Handle.ofMap(Map.copyOf(withoutNulls(result))));
+            woken.addLast(new Sleeper(a.task(), a.handler(), tickCounter));
+        }
+    }
+
+    private static Map<String, Object> withoutNulls(Map<String, Object> map) {
+        Map<String, Object> out = new HashMap<>(map);
+        out.values().removeIf(java.util.Objects::isNull);
+        return out;
     }
 
     private boolean passesFilter(CompiledHandler h, Map<String, Object> payload) {
@@ -229,6 +275,11 @@ public final class ProgramRunner {
                 return true;
             }
         }
+        for (Awaiter a : awaiting) {
+            if (a.handler() == h) {
+                return true;
+            }
+        }
         for (Pending p : queue) {
             if (p.handler() == h) {
                 return true;
@@ -250,13 +301,21 @@ public final class ProgramRunner {
         }
     }
 
-    /** Wakes sleepers whose time has come and puts them at the front of the line. */
+    /** Wakes sleepers whose time has come and awaiters whose timeout ran out, and puts them at the front of the line. */
     private void wake() {
         for (int i = sleeping.size() - 1; i >= 0; i--) {
             Sleeper s = sleeping.get(i);
             if (s.wakeAt() <= tickCounter) {
                 sleeping.remove(i);
                 woken.addFirst(s);
+            }
+        }
+        for (int i = awaiting.size() - 1; i >= 0; i--) {
+            Awaiter a = awaiting.get(i);
+            if (a.deadline() <= tickCounter) {
+                awaiting.remove(i);
+                a.task().resume(null);
+                woken.addLast(new Sleeper(a.task(), a.handler(), tickCounter));
             }
         }
     }
@@ -303,11 +362,18 @@ public final class ProgramRunner {
                         current = null;
                         currentHandler = null;
                     }
+                    case AWAITING -> {
+                        long timeout = (long) current.waitTicks();
+                        awaiting.add(new Awaiter(current, currentHandler, timeout > 0 ? tickCounter + timeout : Long.MAX_VALUE));
+                        current = null;
+                        currentHandler = null;
+                    }
                     case PAUSED -> {
                         if (current.sinceYield() > (long) WATCHDOG_FACTOR * budget) {
                             throw new VmException(VmError.WATCHDOG, "Task ran too long without yielding", 0);
                         }
                         totalCycles += used;
+                        syncPersisted();
                         return used; // paused: resume next tick
                     }
                 }
@@ -318,7 +384,52 @@ public final class ProgramRunner {
             }
         }
         totalCycles += used;
+        syncPersisted();
         return used;
+    }
+
+    // ---------------------------------------------------------------- PERSIST (ISA-5)
+
+    /** Overwrites the initial values of persisted variables with what the host saved. */
+    private void restorePersisted() {
+        if (program.persisted().isEmpty()) {
+            return;
+        }
+        Map<String, Object> saved = host.restorePersisted();
+        for (String name : program.persisted()) {
+            if (saved.containsKey(name) && persistable(saved.get(name))) {
+                globals.put(name, saved.get(name));
+            }
+        }
+        lastPersisted = persistedValues();
+    }
+
+    /** Hands the persisted variables to the host when any of them changed. */
+    private void syncPersisted() {
+        if (program.persisted().isEmpty()) {
+            return;
+        }
+        Map<String, Object> now = persistedValues();
+        if (!now.equals(lastPersisted)) {
+            lastPersisted = now;
+            host.persist(now);
+        }
+    }
+
+    /** Persisted variables that hold a storable value (number, bool, string or NULL); others are skipped. */
+    private Map<String, Object> persistedValues() {
+        Map<String, Object> out = new HashMap<>();
+        for (String name : program.persisted()) {
+            Object value = globals.get(name);
+            if (persistable(value)) {
+                out.put(name, value);
+            }
+        }
+        return out;
+    }
+
+    private static boolean persistable(Object value) {
+        return value == null || value instanceof Double || value instanceof Boolean || value instanceof String;
     }
 
     private void clearCurrent() {

@@ -18,9 +18,9 @@ import java.util.Map;
 /**
  * Recursive-descent / Pratt parser for Synapse (docs/design/04-synapse-language.md, section 13).
  *
- * <p>Layer 1 implements ISA-1. Every statement and declaration that belongs to a higher ISA is recognised and
- * rejected with an error naming the level that introduces it, so players get a useful message instead of a
- * generic syntax error.
+ * <p>ISA-1, ISA-2 and the ISA-5 additions are implemented. Every statement and declaration that belongs to a higher
+ * ISA than the deck runs is recognised and rejected with an error naming the level that introduces it, so players get
+ * a useful message instead of a generic syntax error.
  */
 public final class Parser {
     private final List<Token> tokens;
@@ -100,10 +100,18 @@ public final class Parser {
                     next();
                     Token id = expect(TokenType.WORD, "a variable name");
                     expectOp("=");
-                    vars.add(new Ast.Var(id.text(), expression(), id.line()));
+                    vars.add(new Ast.Var(id.text(), expression(), false, id.line()));
                     endOfLine();
                 }
-                case "PERSIST" -> throw needs(t, "PERSIST", IsaLevel.ISA_5);
+                case "PERSIST" -> {
+                    requireIsa(t, "PERSIST", IsaLevel.ISA_5);
+                    next();
+                    expectKeyword("VAR");
+                    Token id = expect(TokenType.WORD, "a variable name");
+                    expectOp("=");
+                    vars.add(new Ast.Var(id.text(), expression(), true, id.line()));
+                    endOfLine();
+                }
                 case "DEVICE" -> {
                     next();
                     Token id = expect(TokenType.WORD, "a device name");
@@ -296,7 +304,10 @@ public final class Parser {
                     }
                     case "FOR", "RETURN", "EMIT", "BIND" -> throw needs(t, kw, IsaLevel.ISA_3);
                     case "TRY" -> throw needs(t, kw, IsaLevel.ISA_4);
-                    case "AWAIT", "REQUEST", "OVERCLOCK" -> throw needs(t, kw, IsaLevel.ISA_5);
+                    case "AWAIT", "REQUEST", "OVERCLOCK" -> {
+                        requireIsa(t, kw, IsaLevel.ISA_5);
+                        return isa5Statement(kw, t);
+                    }
                     default -> {
                     }
                 }
@@ -391,6 +402,52 @@ public final class Parser {
                 return new Ast.Manipulate(target, name, argument, t.line());
             }
             default -> throw error(t, kw + " needs a Remote Sensor Uplink module, which arrives with a later layer");
+        }
+    }
+
+    /** The ISA-5 statements. The keyword token is still unread. */
+    private Stmt isa5Statement(String kw, Token t) {
+        next();
+        switch (kw) {
+            case "AWAIT" -> {
+                expectKeyword("ANY");
+                List<Ast.AwaitEvent> events = new ArrayList<>();
+                do {
+                    Token event = expect(TokenType.WORD, "an event name");
+                    if (event.text().equalsIgnoreCase("message")) {
+                        throw needs(event, "AWAIT on messages", IsaLevel.ISA_3);
+                    }
+                    Double argument = peek().is(TokenType.NUMBER) ? next().number() : null;
+                    events.add(new Ast.AwaitEvent(event.text(), argument));
+                } while (acceptOp(","));
+                Expr timeout = null;
+                String into = null;
+                if (peek().isKeyword("TIMEOUT")) {
+                    next();
+                    timeout = expression();
+                }
+                if (peek().isKeyword("INTO")) {
+                    next();
+                    into = expect(TokenType.WORD, "a variable name").text();
+                }
+                endOfLine();
+                return new Ast.Await(events, timeout, into, t.line());
+            }
+            case "REQUEST" -> {
+                Expr item = expression();
+                expectKeyword("COUNT");
+                Expr count = expression();
+                expectKeyword("FROM");
+                Expr network = expression();
+                expectKeyword("TO");
+                Expr address = expression();
+                endOfLine();
+                return new Ast.Request(item, count, network, address, t.line());
+            }
+            default -> {
+                endOfLine();
+                return new Ast.Overclock(t.line());
+            }
         }
     }
 
@@ -526,7 +583,12 @@ public final class Parser {
             if (peek().isOp(".")) {
                 Token dot = next();
                 Token name = expect(TokenType.WORD, "a property name");
-                e = new Ast.Member(e, name.text(), dot.line());
+                if (peek().isOp("(")) {
+                    next();
+                    e = new Ast.Invoke(e, name.text(), arguments(), dot.line());
+                } else {
+                    e = new Ast.Member(e, name.text(), dot.line());
+                }
             } else if (peek().isOp("[")) {
                 throw needs(peek(), "indexing", IsaLevel.ISA_3);
             } else {
@@ -556,14 +618,7 @@ public final class Parser {
                 }
                 if (peek().isOp("(")) {
                     next();
-                    List<Expr> args = new ArrayList<>();
-                    if (!peek().isOp(")")) {
-                        do {
-                            args.add(expression());
-                        } while (acceptOp(","));
-                    }
-                    expectOp(")");
-                    return new Ast.Call(t.text(), args, t.line());
+                    return new Ast.Call(t.text(), arguments(), t.line());
                 }
                 return new Ast.Name(t.text(), t.line());
             case OP:
@@ -582,6 +637,18 @@ public final class Parser {
             default:
                 throw error(t, "Expected an expression, found " + describe(t));
         }
+    }
+
+    /** A call's arguments after the opening parenthesis, through the closing one. */
+    private List<Expr> arguments() {
+        List<Expr> args = new ArrayList<>();
+        if (!peek().isOp(")")) {
+            do {
+                args.add(expression());
+            } while (acceptOp(","));
+        }
+        expectOp(")");
+        return args;
     }
 
     // ---------------------------------------------------------------- helpers
@@ -608,6 +675,14 @@ public final class Parser {
             throw error(t, "Expected " + what + ", found " + describe(t));
         }
         return next();
+    }
+
+    private void expectKeyword(String keyword) {
+        Token t = peek();
+        if (!t.isKeyword(keyword)) {
+            throw error(t, "Expected " + keyword + ", found " + describe(t));
+        }
+        next();
     }
 
     private void expectOp(String op) {

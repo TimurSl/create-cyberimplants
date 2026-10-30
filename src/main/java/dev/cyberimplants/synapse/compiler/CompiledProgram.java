@@ -6,7 +6,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-/** The result of compiling a Synapse program. Immutable. */
+/**
+ * The result of compiling a Synapse program. Immutable. {@code persisted} lists the ISA-5 {@code PERSIST VAR}s and
+ * {@code awaited} the events some {@code AWAIT ANY} waits for.
+ */
 public record CompiledProgram(
         String name,
         IsaLevel isa,
@@ -15,12 +18,16 @@ public record CompiledProgram(
         boolean autostart,
         Code init,
         List<String> globals,
-        List<CompiledHandler> handlers) {
+        List<CompiledHandler> handlers,
+        List<String> persisted,
+        Set<String> awaited) {
 
     public CompiledProgram {
         requires = List.copyOf(requires);
         globals = List.copyOf(globals);
         handlers = List.copyOf(handlers);
+        persisted = List.copyOf(persisted);
+        awaited = Set.copyOf(awaited);
     }
 
     /**
@@ -47,8 +54,9 @@ public record CompiledProgram(
         return handlers.stream().filter(h -> h.event().equals("@every")).toList();
     }
 
+    /** Whether a handler or an {@code AWAIT ANY} listens for the event. */
     public boolean subscribes(String event) {
-        return handlers.stream().anyMatch(h -> h.event().equals(event));
+        return awaited.contains(event) || handlers.stream().anyMatch(h -> h.event().equals(event));
     }
 
     /**

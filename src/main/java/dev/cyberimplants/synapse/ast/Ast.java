@@ -8,7 +8,7 @@ public final class Ast {
     private Ast() {
     }
 
-    public sealed interface Expr permits Num, Bool, Str, Null, Dur, Name, Member, Call, Unary, Binary {
+    public sealed interface Expr permits Num, Bool, Str, Null, Dur, Name, Member, Call, Invoke, Unary, Binary {
         int line();
     }
 
@@ -37,6 +37,10 @@ public final class Ast {
     public record Call(String function, List<Expr> args, int line) implements Expr {
     }
 
+    /** A method call on an object, e.g. {@code predict.position(target, 2)}. */
+    public record Invoke(Expr target, String method, List<Expr> args, int line) implements Expr {
+    }
+
     /** {@code op} is {@code -} or {@code NOT}. */
     public record Unary(String op, Expr operand, int line) implements Expr {
     }
@@ -46,7 +50,7 @@ public final class Ast {
     }
 
     public sealed interface Stmt permits Let, Set, If, Activate, Deactivate, Toggle, Log, Alert, Scan, Tag, Untag, Stop, ExprStmt,
-            While, Repeat, Break, Continue, Wait, Configure, Manipulate, Read {
+            While, Repeat, Break, Continue, Wait, Configure, Manipulate, Read, Await, Overclock, Request {
         int line();
     }
 
@@ -121,6 +125,26 @@ public final class Ast {
     public record Read(Member source, String into, int line) implements Stmt {
     }
 
+    /** One event an {@code AWAIT ANY} waits for; {@code argument} is the threshold or key number, or null. */
+    public record AwaitEvent(String name, Double argument) {
+    }
+
+    /**
+     * ISA-5: {@code AWAIT ANY e1, e2 [TIMEOUT d] [INTO x]}. Suspends the task until one of the events fires; {@code x}
+     * receives the event (its payload plus {@code name}) or NULL after the timeout. {@code timeout} and {@code into}
+     * may be null.
+     */
+    public record Await(List<AwaitEvent> events, Expr timeout, String into, int line) implements Stmt {
+    }
+
+    /** ISA-5: {@code OVERCLOCK}, the Tier V Processor's burst. */
+    public record Overclock(int line) implements Stmt {
+    }
+
+    /** ISA-5: {@code REQUEST item COUNT n FROM network TO address}, a Create 6 package request. */
+    public record Request(Expr item, Expr count, Expr network, Expr address, int line) implements Stmt {
+    }
+
     /** A bare expression, e.g. a call whose value is discarded. */
     public record ExprStmt(Expr value, int line) implements Stmt {
     }
@@ -143,7 +167,8 @@ public final class Ast {
     public record Const(String name, Expr value, int line) {
     }
 
-    public record Var(String name, Expr value, int line) {
+    /** {@code persist} marks an ISA-5 {@code PERSIST VAR}, which survives reboot, death and logout. */
+    public record Var(String name, Expr value, boolean persist, int line) {
     }
 
     public record ProgramNode(

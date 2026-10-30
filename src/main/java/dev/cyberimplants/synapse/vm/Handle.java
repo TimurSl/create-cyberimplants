@@ -1,5 +1,8 @@
 package dev.cyberimplants.synapse.vm;
 
+import dev.cyberimplants.synapse.IsaLevel;
+
+import java.util.List;
 import java.util.Map;
 
 /** An object scripts can read members from: an implant, an entity, the event payload. */
@@ -20,6 +23,15 @@ public interface Handle {
     /** Cycles charged for a read; hosts may raise this for expensive sources. */
     default int readCost() {
         return 2;
+    }
+
+    /**
+     * Calls a method such as {@code predict.position(entity, 2)}. {@code isa} is the calling deck's level, for methods
+     * whose range grows with it. Throw {@link UnsupportedOperationException} for an unknown method and
+     * {@link IllegalArgumentException} (with a message for the player) for bad arguments.
+     */
+    default Object invoke(String method, List<Object> args, IsaLevel isa) {
+        throw new UnsupportedOperationException(method);
     }
 
     /** A read-only handle over a map, used for {@code event.<field>}. */

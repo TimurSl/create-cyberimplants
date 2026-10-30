@@ -2,6 +2,7 @@ package dev.cyberimplants.synapse.vm;
 
 import dev.cyberimplants.synapse.IsaLevel;
 import dev.cyberimplants.synapse.compiler.ActivateInfo;
+import dev.cyberimplants.synapse.compiler.AwaitInfo;
 import dev.cyberimplants.synapse.compiler.Code;
 import dev.cyberimplants.synapse.compiler.Compiler;
 import dev.cyberimplants.synapse.compiler.ConfigureInfo;
@@ -20,7 +21,7 @@ import java.util.Map;
  * spent (then the task is paused and can be resumed next tick), the code ends, the program stops or an error aborts it.
  */
 public final class Task {
-    public enum Status { DONE, PAUSED, STOPPED, WAITING }
+    public enum Status { DONE, PAUSED, STOPPED, WAITING, AWAITING }
 
     /** Strings longer than this abort the task: a single value must not outgrow any RAM reservation. */
     public static final int MAX_STRING = 4096;
@@ -37,6 +38,7 @@ public final class Task {
     private long cyclesUsed;
     private long sinceYield;
     private double waitTicks;
+    private AwaitInfo awaiting;
 
     public Task(Code code, Map<String, Object> globals, Map<String, Object> payload, Host host, IsaLevel isa) {
         this.code = code;
@@ -54,6 +56,17 @@ public final class Task {
     /** Ticks the task asked to sleep when {@link #run} returned {@link Status#WAITING}. */
     public double waitTicks() {
         return waitTicks;
+    }
+
+    /** What the task waits for when {@link #run} returned {@link Status#AWAITING}; {@link #waitTicks} is its timeout (0 = none). */
+    public AwaitInfo awaiting() {
+        return awaiting;
+    }
+
+    /** Resumes an {@code AWAIT ANY}: the event that fired, or null after the timeout, becomes the statement's value. */
+    public void resume(Object value) {
+        awaiting = null;
+        push(value);
     }
 
     /** Cells of this task's frame: 2 plus its locals (docs/design/04-synapse-language.md, section 8.2). */
@@ -104,6 +117,21 @@ public final class Task {
                 waitTicks = Math.max(1, Math.ceil(ticks));
                 sinceYield = 0;
                 return Status.WAITING;
+            }
+            if (in.op() == Op.AWAIT) {
+                AwaitInfo info = (AwaitInfo) in.k();
+                waitTicks = 0;
+                if (info.hasTimeout()) {
+                    Object d = pop();
+                    Double ticks = numeric(d);
+                    if (ticks == null) {
+                        throw error(VmError.TYPE, "TIMEOUT needs a duration but found " + typeName(d), in);
+                    }
+                    waitTicks = Math.max(1, Math.ceil(ticks));
+                }
+                awaiting = info;
+                sinceYield = 0;
+                return Status.AWAITING;
             }
             if (execute(in)) {
                 return Status.STOPPED;
@@ -224,6 +252,38 @@ public final class Task {
             case DEACTIVATE -> host.deactivate((String) in.k());
             case TOGGLE -> host.toggle((String) in.k());
             case SCAN -> host.scan();
+            case OVERCLOCK -> host.overclock();
+            case REQUEST -> {
+                Object address = pop();
+                Object network = pop();
+                Object count = pop();
+                Object item = pop();
+                double n = num(count, in);
+                if (n < 1 || n != Math.floor(n)) {
+                    throw error(VmError.TYPE, "REQUEST needs a whole COUNT of at least 1", in);
+                }
+                host.request(text(item, in), (int) Math.min(n, Integer.MAX_VALUE), text(network, in), text(address, in));
+            }
+            case INVOKE -> {
+                List<Object> args = new ArrayList<>();
+                for (int i = 0; i < in.a(); i++) {
+                    args.add(0, pop());
+                }
+                Object target = pop();
+                if (target == null) {
+                    throw error(VmError.NULL_ACCESS, "Cannot call '" + in.k() + "' on NULL", in);
+                }
+                if (!(target instanceof Handle h)) {
+                    throw error(VmError.TYPE, "Cannot call '" + in.k() + "' on " + typeName(target), in);
+                }
+                try {
+                    push(h.invoke((String) in.k(), args, isa));
+                } catch (UnsupportedOperationException e) {
+                    throw error(VmError.TYPE, "No method '" + in.k() + "' here", in);
+                } catch (IllegalArgumentException e) {
+                    throw error(VmError.TYPE, e.getMessage(), in);
+                }
+            }
             case TAG -> host.tag(pop());
             case UNTAG -> host.untag(pop());
             case LOG -> host.log(stringify(pop()));
@@ -419,6 +479,10 @@ public final class Task {
             case "POS" -> new Position(num(args[0], in), num(args[1], in), num(args[2], in));
             case "NOW" -> (double) host.now();
             case "RANDOM" -> host.random();
+            case "STOCK" -> {
+                charge(18); // a logistics read costs 20 cycles
+                yield host.stock(text(args[0], in), text(args[1], in));
+            }
             default -> throw error(VmError.TYPE, "Unknown function " + fn, in);
         };
     }

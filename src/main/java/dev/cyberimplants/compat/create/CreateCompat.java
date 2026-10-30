@@ -10,8 +10,9 @@ import net.neoforged.fml.ModList;
  * (and its future implementations) may import {@code com.simibubi.create.*}.
  *
  * <p>Bridges default to no-ops (the interfaces' default methods); real implementations replace them in
- * {@link #init()} as layers need them. Layer 1 adds the kinetic (speed) and goggle bridges. The Rig and Charger blocks live in
- * {@code compat.create.block} because they extend Create's kinetic classes.
+ * {@link #init()} as layers need them. Layer 1 adds the kinetic (speed) and goggle bridges, Layer 5 the logistics
+ * one. The Rig, Charger and Precision Etcher blocks live in {@code compat.create.block} because they extend Create's
+ * kinetic classes.
  */
 public final class CreateCompat {
     private static volatile KineticBridge kinetic = new KineticBridge() { };
@@ -23,7 +24,7 @@ public final class CreateCompat {
     private static final PotatoBridge POTATO = new PotatoBridge() { };
     private static final ContraptionBridge CONTRAPTION = new ContraptionBridge() { };
     private static final TrainBridge TRAIN = new TrainBridge() { };
-    private static final LogisticsBridge LOGISTICS = new LogisticsBridge() { };
+    private static volatile LogisticsBridge logistics = new LogisticsBridge() { };
     private static volatile GoggleBridge goggle = new GoggleBridge() { };
 
     private static boolean createLoaded;
@@ -35,8 +36,10 @@ public final class CreateCompat {
             kinetic = new KineticBridgeImpl();
             goggle = new GoggleBridgeImpl();
             goggle.registerWearingPredicate(player -> BodyState.get(player).has(ImplantIds.MACHINE_ANALYZER));
+            // Layer 5: Machine Interface Tier V reads stock networks and places package requests.
+            logistics = new LogisticsBridgeImpl();
         }
-        CyberImplants.LOGGER.info("Create compat initialised (Create present: {}; real bridges: kinetic, goggles)", createLoaded);
+        CyberImplants.LOGGER.info("Create compat initialised (Create present: {}; real bridges: kinetic, goggles, logistics)", createLoaded);
     }
 
     public static boolean isCreateLoaded() {
@@ -52,7 +55,7 @@ public final class CreateCompat {
     public static PotatoBridge potato() { return POTATO; }
     public static ContraptionBridge contraption() { return CONTRAPTION; }
     public static TrainBridge train() { return TRAIN; }
-    public static LogisticsBridge logistics() { return LOGISTICS; }
+    public static LogisticsBridge logistics() { return logistics; }
     public static GoggleBridge goggles() { return goggle; }
 
     private CreateCompat() {

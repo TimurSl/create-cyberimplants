@@ -33,6 +33,30 @@ public interface Host {
 
     boolean scan();
 
+    /** ISA-5: start the Processor overclock (Tier V Processor only). */
+    default boolean overclock() {
+        return false;
+    }
+
+    /** ISA-5: a Create 6 package request: {@code count} of {@code item} from a stock network to a package address. */
+    default boolean request(String item, int count, String network, String address) {
+        return false;
+    }
+
+    /** ISA-4 logistics read: how many of {@code item} a stock network holds, or null when it can't be read. */
+    default Double stock(String network, String item) {
+        return null;
+    }
+
+    /** ISA-5: the saved values of this program's {@code PERSIST VAR}s, by name. */
+    default Map<String, Object> restorePersisted() {
+        return Map.of();
+    }
+
+    /** ISA-5: saves the current values of this program's {@code PERSIST VAR}s (numbers, booleans, strings, NULL). */
+    default void persist(Map<String, Object> values) {
+    }
+
     boolean tag(Object entity);
 
     boolean untag(Object entity);

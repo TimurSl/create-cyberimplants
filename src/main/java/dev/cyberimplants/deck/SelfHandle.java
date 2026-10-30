@@ -15,6 +15,10 @@ final class SelfHandle implements Handle {
         this.player = player;
     }
 
+    ServerPlayer player() {
+        return player;
+    }
+
     @Override
     public Object get(String member) {
         BodyState s = BodyState.get(player);

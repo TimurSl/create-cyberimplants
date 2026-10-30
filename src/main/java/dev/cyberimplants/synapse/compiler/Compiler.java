@@ -26,10 +26,13 @@ public final class Compiler {
             Map.entry("ROUND", 1), Map.entry("FLOOR", 1), Map.entry("SQRT", 1), Map.entry("LEN", 1),
             Map.entry("STR", 1), Map.entry("NUM", 1), Map.entry("DIST", 2), Map.entry("POS", 3),
             Map.entry("NOW", 0), Map.entry("RANDOM", 0),
-            Map.entry("UPPER", 1), Map.entry("LOWER", 1), Map.entry("CONTAINS", 2), Map.entry("SUBSTR", 3));
+            Map.entry("UPPER", 1), Map.entry("LOWER", 1), Map.entry("CONTAINS", 2), Map.entry("SUBSTR", 3),
+            Map.entry("STOCK", 2));
 
     /** Builtins that operate on strings: ISA-2. */
     private static final Set<String> STRING_FUNCTIONS = Set.of("LEN", "UPPER", "LOWER", "CONTAINS", "SUBSTR");
+    /** Logistics reads ({@code stock(network, item)}): ISA-4. */
+    private static final Set<String> LOGISTICS_FUNCTIONS = Set.of("STOCK");
 
     /** Hardware limits the compiler checks: the Processor's minimum {@code EVERY} interval, in ticks. */
     public record Limits(int minEveryTicks) {
@@ -41,6 +44,8 @@ public final class Compiler {
     private final Limits limits;
     private final Set<String> globals = new LinkedHashSet<>();
     private final Set<String> constants = new HashSet<>();
+    private final List<String> persisted = new ArrayList<>();
+    private final Set<String> awaited = new HashSet<>();
 
     private List<Instr> out;
     private Deque<Map<String, Integer>> scopes;
@@ -81,6 +86,9 @@ public final class Compiler {
         }
         for (Ast.Var v : ast.vars()) {
             declareGlobal(v.name(), v.line());
+            if (v.persist()) {
+                persisted.add(v.name());
+            }
         }
         for (Ast.Device d : ast.devices()) {
             declareGlobal(d.name(), d.line());
@@ -107,7 +115,7 @@ public final class Compiler {
             handlers.add(handler(h));
         }
         return new CompiledProgram(ast.name(), isa, ast.requires(), ast.priority(), ast.autostart(), init,
-                List.copyOf(globals), handlers);
+                List.copyOf(globals), handlers, persisted, awaited);
     }
 
     private CompiledProgram.CompiledHandler handler(Ast.Handler h) {
@@ -213,6 +221,15 @@ public final class Compiler {
                 emit(new Instr(Op.MANIPULATE, m.argument() != null ? 1 : 0, m.action(), m.line()));
             }
             case Ast.Read r -> read(r);
+            case Ast.Await a -> await(a);
+            case Ast.Overclock o -> emit(new Instr(Op.OVERCLOCK, o.line()));
+            case Ast.Request r -> {
+                expr(r.item());
+                expr(r.count());
+                expr(r.network());
+                expr(r.address());
+                emit(new Instr(Op.REQUEST, r.line()));
+            }
             case Ast.ExprStmt e -> {
                 expr(e.value());
                 emit(new Instr(Op.POP, e.line()));
@@ -272,15 +289,48 @@ public final class Compiler {
             emit(new Instr(Op.POP, r.line()));
             return;
         }
-        Integer slot = findLocal(r.into());
+        storeInto(r.into(), r.line());
+    }
+
+    /**
+     * AWAIT ANY: the result (event or NULL) lands in the INTO variable, or is dropped. An INTO name that is neither a
+     * local nor a program variable declares a new local, like LET.
+     */
+    private void await(Ast.Await a) {
+        List<AwaitInfo.Event> events = new ArrayList<>();
+        for (Ast.AwaitEvent e : a.events()) {
+            String name = e.name().toLowerCase(Locale.ROOT);
+            events.add(new AwaitInfo.Event(name, e.argument()));
+            awaited.add(name);
+        }
+        if (a.timeout() != null) {
+            expr(a.timeout());
+        }
+        emit(new Instr(Op.AWAIT, 0, new AwaitInfo(events, a.timeout() != null), a.line()));
+        if (a.into() == null) {
+            emit(new Instr(Op.POP, a.line()));
+            return;
+        }
+        if (findLocal(a.into()) == null && !globals.contains(a.into())) {
+            int slot = nextSlot++;
+            scopes.peek().put(a.into(), slot);
+            emit(new Instr(Op.STORE_LOCAL, slot, null, a.line()));
+            return;
+        }
+        storeInto(a.into(), a.line());
+    }
+
+    /** Stores the value on top of the stack into a local or program variable. */
+    private void storeInto(String name, int line) {
+        Integer slot = findLocal(name);
         if (slot != null) {
-            emit(new Instr(Op.STORE_LOCAL, slot, null, r.line()));
-        } else if (constants.contains(r.into())) {
-            throw new SynapseException("Cannot assign to constant '" + r.into() + "'", r.line(), 1);
-        } else if (globals.contains(r.into())) {
-            emit(new Instr(Op.STORE_GLOBAL, 0, r.into(), r.line()));
+            emit(new Instr(Op.STORE_LOCAL, slot, null, line));
+        } else if (constants.contains(name)) {
+            throw new SynapseException("Cannot assign to constant '" + name + "'", line, 1);
+        } else if (globals.contains(name)) {
+            emit(new Instr(Op.STORE_GLOBAL, 0, name, line));
         } else {
-            throw new SynapseException("Undeclared variable '" + r.into() + "'; declare it with VAR or LET", r.line(), 1);
+            throw new SynapseException("Undeclared variable '" + name + "'; declare it with VAR or LET", line, 1);
         }
     }
 
@@ -356,6 +406,13 @@ public final class Compiler {
                 emit(new Instr(Op.MEMBER, 0, m.name(), m.line()));
             }
             case Ast.Call c -> call(c);
+            case Ast.Invoke i -> {
+                expr(i.target());
+                for (Expr arg : i.args()) {
+                    expr(arg);
+                }
+                emit(new Instr(Op.INVOKE, i.args().size(), i.method(), i.line()));
+            }
             case Ast.Unary u -> {
                 expr(u.operand());
                 emit(new Instr(u.op().equals("-") ? Op.NEG : Op.NOT, u.line()));
@@ -375,6 +432,10 @@ public final class Compiler {
         }
         if (STRING_FUNCTIONS.contains(name) && !isa.atLeast(IsaLevel.ISA_2)) {
             throw new SynapseException(name + " (string operations) requires ISA-2 (this deck runs ISA-" + isa.number() + ")",
+                    c.line(), 1);
+        }
+        if (LOGISTICS_FUNCTIONS.contains(name) && !isa.atLeast(IsaLevel.ISA_4)) {
+            throw new SynapseException(name + " (logistics reads) requires ISA-4 (this deck runs ISA-" + isa.number() + ")",
                     c.line(), 1);
         }
         for (Expr arg : c.args()) {

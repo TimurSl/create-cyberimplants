@@ -6,7 +6,7 @@ import net.minecraft.server.level.ServerPlayer;
 
 import java.util.function.Supplier;
 
-/** {@code deck.*}: tier, free RAM, last cycle count and dropped events. */
+/** {@code deck.*}: tier, free RAM, last cycle count, dropped events and the Processor overclock. */
 final class DeckStateHandle implements Handle {
     private final ServerPlayer player;
     private final Supplier<DeckRuntime> runtime;
@@ -33,6 +33,8 @@ final class DeckStateHandle implements Handle {
             }
             case "cycles_last_tick" -> r == null ? 0.0 : (double) r.lastCycles;
             case "dropped_events" -> r == null ? 0.0 : (double) r.runner().droppedEvents();
+            case "overclocked" -> DeckService.overclocked(player);
+            case "overclock_cooldown" -> new dev.cyberimplants.synapse.compiler.Ticks(DeckService.overclockCooldown(player));
             default -> null;
         };
     }
