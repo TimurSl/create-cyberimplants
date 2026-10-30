@@ -2,7 +2,7 @@ name: Build
 
 on:
   push:
-    branches: [main, ccr-57f1966a-39efqi]
+    branches: [main, ccr-ffba4197-q9is5h]
   pull_request:
 
 permissions:
