@@ -19,38 +19,6 @@
   ],
   "sequence": [
     {
-      "type": "create:deploying",
-      "ingredients": [
-        {
-          "item": "cyberimplants:incomplete_implant"
-        },
-        {
-          "item": "minecraft:redstone"
-        }
-      ],
-      "results": [
-        {
-          "id": "cyberimplants:incomplete_implant"
-        }
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "ingredients": [
-        {
-          "item": "cyberimplants:incomplete_implant"
-        },
-        {
-          "item": "minecraft:netherite_scrap"
-        }
-      ],
-      "results": [
-        {
-          "id": "cyberimplants:incomplete_implant"
-        }
-      ]
-    },
-    {
       "type": "create:filling",
       "ingredients": [
         {
@@ -75,7 +43,54 @@
           "item": "cyberimplants:incomplete_implant"
         },
         {
-          "item": "create:sturdy_sheet"
+          "item": "cyberimplants:military_processor"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_implant"
+        }
+      ]
+    },
+    {
+      "type": "create:filling",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_implant"
+        },
+        {
+          "type": "neoforge:single",
+          "amount": 100,
+          "fluid": "cyberimplants:cryo_coolant"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_implant"
+        }
+      ]
+    },
+    {
+      "type": "create:cutting",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_implant"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_implant"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_implant"
+        },
+        {
+          "item": "cyberimplants:composite_plate"
         }
       ],
       "results": [

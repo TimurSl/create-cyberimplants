@@ -50,30 +50,78 @@ class StatAuditTest {
         }
     }
 
-    /** Layer 3: unlock rows are cumulative over the tiers, never on Tier I, and each one is registered for layer 3. */
+    /**
+     * Unlock rows are cumulative over the tiers and never on Tier I. Rows first unlocked at Tiers II-IV belong to layer 3
+     * (Capability), Tier V rows to layer 5 (Mastery).
+     */
     @Test
     void unlockRowsAreCumulativeAndRegistered() throws IOException {
         int withUnlocks = 0;
+        int withTierFive = 0;
         for (Path file : statFiles()) {
             JsonObject json = read(file);
             JsonArray tiers = json.getAsJsonArray("tiers");
             JsonObject layers = json.getAsJsonObject("unlock_layers");
             assertEquals(0, tiers.get(0).getAsJsonObject().getAsJsonArray("unlocks").size(), file + ": Tier I has no unlocks");
             Set<String> previous = Set.of();
-            for (JsonElement t : tiers) {
+            boolean tierFive = false;
+            for (int tier = 1; tier <= 5; tier++) {
                 Set<String> unlocks = new TreeSet<>();
-                t.getAsJsonObject().getAsJsonArray("unlocks").forEach(u -> unlocks.add(u.getAsString()));
+                tiers.get(tier - 1).getAsJsonObject().getAsJsonArray("unlocks").forEach(u -> unlocks.add(u.getAsString()));
                 assertTrue(unlocks.containsAll(previous), file + ": a tier lost an unlock of the tier below");
                 for (String u : unlocks) {
-                    assertEquals(3, layers.get(u).getAsInt(), file + ": unlock " + u + " belongs to layer 3");
+                    if (!previous.contains(u)) {
+                        assertEquals(tier == 5 ? 5 : 3, layers.get(u).getAsInt(), file + ": unlock " + u + " first appears at Tier " + tier);
+                        tierFive |= tier == 5;
+                    }
                 }
                 previous = unlocks;
             }
-            if (!previous.isEmpty()) {
-                withUnlocks++;
-            }
+            withUnlocks += previous.isEmpty() ? 0 : 1;
+            withTierFive += tierFive ? 1 : 0;
         }
         assertTrue(withUnlocks >= 5, "Layer 3 starts with at least five implants that have unlock rows");
+        assertTrue(withTierFive >= 15, "Layer 5 gives at least fifteen implants a Tier V row, found " + withTierFive);
+    }
+
+    /** The basic Tier I implants come off a crafting table, so the first implant needs only andesite-age parts. */
+    @Test
+    void basicImplantsAreCraftedFromCivilianParts() throws IOException {
+        for (Path file : statFiles()) {
+            String id = file.getFileName().toString().replace(".json", "");
+            JsonObject recipe = read(RECIPES.resolve(id + ".json"));
+            assertEquals("minecraft:crafting_shaped", recipe.get("type").getAsString(), id);
+            assertEquals("cyberimplants:civilian_casing", recipe.getAsJsonObject("key").getAsJsonObject("C").get("item").getAsString(), id);
+            assertEquals(1, recipe.getAsJsonObject("result").getAsJsonObject("components").get("cyberimplants:tier").getAsInt(), id);
+        }
+    }
+
+    /** Every item a recipe of this mod names must be made by this mod's own chain (or come from Minecraft or Create). */
+    @Test
+    void everyComponentHasARecipe() throws IOException {
+        Set<String> made = new TreeSet<>();
+        Set<String> used = new TreeSet<>();
+        try (Stream<Path> s = Files.walk(RECIPES)) {
+            for (Path p : s.filter(f -> f.toString().endsWith(".json")).toList()) {
+                String text = Files.readString(p);
+                java.util.regex.Matcher m = java.util.regex.Pattern.compile("\"(?:item|id)\": \"(cyberimplants:[a-z_]+)\"").matcher(text);
+                while (m.find()) {
+                    used.add(m.group(1));
+                }
+                JsonObject json = read(p);
+                if (json.has("results")) {
+                    json.getAsJsonArray("results").forEach(r -> made.add(r.getAsJsonObject().get("id").getAsString()));
+                }
+                if (json.has("result")) {
+                    made.add(json.getAsJsonObject("result").get("id").getAsString());
+                }
+                if (json.has("transitional_item")) {
+                    made.add(json.getAsJsonObject("transitional_item").get("id").getAsString());
+                }
+            }
+        }
+        used.removeAll(made);
+        assertTrue(used.isEmpty(), "used in recipes but never made: " + used);
     }
 
     @Test

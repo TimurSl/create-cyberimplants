@@ -5,22 +5,22 @@
     {
       "type": "neoforge:single",
       "amount": 250,
-      "fluid": "cyberimplants:bio_interface_gel"
+      "fluid": "minecraft:water"
     },
     {
-      "item": "minecraft:lapis_lazuli"
+      "tag": "c:dusts/redstone"
     },
     {
-      "item": "minecraft:glowstone_dust"
+      "tag": "c:dusts/redstone"
     },
     {
-      "item": "minecraft:amethyst_shard"
+      "tag": "c:nuggets/copper"
     }
   ],
   "results": [
     {
       "amount": 250,
-      "id": "cyberimplants:neural_gel"
+      "id": "cyberimplants:conductive_ink"
     }
   ]
 }

@@ -53,8 +53,12 @@
         "max_tags": 8,
         "persistence_ticks": -1
       },
-      "unlocks": []
+      "unlocks": [
+        "tracer_tagging"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "tracer_tagging": 5
+  }
 }

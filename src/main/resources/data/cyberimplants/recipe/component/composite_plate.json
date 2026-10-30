@@ -1,0 +1,62 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "create:sturdy_sheet"
+  },
+  "loops": 1,
+  "results": [
+    {
+      "id": "cyberimplants:composite_plate"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_composite_plate"
+        },
+        {
+          "item": "cyberimplants:tempered_steel_sheet"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_composite_plate"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_composite_plate"
+        },
+        {
+          "tag": "cyberimplants:composite_reinforcement"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_composite_plate"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_composite_plate"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_composite_plate"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "cyberimplants:incomplete_composite_plate"
+  }
+}

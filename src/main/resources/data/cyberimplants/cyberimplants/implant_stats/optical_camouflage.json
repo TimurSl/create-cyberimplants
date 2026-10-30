@@ -63,8 +63,12 @@
         "detect_moving": 0.35,
         "aggro_drop_ticks": 0
       },
-      "unlocks": []
+      "unlocks": [
+        "recloak"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "recloak": 5
+  }
 }

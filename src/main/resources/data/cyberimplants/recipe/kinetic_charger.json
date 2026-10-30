@@ -9,16 +9,19 @@
       "item": "minecraft:redstone_block"
     },
     "C": {
-      "item": "create:copper_sheet"
+      "tag": "c:plates/copper"
     },
     "S": {
       "item": "create:shaft"
+    },
+    "W": {
+      "item": "cyberimplants:copper_wire"
     }
   },
   "pattern": [
     "CRC",
     "SAS",
-    "CCC"
+    "WCW"
   ],
   "result": {
     "id": "cyberimplants:kinetic_charger",

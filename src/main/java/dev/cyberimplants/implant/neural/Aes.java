@@ -10,6 +10,13 @@ import dev.cyberimplants.deck.DeckEvents;
 import dev.cyberimplants.deck.EntityHandle;
 import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.Synergies;
+import dev.cyberimplants.implant.limbs.RetractableBlade;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -34,6 +41,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Automatic Evasion System: sidesteps incoming arrows. Layer 1 uses the fixed rule (always on, arrows only, no
  * condition slots). Needs free space on a side to dodge; a dodge into a wall is wasted but still costs a charge.
+ * Tier V Parry (Layer 5): with a melee weapon in hand the arrow is sent back along the user's look instead.
  */
 @EventBusSubscriber(modid = CyberImplants.MOD_ID)
 public final class Aes {
@@ -110,11 +118,36 @@ public final class Aes {
                 return;
             }
             state.charges--;
-            sidestep(player, level, velocity, stats.value("distance", 1.5), start);
+            if (Stats.unlocked(ImplantIds.AES, tier, "parry") && holdsMeleeWeapon(player)) {
+                parry(player, arrow);
+            } else {
+                sidestep(player, level, velocity, stats.value("distance", 1.5), start);
+            }
             DeckEvents.fire(player, "evaded", Map.of("projectile", EntityHandle.of(player, arrow)));
             Synergies.aesEvaded(player);
             return; // one evasion per check
         }
+    }
+
+    /** A sword, an axe, a trident or a deployed Retractable Blade in an empty main hand. */
+    private static boolean holdsMeleeWeapon(ServerPlayer player) {
+        ItemStack held = player.getMainHandItem();
+        if (held.isEmpty()) {
+            return RetractableBlade.strikingTier(player) > 0;
+        }
+        return held.is(ItemTags.SWORDS) || held.is(ItemTags.AXES) || held.is(Items.TRIDENT);
+    }
+
+    /** Tier V Parry: the arrow turns around at the same speed and now belongs to the user. */
+    private static void parry(ServerPlayer player, AbstractArrow arrow) {
+        Vec3 back = player.getLookAngle().scale(Math.max(arrow.getDeltaMovement().length(), 1.0));
+        arrow.setDeltaMovement(back);
+        arrow.setOwner(player);
+        arrow.hasImpulse = true;
+        player.swing(InteractionHand.MAIN_HAND, true);
+        player.level().playSound(null, player.getX(), player.getY(), player.getZ(),
+                SoundEvents.SHIELD_BLOCK, SoundSource.PLAYERS, 0.9f, 1.6f);
+        ImplantFx.aesSidestep(player, arrow.position());
     }
 
     private static void sidestep(ServerPlayer player, ServerLevel level, Vec3 projectileVelocity, double distance, Vec3 arrowAt) {

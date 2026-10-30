@@ -87,7 +87,7 @@ public final class Strain {
         BodyState s = BodyState.get(player);
         List<ResourceLocation> candidates = new ArrayList<>();
         for (ImplantCatalog.Entry e : ImplantCatalog.ALL) {
-            if (s.has(e.id()) && ImplantActions.get(e.id()) != null) {
+            if (s.has(e.id()) && ImplantActions.actionAvailable(e.id(), s.tierOf(e.id()))) {
                 candidates.add(e.id());
             }
         }

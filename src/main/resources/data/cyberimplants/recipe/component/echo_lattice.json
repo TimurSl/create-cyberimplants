@@ -1,0 +1,26 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "superheated",
+  "ingredients": [
+    {
+      "tag": "cyberimplants:echo_sources"
+    },
+    {
+      "item": "create:polished_rose_quartz"
+    },
+    {
+      "item": "create:polished_rose_quartz"
+    },
+    {
+      "type": "neoforge:single",
+      "amount": 100,
+      "fluid": "cyberimplants:nanite_suspension"
+    }
+  ],
+  "results": [
+    {
+      "id": "cyberimplants:echo_lattice",
+      "count": 2
+    }
+  ]
+}

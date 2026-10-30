@@ -25,7 +25,7 @@
           "item": "cyberimplants:incomplete_implant"
         },
         {
-          "item": "create:precision_mechanism"
+          "tag": "cyberimplants:exotics/core"
         }
       ],
       "results": [
@@ -41,7 +41,7 @@
           "item": "cyberimplants:incomplete_implant"
         },
         {
-          "item": "minecraft:echo_shard"
+          "item": "cyberimplants:experimental_core"
         }
       ],
       "results": [
@@ -59,7 +59,7 @@
         {
           "type": "neoforge:single",
           "amount": 100,
-          "fluid": "cyberimplants:neural_gel"
+          "fluid": "cyberimplants:nanite_suspension"
         }
       ],
       "results": [
@@ -69,23 +69,7 @@
       ]
     },
     {
-      "type": "create:deploying",
-      "ingredients": [
-        {
-          "item": "cyberimplants:incomplete_implant"
-        },
-        {
-          "item": "minecraft:netherite_ingot"
-        }
-      ],
-      "results": [
-        {
-          "id": "cyberimplants:incomplete_implant"
-        }
-      ]
-    },
-    {
-      "type": "create:pressing",
+      "type": "create:cutting",
       "ingredients": [
         {
           "item": "cyberimplants:incomplete_implant"

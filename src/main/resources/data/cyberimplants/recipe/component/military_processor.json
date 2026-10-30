@@ -1,0 +1,93 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "cyberimplants:logic_chip"
+  },
+  "loops": 3,
+  "results": [
+    {
+      "id": "cyberimplants:military_processor"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_military_processor"
+        },
+        {
+          "tag": "c:plates/gold"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_military_processor"
+        }
+      ]
+    },
+    {
+      "type": "create:cutting",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_military_processor"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_military_processor"
+        }
+      ]
+    },
+    {
+      "type": "create:filling",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_military_processor"
+        },
+        {
+          "type": "neoforge:single",
+          "amount": 100,
+          "fluid": "cyberimplants:cryo_coolant"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_military_processor"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_military_processor"
+        },
+        {
+          "item": "cyberimplants:logic_chip"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_military_processor"
+        }
+      ]
+    },
+    {
+      "type": "create:cutting",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_military_processor"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_military_processor"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "cyberimplants:incomplete_military_processor"
+  }
+}

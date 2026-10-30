@@ -1,0 +1,26 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "superheated",
+  "ingredients": [
+    {
+      "item": "cyberimplants:silica_dust"
+    },
+    {
+      "item": "cyberimplants:silica_dust"
+    },
+    {
+      "item": "cyberimplants:silica_dust"
+    },
+    {
+      "item": "cyberimplants:silica_dust"
+    },
+    {
+      "tag": "minecraft:coals"
+    }
+  ],
+  "results": [
+    {
+      "id": "cyberimplants:silicon_boule"
+    }
+  ]
+}

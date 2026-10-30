@@ -58,12 +58,16 @@
       },
       "unlocks": [
         "chain_one",
+        "chain_three",
+        "grounded",
         "slows_attacker"
       ]
     }
   ],
   "unlock_layers": {
     "chain_one": 3,
+    "chain_three": 5,
+    "grounded": 5,
     "slows_attacker": 3
   }
 }

@@ -1,0 +1,25 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    {
+      "type": "neoforge:single",
+      "amount": 250,
+      "fluid": "minecraft:water"
+    },
+    {
+      "tag": "cyberimplants:cryo_ice"
+    },
+    {
+      "tag": "cyberimplants:cryo_ice"
+    },
+    {
+      "tag": "c:gems/lapis"
+    }
+  ],
+  "results": [
+    {
+      "amount": 250,
+      "id": "cyberimplants:cryo_coolant"
+    }
+  ]
+}

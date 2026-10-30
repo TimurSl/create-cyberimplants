@@ -1,0 +1,62 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "cyberimplants:mechanical_servo"
+  },
+  "loops": 1,
+  "results": [
+    {
+      "id": "cyberimplants:precision_servo"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_precision_servo"
+        },
+        {
+          "item": "create:precision_mechanism"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_precision_servo"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_precision_servo"
+        },
+        {
+          "item": "cyberimplants:copper_wire"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_precision_servo"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_precision_servo"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_precision_servo"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "cyberimplants:incomplete_precision_servo"
+  }
+}

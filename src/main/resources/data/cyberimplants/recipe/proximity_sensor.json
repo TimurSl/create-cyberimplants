@@ -9,7 +9,7 @@
       "item": "create:andesite_casing"
     },
     "R": {
-      "item": "minecraft:redstone"
+      "tag": "c:dusts/redstone"
     },
     "S": {
       "item": "minecraft:spyglass"

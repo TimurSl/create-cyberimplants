@@ -209,10 +209,10 @@ STATS = {  # cyberimplants.stat.<key>: (english, russian)
 
 MANUAL_RIG = (
     "# Building it\n"
-    "- Implantation Rig: iron sheets, a Precision Mechanism, an Andesite Casing, a shaft and a cogwheel. It is a surgical stool: the shaft goes into the gearbox at its back.\n"
+    "- Implantation Rig: iron sheets, a Mechanical Servo, a Civilian Casing, an Andesite Casing, a shaft and a cogwheel. It is a surgical stool: the shaft goes into the gearbox at its back.\n"
     "- Connect a shaft to it. The Rig needs rotation to work.\n"
     "- Bio-Interface Gel: Mechanical Mixer (no heat), 250 mB water + slime ball + bone meal + sugar.\n"
-    "- Neural Gel (for Tier IV and V): heated Mixer, 250 mB Bio-Interface Gel + lapis + glowstone dust + amethyst shard.\n"
+    "- Neural Gel (for Tier IV and V): heated Mixer, 250 mB Bio-Interface Gel + 50 mB Nanite Suspension (superheated Mixer: 250 mB Bio-Interface Gel + 2 Silica Dust + redstone + 3 iron nuggets).\n"
     "- Fill the Rig's tank (1000 mB) with a bucket or a pipe.\n\n"
     "# Requirements by implant tier\n"
     "|Tier I / II / III / IV / V\n"
@@ -231,10 +231,10 @@ MANUAL_RIG = (
     "! The operation aborts if the Rig slows below the needed RPM, runs out of gel, or you leave the chair some other way (an ender pearl, for instance). You take 4 damage and the implant stays where it was.\n\n"
     "> A redstone signal on the Rig locks it (useful for a clinic door). A comparator reads the operation progress.",
     "# Постройка\n"
-    "- Кресло имплантации: железные листы, прецизионный механизм, андезитовый корпус, вал и шестерня. Это хирургический табурет: вал входит в редуктор сзади.\n"
+    "- Кресло имплантации: железные листы, механический сервопривод, гражданский корпус, андезитовый корпус, вал и шестерня. Это хирургический табурет: вал входит в редуктор сзади.\n"
     "- Подведите к нему вал. Креслу нужно вращение.\n"
     "- Биоинтерфейсный гель: механический миксер (без нагрева), 250 мБ воды + слизь + костная мука + сахар.\n"
-    "- Нейрогель (для IV и V тира): миксер с нагревом, 250 мБ биоинтерфейсного геля + лазурит + светящаяся пыль + аметист.\n"
+    "- Нейрогель (для IV и V тира): миксер с нагревом, 250 мБ биоинтерфейсного геля + 50 мБ нанитовой суспензии (миксер с сильным нагревом: 250 мБ биоинтерфейсного геля + 2 кремнезёма + редстоун + 3 железных самородка).\n"
     "- Залейте бак кресла (1000 мБ) вёдрами или трубой.\n\n"
     "# Требования по тиру импланта\n"
     "|Тир:       I / II / III / IV / V\n"

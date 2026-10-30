@@ -127,7 +127,7 @@ final class Hud {
             double cap = KineticShield.max(player);
             double value = KineticShield.value(player);
             rows.add(Row.bar(Component.translatable("cyberimplants.hud.shield"), Math.round(value) + "/" + Math.round(cap), SHIELD,
-                    SHIELD_SHOWN.update(cap <= 0 ? 0f : (float) (value / cap))));
+                    SHIELD_SHOWN.update(cap <= 0 ? 0f : (float) Math.min(1.0, value / cap))));
         }
         if (body.has(ImplantIds.MOMENTUM_BOOSTER)) {
             double momentum = MomentumBooster.value(player);
@@ -258,7 +258,7 @@ final class Hud {
         int x = left;
         int y = height - 52;
         for (ImplantCatalog.Entry e : ImplantCatalog.ALL) {
-            if (!body.has(e.id()) || !ImplantActions.wheelEligible(e.id())) {
+            if (!ImplantActions.wheelEligible(e.id(), body.tierOf(e.id()))) {
                 continue;
             }
             boolean offline = Strain.offline(Minecraft.getInstance().player, e.id());

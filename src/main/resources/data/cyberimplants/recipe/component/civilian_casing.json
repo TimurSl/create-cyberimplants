@@ -1,0 +1,16 @@
+{
+  "type": "create:compacting",
+  "ingredients": [
+    {
+      "item": "create:andesite_alloy"
+    },
+    {
+      "item": "cyberimplants:synthetic_fiber"
+    }
+  ],
+  "results": [
+    {
+      "id": "cyberimplants:civilian_casing"
+    }
+  ]
+}

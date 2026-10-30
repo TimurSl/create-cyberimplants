@@ -56,13 +56,14 @@
     {
       "load": 6,
       "charge_cost": 0,
-      "cooldown_ticks": 0,
+      "cooldown_ticks": 1200,
       "values": {
         "heal_per_second": 0.85,
         "lockout_ticks": 60,
         "charge_per_hp": 1.0
       },
       "unlocks": [
+        "burst",
         "cures_poison",
         "cures_wither_hunger",
         "works_when_starving"
@@ -70,6 +71,7 @@
     }
   ],
   "unlock_layers": {
+    "burst": 5,
     "cures_poison": 3,
     "cures_wither_hunger": 3,
     "works_when_starving": 3

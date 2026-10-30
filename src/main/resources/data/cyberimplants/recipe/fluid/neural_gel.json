@@ -1,0 +1,22 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    {
+      "type": "neoforge:single",
+      "amount": 250,
+      "fluid": "cyberimplants:bio_interface_gel"
+    },
+    {
+      "type": "neoforge:single",
+      "amount": 50,
+      "fluid": "cyberimplants:nanite_suspension"
+    }
+  ],
+  "results": [
+    {
+      "amount": 250,
+      "id": "cyberimplants:neural_gel"
+    }
+  ]
+}

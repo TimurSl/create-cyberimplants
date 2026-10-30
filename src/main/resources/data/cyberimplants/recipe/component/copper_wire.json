@@ -1,0 +1,15 @@
+{
+  "type": "create:cutting",
+  "ingredients": [
+    {
+      "tag": "c:plates/copper"
+    }
+  ],
+  "processing_time": 50,
+  "results": [
+    {
+      "id": "cyberimplants:copper_wire",
+      "count": 2
+    }
+  ]
+}

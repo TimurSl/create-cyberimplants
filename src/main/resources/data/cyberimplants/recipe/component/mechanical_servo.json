@@ -1,0 +1,16 @@
+{
+  "type": "create:deploying",
+  "ingredients": [
+    {
+      "tag": "c:plates/iron"
+    },
+    {
+      "item": "create:cogwheel"
+    }
+  ],
+  "results": [
+    {
+      "id": "cyberimplants:mechanical_servo"
+    }
+  ]
+}

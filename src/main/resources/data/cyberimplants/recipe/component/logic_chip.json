@@ -1,0 +1,77 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "cyberimplants:silicon_wafer"
+  },
+  "loops": 2,
+  "results": [
+    {
+      "id": "cyberimplants:logic_chip"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:filling",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_logic_chip"
+        },
+        {
+          "type": "neoforge:single",
+          "amount": 50,
+          "fluid": "cyberimplants:conductive_ink"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_logic_chip"
+        }
+      ]
+    },
+    {
+      "type": "create:cutting",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_logic_chip"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_logic_chip"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_logic_chip"
+        },
+        {
+          "item": "create:electron_tube"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_logic_chip"
+        }
+      ]
+    },
+    {
+      "type": "create:cutting",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_logic_chip"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_logic_chip"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "cyberimplants:incomplete_logic_chip"
+  }
+}

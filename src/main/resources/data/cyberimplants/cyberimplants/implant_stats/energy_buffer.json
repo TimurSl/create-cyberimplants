@@ -48,8 +48,12 @@
         "capacity": 400,
         "fill_rate": 4.0
       },
-      "unlocks": []
+      "unlocks": [
+        "surge"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "surge": 5
+  }
 }

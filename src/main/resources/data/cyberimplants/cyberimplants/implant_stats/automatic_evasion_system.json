@@ -63,8 +63,12 @@
         "distance": 3.0,
         "condition_slots": 6
       },
-      "unlocks": []
+      "unlocks": [
+        "parry"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "parry": 5
+  }
 }

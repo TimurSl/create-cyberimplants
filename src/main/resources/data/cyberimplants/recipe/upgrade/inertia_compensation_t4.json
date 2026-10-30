@@ -25,23 +25,7 @@
           "item": "cyberimplants:incomplete_implant"
         },
         {
-          "item": "create:cogwheel"
-        }
-      ],
-      "results": [
-        {
-          "id": "cyberimplants:incomplete_implant"
-        }
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "ingredients": [
-        {
-          "item": "cyberimplants:incomplete_implant"
-        },
-        {
-          "item": "minecraft:netherite_scrap"
+          "item": "create:sturdy_sheet"
         }
       ],
       "results": [
@@ -59,7 +43,20 @@
         {
           "type": "neoforge:single",
           "amount": 100,
-          "fluid": "cyberimplants:neural_gel"
+          "fluid": "cyberimplants:cryo_coolant"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_implant"
+        }
+      ]
+    },
+    {
+      "type": "create:cutting",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_implant"
         }
       ],
       "results": [
@@ -75,7 +72,7 @@
           "item": "cyberimplants:incomplete_implant"
         },
         {
-          "item": "create:sturdy_sheet"
+          "item": "cyberimplants:composite_plate"
         }
       ],
       "results": [

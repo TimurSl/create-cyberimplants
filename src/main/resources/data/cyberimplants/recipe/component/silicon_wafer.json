@@ -1,0 +1,15 @@
+{
+  "type": "create:cutting",
+  "ingredients": [
+    {
+      "item": "cyberimplants:silicon_boule"
+    }
+  ],
+  "processing_time": 100,
+  "results": [
+    {
+      "id": "cyberimplants:silicon_wafer",
+      "count": 6
+    }
+  ]
+}

@@ -3,9 +3,8 @@ package dev.cyberimplants.client;
 import dev.cyberimplants.client.screen.DeckScreen;
 import dev.cyberimplants.client.screen.ImplantWheelScreen;
 import dev.cyberimplants.body.BodyState;
-import dev.cyberimplants.implant.ActivationType;
+import dev.cyberimplants.implant.ImplantActions;
 import dev.cyberimplants.implant.ImplantCatalog;
-import dev.cyberimplants.implant.ImplantType;
 import dev.cyberimplants.implant.Arms;
 import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.network.DeckMacroKeyPayload;
@@ -63,14 +62,12 @@ final class ClientInput {
         }
     }
 
-    /** Installed Active and Toggle implants, in a stable order. */
+    /** Installed Active and Toggle implants, and those whose tier unlocked an action, in a stable order. */
     static List<ResourceLocation> wheelEntries() {
         BodyState body = ClientBodyState.get();
         List<ResourceLocation> out = new ArrayList<>();
         for (ImplantCatalog.Entry entry : ImplantCatalog.ALL) {
-            ImplantType type = entry.type();
-            if ((type.activation() == ActivationType.ACTIVE || type.activation() == ActivationType.TOGGLE)
-                    && body.has(entry.id())) {
+            if (ImplantActions.wheelEligible(entry.id(), body.tierOf(entry.id()))) {
                 out.add(entry.id());
             }
         }

@@ -1,0 +1,29 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    {
+      "item": "cyberimplants:synthetic_fiber"
+    },
+    {
+      "item": "cyberimplants:synthetic_fiber"
+    },
+    {
+      "item": "cyberimplants:synthetic_fiber"
+    },
+    {
+      "tag": "c:dusts/redstone"
+    },
+    {
+      "type": "neoforge:single",
+      "amount": 100,
+      "fluid": "cyberimplants:bio_interface_gel"
+    }
+  ],
+  "results": [
+    {
+      "id": "cyberimplants:synthetic_muscle",
+      "count": 2
+    }
+  ]
+}

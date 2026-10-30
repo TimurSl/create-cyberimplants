@@ -80,7 +80,7 @@ TIERS = {
         "range": [24, 32, 48, 64, 96], "max_tags": [1, 2, 3, 5, 8], "persistence_ticks": [200, 400, 800, 1800, -1]}),
     # ---- F. Circulatory
     "biomonitor": ([1, 1, 2, 2, 2], 0, 0, {"alarms": [1, 2, 4, 6, 8], "broadcast_channels": [0, 1, 2, 3, 4]}),
-    "regenerator": ([3, 3, 4, 5, 6], 0, 0, {
+    "regenerator": ([3, 3, 4, 5, 6], 0, [0, 0, 0, 0, 1200], {
         "heal_per_second": [0.25, 0.35, 0.5, 0.65, 0.85], "lockout_ticks": [160, 120, 100, 80, 60],
         "charge_per_hp": [2.0, 1.75, 1.5, 1.25, 1.0]}),
     "adrenaline_pump": ([2, 2, 3, 3, 4], 0, [600, 500, 400, 300, 240], {

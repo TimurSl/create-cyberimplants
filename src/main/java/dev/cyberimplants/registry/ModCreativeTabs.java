@@ -26,8 +26,8 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.NEURAL_PORT.get());
                         output.accept(ModItems.PROXIMITY_SENSOR.get());
                         output.accept(ModItems.NEURO_STABILIZER.get());
-                        output.accept(ModItems.BIO_GEL_BUCKET.get());
-                        output.accept(ModItems.NEURAL_GEL_BUCKET.get());
+                        ModItems.components().forEach(item -> output.accept(item.get()));
+                        ModFluids.ALL.forEach(fluid -> output.accept(fluid.bucket().get()));
                     })
                     .build());
 
