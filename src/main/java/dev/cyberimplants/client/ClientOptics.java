@@ -227,9 +227,12 @@ public final class ClientOptics {
         }
         if (player.tickCount % 5 == 0) {
             for (Footprint f : FOOTPRINTS) {
+                if (!A11y.particle()) {
+                    continue;
+                }
                 float heat = 1.0f - (float) (now - f.time()) / TRAIL_TICKS;
-                // Hot footprints glow orange and cool toward a dim red.
-                Vector3f color = new Vector3f(1.0f, 0.25f + 0.45f * heat, 0.1f * heat);
+                // Hot footprints glow orange and cool toward a dim red (yellow to blue in the colour-blind palette).
+                Vector3f color = A11y.heat(heat);
                 mc.level.addParticle(new DustParticleOptions(color, 0.4f + 0.6f * heat), f.x(), f.y(), f.z(), 0, 0, 0);
             }
         }
@@ -279,6 +282,9 @@ public final class ClientOptics {
         }
         // Compensate for the arrow's drop over the flight time (0.05 b/t^2).
         aim = aim.add(0, 0.5 * 0.05 * t * t, 0);
+        if (!A11y.particle()) {
+            return;
+        }
         mc.level.addParticle(ParticleTypes.END_ROD, aim.x, aim.y, aim.z, 0, 0, 0);
     }
 
@@ -300,7 +306,7 @@ public final class ClientOptics {
         if (mc.crosshairPickEntity instanceof LivingEntity looked && looked.isAlive()) {
             targets.add(looked);
         }
-        Vector3f violet = new Vector3f(0.7f, 0.36f, 1.0f);
+        Vector3f violet = A11y.precog();
         for (Entity e : targets) {
             Vec3 velocity = new Vec3(e.getX() - e.xo, e.onGround() ? 0 : e.getY() - e.yo, e.getZ() - e.zo);
             if (velocity.lengthSqr() < 1.0E-4) {
@@ -313,6 +319,9 @@ public final class ClientOptics {
                 double cx = ghost.x + (corner % 2 == 0 ? -w : w);
                 double cz = ghost.z + (corner < 2 ? -w : w);
                 for (double y = 0; y <= h; y += 0.4) {
+                    if (!A11y.particle()) {
+                        continue;
+                    }
                     mc.level.addParticle(new DustParticleOptions(violet, 0.6f), cx, ghost.y + y, cz, 0, 0, 0);
                 }
             }
@@ -355,7 +364,7 @@ public final class ClientOptics {
             for (int step = 0; step < 36; step++) {
                 pos = pos.add(vel);
                 vel = vel.scale(0.99).add(0, -0.05, 0);
-                if (step % 3 == 0) {
+                if (step % 3 == 0 && A11y.particle()) {
                     mc.level.addParticle(ParticleTypes.CRIT, pos.x, pos.y, pos.z, 0, 0, 0);
                 }
                 if (!mc.level.getBlockState(net.minecraft.core.BlockPos.containing(pos)).isAir()) {

@@ -97,7 +97,7 @@ class LangAuditTest {
                     } else if (code.length() > 0) {
                         // Monospace blocks that do not start with PROGRAM are plain tables.
                         if (code.toString().startsWith("PROGRAM")) {
-                            Compiler.compile(code.toString(), IsaLevel.ISA_2);
+                            Compiler.compile(code.toString(), IsaLevel.ISA_5);
                             programs++;
                         }
                         code.setLength(0);

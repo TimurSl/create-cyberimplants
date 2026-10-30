@@ -85,6 +85,11 @@ public final class ProgramRunner {
         return dropped;
     }
 
+    /** Counts an event the host dropped before it reached the program (rate limits). */
+    public void dropEvent() {
+        dropped++;
+    }
+
     public int queued() {
         return queue.size() + sleeping.size() + awaiting.size() + woken.size() + (current == null ? 0 : 1);
     }

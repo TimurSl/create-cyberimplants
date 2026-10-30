@@ -2,11 +2,13 @@ package dev.cyberimplants.client;
 
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.compat.create.block.RigRenderer;
+import dev.cyberimplants.compat.create.ponder.CyberPonderPlugin;
 import dev.cyberimplants.registry.ModBlockEntities;
 import dev.cyberimplants.registry.ModEntities;
 import dev.cyberimplants.client.render.Afterimages;
 import dev.cyberimplants.client.render.ImplantModels;
 import dev.cyberimplants.client.render.ImplantRender;
+import net.createmod.ponder.foundation.PonderIndex;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -34,6 +36,8 @@ public final class ClientSetup {
         container = modContainer;
         // Mods > Create: Cybernetics > Config edits the client config (HUD, visuals, UI) in game.
         modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        // Layer 5 teaching: Ponder scenes for every block of the mod.
+        PonderIndex.addPlugin(new CyberPonderPlugin());
         modBus.addListener(ClientSetup::registerKeys);
         modBus.addListener(ImplantModels::registerLayer);
         modBus.addListener(ClientSetup::addLayers);

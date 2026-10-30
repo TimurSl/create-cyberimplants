@@ -360,13 +360,7 @@ final class Hud {
     }
 
     private static int kindColor(String kind) {
-        return switch (kind) {
-            case "hostile" -> CyberUi.RED;
-            case "boss" -> 0xFFFF40FF;
-            case "neutral" -> CyberUi.AMBER;
-            case "player" -> 0xFF60C0FF;
-            default -> 0xFF80FF80;
-        };
+        return A11y.kindColor(kind);
     }
 
     private static void bar(GuiGraphics g, int x, int y, int w, int h, double fraction, int color) {

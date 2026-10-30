@@ -53,6 +53,8 @@ public final class ClientConfig {
     public static final ModConfigSpec.DoubleValue AFTERIMAGE_OPACITY;
     public static final ModConfigSpec.BooleanValue AFTERIMAGE_RAINBOW;
 
+    public static final ModConfigSpec.DoubleValue PARTICLE_DENSITY;
+
     public static final ModConfigSpec.BooleanValue UI_ANIMATIONS;
     public static final ModConfigSpec.BooleanValue UI_SOUNDS;
 
@@ -129,6 +131,12 @@ public final class ClientConfig {
         AFTERIMAGE_RAINBOW = b
                 .comment("Cycle the afterimages through many colours; off keeps them Sandevistan green.")
                 .define("afterimageRainbow", true);
+        b.pop();
+
+        b.push("accessibility");
+        PARTICLE_DENSITY = b
+                .comment("Share of the decorative particles your own optics draw (heat trails, Precog ghosts, lead and arc markers).")
+                .defineInRange("particleDensity", 1.0, 0.0, 1.0);
         b.pop();
 
         b.push("ui");

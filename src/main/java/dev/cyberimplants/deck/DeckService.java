@@ -8,6 +8,7 @@ import dev.cyberimplants.config.ServerConfig;
 import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.UseResult;
 import dev.cyberimplants.network.DeckStatusPayload;
+import dev.cyberimplants.perf.DeckBudget;
 import dev.cyberimplants.registry.ModAttachments;
 import dev.cyberimplants.synapse.SynapseException;
 import dev.cyberimplants.synapse.compiler.CompiledProgram;
@@ -291,7 +292,10 @@ public final class DeckService {
             if (overclocked) {
                 budget = Math.min(budget * OVERCLOCK_CYCLE_FACTOR, ServerConfig.DECK_MAX_CYCLES_PER_PLAYER_PER_TICK.get());
             }
-            int used = powered ? rt.runner().tick(budget) : 0;
+            budget = DeckBudget.claim(budget);
+            long started = System.nanoTime();
+            int used = powered && budget > 0 ? rt.runner().tick(budget) : 0;
+            DeckBudget.record(used, System.nanoTime() - started);
             rt.lastCycles = used;
             if (Body.chargeEnabled() && used > 0) {
                 rt.cycleDebt += overclocked ? used * OVERCLOCK_CHARGE_FACTOR : used;

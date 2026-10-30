@@ -18,6 +18,7 @@ import dev.cyberimplants.implant.mobility.HydraulicLegs;
 import dev.cyberimplants.implant.mobility.InertialStabilizer;
 import dev.cyberimplants.implant.optical.EntityScanner;
 import dev.cyberimplants.implant.subdermal.EmergencyShell;
+import dev.cyberimplants.perf.DeckBudget;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceLocation;
@@ -154,6 +155,15 @@ public final class Layer5Tests {
         player.setOnGround(false);
         helper.assertTrue(InertialStabilizer.redirect(player), "the first redirect in the air works");
         helper.assertTrue(!InertialStabilizer.redirect(player), "the second one in the same airtime is refused");
+        helper.succeed();
+    }
+
+    @GameTest(template = "empty")
+    public static void deckBudgetSharesFairly(GameTestHelper helper) {
+        helper.assertTrue(DeckBudget.fairShare(320, 50_000, 10, 0) == 320, "under the cap every thread gets its own budget");
+        helper.assertTrue(DeckBudget.fairShare(1_000, 50_000, 100, 0) == 500, "over the cap each of 100 threads gets 1/100");
+        helper.assertTrue(DeckBudget.fairShare(1_000, 50_000, 100, 49_800) == 200, "never more than the server has left");
+        helper.assertTrue(DeckBudget.fairShare(1_000, 50_000, 100, 50_000) == 0, "nothing once the tick is spent");
         helper.succeed();
     }
 
