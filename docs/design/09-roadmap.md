@@ -170,7 +170,7 @@ chain arrive.*
 
 *Status:* **started**, not finished. Like Layers 1 and 2 this has only been compiled by CI, never run in a game. In so far:
 
-- **Unlock framework:** `scripts/layer3_unlocks.py` lists the unlock rows that exist in code; the stat files carry them
+- **Unlock framework:** `scripts/unlocks.py` lists the unlock rows that exist in code; the stat files carry them
   cumulatively per tier (Tier I never has any) and register each one under `unlock_layers` as layer 3, so
   `layers.maxEnabled < 3` switches them off. Code asks `Stats.unlocked(player | id + tier, "unlock_id")`. Item tooltips list
   the unlocks of the stack's tier. `StatAuditTest` checks that the rows are cumulative and registered.
@@ -179,7 +179,7 @@ chain arrive.*
   one more enemy), Kinetic Shield (projectiles fully absorbed), Emergency Shell (knockback immunity, cleanse and extinguish).
   `Layer3Tests` covers the tier gating, the Shield and the Shell.
 - **Look and feel (also for the later layers):** every item, block and gel fluid has a hand-drawn neon-on-steel texture
-  (`scripts/gen_textures.py`, called by `gen_layer1_data.py`), and the Rig, Deck and Implant Wheel screens and the HUD share the
+  (`scripts/gen_textures.py`, called by `gen_data.py`), and the Rig, Deck and Implant Wheel screens and the HUD share the
   cyberpunk style of `client/CyberUi.java` (glass panels, neon edges, scanlines, `CyberButton`, `meter`).
 
 Still to do in Layer 3: the remaining unlock rows (Sandevistan, Reflex Booster, Entity Scanner, Thermal Vision, Microgrip, the
@@ -237,6 +237,33 @@ scanning, tracking, Sandevistan fields and ERS reactions without desyncs.
 | **Logistics** | Machine Interface Tier V: Create 6 stock reads and package requests (`LogisticsBridge`, the most volatile API, so it is built last) |
 | **Teaching** | Ponder scenes for every new block; an in-game guide; example programs on Data Shards; tooltips that show tier unlocks |
 | **Polish** | Accessibility options, localisation, performance profiling against the [budgets](08-technical-architecture.md#813-performance-budgets), crash and fuzz hardening, **final balance pass** |
+
+*Status:* **started**, not finished. Like the earlier layers this is only compiled (and unit-tested) by CI, never run in a
+game. All of it is off under `layers.maxEnabled < 5`, except the recipes (data packs replace them, rule 5). In so far:
+
+- **Data generator refactor:** `scripts/gen_data.py` drives `implants.py` (the catalogue), `layer2_tiers.py` (numbers),
+  `unlocks.py` (every unlock row with its first tier *and its layer*: Tier II-IV rows are Layer 3, Tier V rows Layer 5) and
+  `crafting.py` (components, fluids, tags, recipes). `StatAuditTest` checks that a row's layer matches its first tier.
+- **Tier V unlocks (17 rows, 16 implants):** Sandevistan *Temporal Anchor* (allies keep real time, +25% attack speed in your
+  field), AES *Parry* (melee weapon or deployed blade reflects the arrow), Reinforced Skeleton crit immunity, Impact
+  Dampeners *Recoil Storage* (x2 fall Momentum), Inertia Compensation -50% explosion knockback, Retractable Blade *Thermal
+  edge* (fire, 40% armour pierce), Camo *Re-cloak*, Target Tracking *Tracer tagging* (flechette hits tag), Regenerator
+  *Burst*, Adrenaline Pump *Last Stand* (boost x2 below 30% HP), Energy Buffer *Surge*, Shock Circuit chain to 3 and
+  *Grounded*, Kinetic Shield *Overcharge* (150% from the buffer), Emergency Shell manual activation, Enhanced Tendons *Gust*,
+  Magnetic Soles *Polarity* (pulls metal items). `Layer5Tests` covers the gating, the actions and Recoil Storage.
+- **Unlock-gated actions:** an unlock may give a Passive or Triggered implant an action (`ImplantActions.ACTION_UNLOCKS`):
+  Regenerator Burst and the manual Shell appear on the Implant Wheel and answer `ACTIVATE` only at Tier V.
+- **Experimental crafting and the real chain:** 22 shared components and 5 assembly transitional items, Conductive Ink,
+  Cryo-Coolant and Nanite Suspension next to the two gels (one `ModFluids.ProcessFluid` registers fluid type, fluids, block
+  and bucket), the real Neural Gel recipe, basic Tier I implants on a crafting table, and Tier II-V upgrades from the
+  per-tier template plus category parts. Tier V exotics are item tags. Etch steps run on a Mechanical Saw until the
+  Precision Etcher exists.
+
+Still to do in Layer 5: the remaining Tier V rows (Kinetic Tendons Elastic Recoil, Microgrip ceiling hang, Thermal heat
+trails, Entity Scanner implant reading, Combat Predictor Precog, Hydraulic Legs Rebound, Inertial Stabilizer Redirect,
+Silent Actuators Ghost step, Cybernetic Arm Haptic precision), the Precision Etcher and its 256 RPM lines, ISA-5
+(`AWAIT ANY`, `PERSIST`, `OVERCLOCK`, `REQUEST`, `predict.*`; it builds on ISA-3/4, which are not done), Machine Interface
+Tier V, Ponder scenes, accessibility, profiling and the final balance pass.
 
 *Exit criteria:* a complete Tier V progression is possible. All five archetypes sit inside target
 time-to-kill and time-to-death bands. The full example set in [Synapse §12](04-synapse-language.md#12-example-programs)

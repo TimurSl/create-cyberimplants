@@ -7,7 +7,9 @@ Players **manufacture** implants on Create production lines, **install** them on
 **program** their behaviour with a cyberdeck. The cyberdeck can also read and drive Create machinery. Implant tiers
 make the existing abilities stronger; they never add duplicate items.
 
-> Status: **Layer 4 (interplay) started** on top of Layer 3 (capability, also started) and Layer 2 (scaling), see the roadmap for what is in. **Layer 2**: All 46 implant types exist at Tiers I-V with their real numeric rows, with the
+> Status: **Layer 5 (mastery) started**: 17 Tier V unlock rows, the real five-tier production chain (22 components, five
+> process fluids, basic Tier I implants on a crafting table, tag-driven Tier V exotics). Layers 3 (capability) and 4
+> (interplay) are started too, on top of Layer 2 (scaling): all 46 implant types exist at Tiers I-V with their real numeric rows, with the
 > upgrade chain, timed Rig operations (RPM, gel, aborts), Strain, Coprocessors and parallel programs, Machine Interface
 > Tiers I-II, the Proximity Sensor and the ISA-2 Synapse language. The Synapse language is compiled and unit-tested; the
 > NeoForge-dependent code is compiled by CI but has not been run in a game yet (see the roadmap). See
@@ -71,7 +73,8 @@ Requires JDK 21.
 ./gradlew runClient        # dev client
 ./gradlew runGameTestServer
 ./scripts/test-synapse.sh  # Synapse language tests only; needs just a JDK and Maven Central
-python3 scripts/gen_layer1_data.py  # regenerates stats (layer2_tiers.py, layer3_unlocks.py), recipes, models, textures and lang keys
+python3 scripts/gen_data.py        # regenerates stats (implants.py, layer2_tiers.py, unlocks.py), recipes and tags (crafting.py),
+                                    # models, textures and lang keys
 python3 scripts/gen_textures.py     # only the textures
 ```
 
@@ -93,7 +96,7 @@ src/main/java/dev/cyberimplants
   combat/          the damage mitigation pipeline
   deck/            binds Synapse programs to the player (host, handles, storage, events)
   client/          HUD, key bindings, client-side movement, optics overlays, screens and the shared cyberpunk style (CyberUi)
-  gametest/        Layer 1-4 GameTests
+  gametest/        Layer 1-5 GameTests
   synapse/         scripting language (no Minecraft imports): lexer, parser, compiler, VM
 src/main/templates/META-INF/neoforge.mods.toml
 src/test/java      JUnit tests

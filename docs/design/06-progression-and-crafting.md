@@ -69,8 +69,9 @@
 
 | Component | Recipe |
 |-----------|--------|
-| Echo Lattice | **Mixing** (superheated): Echo Shard + 2 Polished Rose Quartz + 100 mB Nanite Suspension → Echo Lattice |
-| Experimental Core | **Sequenced assembly** on Military Processor: deploy Echo Lattice → **etch at 256 RPM** → spout 100 mB Nanite Suspension → **etch at 256 RPM** → press (4 loops) |
+| Echo Lattice | **Mixing** (superheated): Echo Shard + 2 Polished Rose Quartz + 100 mB Nanite Suspension → 2 Echo Lattice |
+| Experimental Core | **Sequenced assembly** on Military Processor: deploy Echo Lattice → **etch at 256 RPM** → spout 100 mB Nanite Suspension → **etch at 256 RPM** → press (1 loop: every Tier V upgrade already takes four cores) |
+| Quantum Substrate | **Mixing** (superheated): Amethyst Shard + Ender Pearl + Echo Shard (the deck's Tier V exotic) |
 
 ## 6.4 Category parts and exotics
 
@@ -94,10 +95,34 @@ fire). This is the mod's use of Create's haunting.
 ² **Inked Steel Sheet:** a Tempered Steel Sheet spouted with 100 mB Conductive Ink. Nanite Suspension only appears
 at T4.
 
-### Template: Tier I crafting
+### Template: Tier I crafting (basic implants)
 
-All Tier I implants are made on **Mechanical Crafters** (3×3 or larger), then **spouted with 100 mB Bio-Interface
-Gel** on a depot to "sterilise" them. Tier I is already a small machine setup, not a crafting-table recipe.
+Tier I implants are **crafting-table** recipes from the Civilian parts, so the first implant comes right after the andesite
+age (§6.5): `a b a / w X w / a C a`, where `a` is the category's frame part (×4), `b` its category part, `w` Copper Wire,
+`X` the implant's signature item and `C` a Civilian Casing. The parts already need a saw, a mixer, a deployer and a press,
+so Tier I is still a small machine setup. (Earlier drafts used Mechanical Crafters, which need brass and so came too late.)
+
+| Category | Frame part `a` | Category part `b` |
+|----------|----------------|-------------------|
+| Core | Copper Sheet | Mechanical Servo |
+| Neural, Cyberdeck | Copper Wire | Redstone |
+| Skeletal | Iron Sheet | Bone Block |
+| Limbs | Iron Sheet | Mechanical Servo |
+| Optical | Glass Pane | Copper Sheet |
+| Circulatory | Synthetic Fiber | Copper Sheet |
+| Subdermal | Iron Sheet | Synthetic Fiber |
+| Mobility | Synthetic Fiber | Piston |
+
+### Item tags for rare inputs
+
+Rare or biome-bound inputs are item tags so a modpack can swap them without new recipes: `cyberimplants:exotics/<category>`
+(plus `exotics/sandevistan` and `exotics/emergency_defibrillator`), `composite_reinforcement` (Netherite Scrap),
+`echo_sources` (Echo Shard), `cryo_ice` (packed ice, blue ice, snow block) and `fiber_fillers` (dried kelp, paper).
+
+### Etching
+
+The Precision Etcher (§5) is not built yet. Until it is, every **etch** step of the chains below runs on a **Mechanical
+Saw** (`create:cutting` in the sequenced assembly), so the RPM gates of Tiers III-V only apply to the Rig.
 
 ### Template: upgrade sequences
 
