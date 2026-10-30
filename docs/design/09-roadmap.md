@@ -238,32 +238,59 @@ scanning, tracking, Sandevistan fields and ERS reactions without desyncs.
 | **Teaching** | Ponder scenes for every new block; an in-game guide; example programs on Data Shards; tooltips that show tier unlocks |
 | **Polish** | Accessibility options, localisation, performance profiling against the [budgets](08-technical-architecture.md#813-performance-budgets), crash and fuzz hardening, **final balance pass** |
 
-*Status:* **started**, not finished. Like the earlier layers this is only compiled (and unit-tested) by CI, never run in a
-game. All of it is off under `layers.maxEnabled < 5`, except the recipes (data packs replace them, rule 5). In so far:
+*Status:* **implemented** in the repository: every Layer 5 area has its code, but like the earlier layers it is only
+compiled and unit-tested by CI and has **never been run in a game**, so the exit criteria below are not verified yet. All
+of it is off under `layers.maxEnabled < 5`, except the recipes (data packs replace them, rule 5). What is in:
 
-- **Data generator refactor:** `scripts/gen_data.py` drives `implants.py` (the catalogue), `layer2_tiers.py` (numbers),
-  `unlocks.py` (every unlock row with its first tier *and its layer*: Tier II-IV rows are Layer 3, Tier V rows Layer 5) and
-  `crafting.py` (components, fluids, tags, recipes). `StatAuditTest` checks that a row's layer matches its first tier.
-- **Tier V unlocks (17 rows, 16 implants):** Sandevistan *Temporal Anchor* (allies keep real time, +25% attack speed in your
-  field), AES *Parry* (melee weapon or deployed blade reflects the arrow), Reinforced Skeleton crit immunity, Impact
-  Dampeners *Recoil Storage* (x2 fall Momentum), Inertia Compensation -50% explosion knockback, Retractable Blade *Thermal
-  edge* (fire, 40% armour pierce), Camo *Re-cloak*, Target Tracking *Tracer tagging* (flechette hits tag), Regenerator
-  *Burst*, Adrenaline Pump *Last Stand* (boost x2 below 30% HP), Energy Buffer *Surge*, Shock Circuit chain to 3 and
-  *Grounded*, Kinetic Shield *Overcharge* (150% from the buffer), Emergency Shell manual activation, Enhanced Tendons *Gust*,
-  Magnetic Soles *Polarity* (pulls metal items). `Layer5Tests` covers the gating, the actions and Recoil Storage.
+- **Data generator:** `scripts/gen_data.py` drives `implants.py` (the catalogue), `layer2_tiers.py` (numbers),
+  `unlocks.py` (every unlock row with its first tier *and its layer*: Tier II-IV rows are Layer 3, Tier V rows Layer 5),
+  `crafting.py` (components, fluids, tags, recipes) and the Ponder schematics. `StatAuditTest` checks that a row's layer
+  matches its first tier.
+- **Every Tier V unlock row (26 rows, 25 implants):** Sandevistan *Temporal Anchor*, Combat Predictor *Precog* (a ghost
+  where each tracked or looked-at target will be after the horizon), AES *Parry*, Reinforced Skeleton crit immunity,
+  Kinetic Tendons *Elastic Recoil*, Impact Dampeners *Recoil Storage*, Inertia Compensation -50% explosion knockback,
+  Cybernetic Arm *Haptic precision* (a wheel toggle: the empty hand mines with silk touch), Retractable Blade *Thermal
+  edge*, Microgrip *Ceiling hang*, Entity Scanner *implant reading* (other players' category letters; breaks Optical
+  Camouflage up to Tier IV), Thermal Vision *heat trails* (10 s footprints), Camo *Re-cloak*, Target Tracking *Tracer
+  tagging*, Regenerator *Burst*, Adrenaline Pump *Last Stand*, Energy Buffer *Surge*, Shock Circuit chain to 3 and
+  *Grounded*, Kinetic Shield *Overcharge*, Emergency Shell manual activation, Enhanced Tendons *Gust*, Hydraulic Legs
+  *Rebound*, Silent Actuators *Ghost step*, Magnetic Soles *Polarity*, Inertial Stabilizer *Redirect* (tap Sprint mid-air).
+  Some rows needed their lower-tier prerequisites, which arrive here as well: Hydraulic Legs ground slam (III) and slam
+  scaling (IV), Entity Scanner auto-scan (III), and the arm frame's empty-hand harvest level (Layer 2 numbers).
+  `Layer5Tests` covers the gating, the actions, Recoil Storage, slam damage, harvest levels, implant reading and Redirect.
 - **Unlock-gated actions:** an unlock may give a Passive or Triggered implant an action (`ImplantActions.ACTION_UNLOCKS`):
-  Regenerator Burst and the manual Shell appear on the Implant Wheel and answer `ACTIVATE` only at Tier V.
+  Regenerator Burst, the manual Shell and Haptic precision appear on the Implant Wheel and answer `ACTIVATE` only at Tier V.
 - **Experimental crafting and the real chain:** 22 shared components and 5 assembly transitional items, Conductive Ink,
-  Cryo-Coolant and Nanite Suspension next to the two gels (one `ModFluids.ProcessFluid` registers fluid type, fluids, block
-  and bucket), the real Neural Gel recipe, basic Tier I implants on a crafting table, and Tier II-V upgrades from the
-  per-tier template plus category parts. Tier V exotics are item tags. Etch steps run on a Mechanical Saw until the
-  Precision Etcher exists.
+  Cryo-Coolant and Nanite Suspension next to the two gels, the real Neural Gel recipe, basic Tier I implants on a
+  crafting table, Tier II-V upgrades from the per-tier template plus category parts, and Tier V exotics as item tags.
+- **Precision Etcher:** the `cyberimplants:etching` recipe type (a Create processing recipe with `min_rpm`, usable as a
+  sequenced assembly step) and the Etcher block, mounted like a Mechanical Press above a belt or depot (8 SU/RPM, idles
+  below a recipe's speed, goggles say why, faster shafts etch faster). Logic Chips and Tier III grades etch at 64 RPM,
+  Military Processors and Tier IV at 128, Experimental Cores and Tier V at 256; `StatAuditTest` checks the gates.
+- **ISA-5:** `AWAIT ANY` (with `TIMEOUT` and `INTO`), `PERSIST VAR` (kept in the deck attachment through reboot, death
+  and logout), `OVERCLOCK` (Tier V Processor: x2 cycles for 10 s at x3 Charge, 60 s cooldown), `REQUEST`, the `STOCK`
+  logistics read (ISA-4) and method calls, used by `predict.position(entity, s)` (over 1 s needs ISA-5) and
+  `predict.windup(entity)`. `Isa5Test` covers them.
+- **Machine Interface Tier V:** `LogisticsBridge` against Create 6: a bound Neural Port on a Stock Link (or Stock
+  Ticker) names a stock network; `STOCK` reads its summary and `REQUEST` broadcasts a package order to an address.
+- **Teaching:** Ponder scenes for every block (Rig, Charger, Etcher, Neural Port, Proximity Sensor), Field Manual
+  sections for the Etcher, logistics and ISA-5 (its code blocks compile at ISA-5 in `LangAuditTest`), tooltips that list
+  the unlocks of a stack's tier.
+- **Polish:** the colour-blind palette is wired (scan readout, heat trails, Precog), `accessibility.particleDensity`
+  thins the optics' particles; the section 8.13 deck budgets are enforced (`maxCyclesPerServerTick` is shared fairly
+  between deck threads, `maxEventsPerSecond` drops excess events) and `/cyberimplants perf` reports cycles, VM time,
+  throttling and dropped events over the last second.
 
-Still to do in Layer 5: the remaining Tier V rows (Kinetic Tendons Elastic Recoil, Microgrip ceiling hang, Thermal heat
-trails, Entity Scanner implant reading, Combat Predictor Precog, Hydraulic Legs Rebound, Inertial Stabilizer Redirect,
-Silent Actuators Ghost step, Cybernetic Arm Haptic precision), the Precision Etcher and its 256 RPM lines, ISA-5
-(`AWAIT ANY`, `PERSIST`, `OVERCLOCK`, `REQUEST`, `predict.*`; it builds on ISA-3/4, which are not done), Machine Interface
-Tier V, Ponder scenes, accessibility, profiling and the final balance pass.
+Deliberate Layer 5 simplifications and what is still open:
+
+- ISA-5 builds on ISA-3/4, which Layer 3 has not finished: a Tier V deck has ISA-5 statements but still no functions,
+  lists, records or `TRY`, so the full example set of [Synapse §12](04-synapse-language.md#12-example-programs) does not
+  compile yet. `AWAIT ANY` waits on event names (and thresholds), not on `message` topics.
+- The Etcher has no fluid tank (no recipe needs one) and no animated head; JEI draws its assembly steps as pressing.
+  The `stock_changed` event is not raised; scripts poll `STOCK`.
+- `predict.windup` knows creeper fuses and skeleton draws only (the full telegraph list is the Tier II unlock, Layer 3).
+- **Not done because it needs a running game:** the final balance pass, time-to-kill and time-to-death measurements of
+  the five archetypes, and profiling 20 active decks on a test server (`/cyberimplants perf` exists for that run).
 
 *Exit criteria:* a complete Tier V progression is possible. All five archetypes sit inside target
 time-to-kill and time-to-death bands. The full example set in [Synapse §12](04-synapse-language.md#12-example-programs)

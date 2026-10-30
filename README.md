@@ -7,9 +7,11 @@ Players **manufacture** implants on Create production lines, **install** them on
 **program** their behaviour with a cyberdeck. The cyberdeck can also read and drive Create machinery. Implant tiers
 make the existing abilities stronger; they never add duplicate items.
 
-> Status: **Layer 5 (mastery) started**: 17 Tier V unlock rows, the real five-tier production chain (22 components, five
-> process fluids, basic Tier I implants on a crafting table, tag-driven Tier V exotics). Layers 3 (capability) and 4
-> (interplay) are started too, on top of Layer 2 (scaling): all 46 implant types exist at Tiers I-V with their real numeric rows, with the
+> Status: **Layer 5 (mastery) implemented**: every Tier V unlock row, the real five-tier production chain (22
+> components, five process fluids, the Precision Etcher with 64/128/256 RPM etch lines, tag-driven Tier V exotics),
+> ISA-5 (`AWAIT ANY`, `PERSIST`, `OVERCLOCK`, `REQUEST`, `predict.*`), Machine Interface Tier V logistics on Create 6
+> stock networks, Ponder scenes for every block, accessibility options and enforced deck budgets. The final balance pass
+> still needs playtesting. Layers 3 (capability) and 4 (interplay) are started, on top of Layer 2 (scaling): all 46 implant types exist at Tiers I-V with their real numeric rows, with the
 > upgrade chain, timed Rig operations (RPM, gel, aborts), Strain, Coprocessors and parallel programs, Machine Interface
 > Tiers I-II, the Proximity Sensor and the ISA-2 Synapse language. The Synapse language is compiled and unit-tested; the
 > NeoForge-dependent code is compiled by CI but has not been run in a game yet (see the roadmap). See
