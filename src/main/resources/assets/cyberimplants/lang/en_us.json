@@ -629,5 +629,8 @@
   "cyberimplants.unlock.silent_actuators.ghost_step": "Ghost step: no heat trails, and Entity Scanner auto-scan ignores you while you stand still",
   "cyberimplants.unlock.inertial_stabilizer.redirect": "Redirect: tap Sprint mid-air to turn your velocity toward where you look, once per airtime (10 Charge)",
   "cyberimplants.arm.haptic_on": "Haptic precision: on (empty hand mines with silk touch)",
-  "cyberimplants.arm.haptic_off": "Haptic precision: off"
+  "cyberimplants.arm.haptic_off": "Haptic precision: off",
+  "block.cyberimplants.precision_etcher": "Precision Etcher",
+  "cyberimplants.recipe.assembly.etching": "Etch at %s RPM or faster",
+  "cyberimplants.etcher.too_slow": "Speed too low for this recipe (needs %s RPM)"
 }

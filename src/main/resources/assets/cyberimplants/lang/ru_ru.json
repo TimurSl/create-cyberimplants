@@ -629,5 +629,8 @@
   "cyberimplants.unlock.silent_actuators.ghost_step": "Шаг призрака: никаких тепловых следов, автосканирование Сканера существ не видит вас, пока вы стоите",
   "cyberimplants.unlock.inertial_stabilizer.redirect": "Перенаправление: нажмите Бег в воздухе, чтобы повернуть скорость туда, куда смотрите, раз за полёт (10 заряда)",
   "cyberimplants.arm.haptic_on": "Тактильная точность: вкл. (пустая рука добывает с шёлковым касанием)",
-  "cyberimplants.arm.haptic_off": "Тактильная точность: выкл."
+  "cyberimplants.arm.haptic_off": "Тактильная точность: выкл.",
+  "block.cyberimplants.precision_etcher": "Прецизионный гравёр",
+  "cyberimplants.recipe.assembly.etching": "Гравировка при %s об/мин и выше",
+  "cyberimplants.etcher.too_slow": "Слишком низкая скорость для рецепта (нужно %s об/мин)"
 }

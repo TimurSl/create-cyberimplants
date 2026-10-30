@@ -27,7 +27,7 @@
       ]
     },
     {
-      "type": "create:cutting",
+      "type": "cyberimplants:etching",
       "ingredients": [
         {
           "item": "cyberimplants:incomplete_experimental_core"
@@ -37,7 +37,8 @@
         {
           "id": "cyberimplants:incomplete_experimental_core"
         }
-      ]
+      ],
+      "min_rpm": 256
     },
     {
       "type": "create:filling",
@@ -58,7 +59,7 @@
       ]
     },
     {
-      "type": "create:cutting",
+      "type": "cyberimplants:etching",
       "ingredients": [
         {
           "item": "cyberimplants:incomplete_experimental_core"
@@ -68,7 +69,8 @@
         {
           "id": "cyberimplants:incomplete_experimental_core"
         }
-      ]
+      ],
+      "min_rpm": 256
     },
     {
       "type": "create:pressing",

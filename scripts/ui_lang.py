@@ -8,6 +8,9 @@ import os
 LANG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src", "main", "resources", "assets", "cyberimplants", "lang")
 
 UI = {  # key: (english, russian)
+    "block.cyberimplants.precision_etcher": ("Precision Etcher", "Прецизионный гравёр"),
+    "cyberimplants.recipe.assembly.etching": ("Etch at %s RPM or faster", "Гравировка при %s об/мин и выше"),
+    "cyberimplants.etcher.too_slow": ("Speed too low for this recipe (needs %s RPM)", "Слишком низкая скорость для рецепта (нужно %s об/мин)"),
     "cyberimplants.arm.haptic_on": ("Haptic precision: on (empty hand mines with silk touch)",
                                     "Тактильная точность: вкл. (пустая рука добывает с шёлковым касанием)"),
     "cyberimplants.arm.haptic_off": ("Haptic precision: off", "Тактильная точность: выкл."),

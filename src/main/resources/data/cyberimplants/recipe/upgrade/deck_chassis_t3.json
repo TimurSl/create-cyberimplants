@@ -53,7 +53,7 @@
       ]
     },
     {
-      "type": "create:cutting",
+      "type": "cyberimplants:etching",
       "ingredients": [
         {
           "item": "cyberimplants:incomplete_implant"
@@ -63,7 +63,8 @@
         {
           "id": "cyberimplants:incomplete_implant"
         }
-      ]
+      ],
+      "min_rpm": 64
     },
     {
       "type": "create:deploying",

@@ -472,6 +472,57 @@ def charger_top():
     return cv
 
 
+def etcher_side():
+    cv = Canvas()
+    panel(cv, STEEL, NEON["cyberdeck"])
+    cv.rect(3, 3, 12, 8, STEEL_DARK)
+    for x in range(4, 12, 2):  # cooling fins
+        cv.rect(x, 4, x, 7, dim(NEON["cyberdeck"], 0.7))
+    cv.rect(2, 10, 13, 11, dim(NEON["cyberdeck"], 0.9))
+    cv.rect(2, 10, 13, 10, NEON["cyberdeck"])
+    return cv
+
+
+def etcher_top():
+    cv = Canvas()
+    panel(cv, STEEL_LIGHT, NEON["cyberdeck"])
+    cv.rect(4, 4, 11, 11, STEEL_DARK)
+    for i in range(4, 12):
+        cv.set(i, i, dim(NEON["cyberdeck"], 0.8))
+        cv.set(15 - i, i, dim(NEON["cyberdeck"], 0.8))
+    return cv
+
+
+def etcher_head():
+    cv = Canvas()
+    panel(cv, STEEL_DARK, NEON["cyberdeck"], rivets=False)
+    for y in range(4, 12):
+        for x in range(4, 12):
+            d = (x - 7.5) ** 2 + (y - 7.5) ** 2
+            if d <= 12:
+                cv.set(x, y, mix(WHITE, NEON["cyberdeck"], min(1.0, d / 12)))
+    return cv
+
+
+def etcher_model():
+    tex = {"particle": "cyberimplants:block/precision_etcher", "side": "cyberimplants:block/precision_etcher",
+           "top": "cyberimplants:block/precision_etcher_top", "head": "cyberimplants:block/precision_etcher_head",
+           "bottom": "cyberimplants:block/implantation_rig_bottom"}
+
+    def faces(mapping):
+        out = {}
+        for face in ("north", "east", "south", "west", "up", "down"):
+            key = mapping.get(face, mapping.get("*"))
+            if key:
+                out[face] = {"texture": "#" + key}
+        return out
+
+    return {"parent": "minecraft:block/block", "textures": tex, "elements": [
+        {"from": [0, 6, 0], "to": [16, 16, 16], "faces": faces({"*": "side", "up": "top", "down": "bottom"})},
+        {"from": [4, 0, 4], "to": [12, 6, 12], "faces": faces({"*": "head"})},
+    ]}
+
+
 def port_tex():
     cv = Canvas()
     panel(cv, STEEL_DARK, NEON["cyberdeck"], rivets=False)
@@ -552,6 +603,8 @@ def main():
                      ("implantation_rig_cushion", rig_cushion()), ("implantation_rig_gearbox", rig_gearbox()),
                      ("implantation_rig_restraint", rig_restraint()),
                      ("kinetic_charger", charger_side()), ("kinetic_charger_top", charger_top()),
+                     ("precision_etcher", etcher_side()), ("precision_etcher_top", etcher_top()),
+                     ("precision_etcher_head", etcher_head()),
                      ("neural_port", port_tex()), ("proximity_sensor", sensor_tex())):
         save("textures/block/%s.png" % name, cv.png())
 
@@ -560,6 +613,7 @@ def main():
         save(path, (json.dumps(obj, indent=2) + "\n").encode())
 
     model("models/block/implantation_rig.json", rig_model())
+    model("models/block/precision_etcher.json", etcher_model())
     model("models/block/kinetic_charger.json", {"parent": "minecraft:block/slab", "textures": {
         "bottom": "cyberimplants:block/implantation_rig_bottom", "top": "cyberimplants:block/kinetic_charger_top",
         "side": "cyberimplants:block/kinetic_charger"}})

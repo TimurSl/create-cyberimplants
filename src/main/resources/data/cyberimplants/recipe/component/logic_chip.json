@@ -29,7 +29,7 @@
       ]
     },
     {
-      "type": "create:cutting",
+      "type": "cyberimplants:etching",
       "ingredients": [
         {
           "item": "cyberimplants:incomplete_logic_chip"
@@ -39,7 +39,8 @@
         {
           "id": "cyberimplants:incomplete_logic_chip"
         }
-      ]
+      ],
+      "min_rpm": 64
     },
     {
       "type": "create:deploying",
@@ -58,7 +59,7 @@
       ]
     },
     {
-      "type": "create:cutting",
+      "type": "cyberimplants:etching",
       "ingredients": [
         {
           "item": "cyberimplants:incomplete_logic_chip"
@@ -68,7 +69,8 @@
         {
           "id": "cyberimplants:incomplete_logic_chip"
         }
-      ]
+      ],
+      "min_rpm": 64
     }
   ],
   "transitional_item": {

@@ -126,7 +126,11 @@ def write_assets():
     charger = "%s:block/kinetic_charger" % MOD
     write_json("assets/%s/blockstates/kinetic_charger.json" % MOD, {"variants": {
         "axis=y": {"model": charger}, "axis=x": {"model": charger}, "axis=z": {"model": charger}}})
-    blocks = ("implantation_rig", "kinetic_charger", "neural_port", "proximity_sensor")
+    etcher = "%s:block/precision_etcher" % MOD
+    write_json("assets/%s/blockstates/precision_etcher.json" % MOD, {"variants": {
+        "facing=north": {"model": etcher}, "facing=east": {"model": etcher, "y": 90},
+        "facing=south": {"model": etcher, "y": 180}, "facing=west": {"model": etcher, "y": 270}}})
+    blocks = ("implantation_rig", "kinetic_charger", "precision_etcher", "neural_port", "proximity_sensor")
     for name in blocks:
         write_json("assets/%s/models/item/%s.json" % (MOD, name), {"parent": "%s:block/%s" % (MOD, name)})
         write_json("data/%s/loot_table/blocks/%s.json" % (MOD, name), {

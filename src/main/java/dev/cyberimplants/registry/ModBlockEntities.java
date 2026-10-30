@@ -2,6 +2,7 @@ package dev.cyberimplants.registry;
 
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.compat.create.block.ChargerBlockEntity;
+import dev.cyberimplants.compat.create.block.EtcherBlockEntity;
 import dev.cyberimplants.compat.create.block.RigBlockEntity;
 import dev.cyberimplants.content.NeuralPortBlockEntity;
 import dev.cyberimplants.content.ProximitySensorBlockEntity;
@@ -23,6 +24,11 @@ public final class ModBlockEntities {
             BLOCK_ENTITY_TYPES.register("kinetic_charger", () ->
                     BlockEntityType.Builder.of((pos, state) -> new ChargerBlockEntity(ModBlockEntities.CHARGER.get(), pos, state),
                             ModBlocks.KINETIC_CHARGER.get()).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<EtcherBlockEntity>> ETCHER =
+            BLOCK_ENTITY_TYPES.register("precision_etcher", () ->
+                    BlockEntityType.Builder.of((pos, state) -> new EtcherBlockEntity(ModBlockEntities.ETCHER.get(), pos, state),
+                            ModBlocks.PRECISION_ETCHER.get()).build(null));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<NeuralPortBlockEntity>> NEURAL_PORT =
             BLOCK_ENTITY_TYPES.register("neural_port", () ->
