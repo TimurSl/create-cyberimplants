@@ -121,6 +121,40 @@ final class FakeHost implements Host {
         return 0.25;
     }
 
+    /** ISA-5 state: the persisted variables the host keeps, stock levels and placed requests. */
+    final Map<String, Object> persisted = new HashMap<>();
+    final Map<String, Double> stock = new HashMap<>();
+    final List<String> requests = new ArrayList<>();
+    int overclocks;
+
+    @Override
+    public boolean overclock() {
+        overclocks++;
+        return true;
+    }
+
+    @Override
+    public boolean request(String item, int count, String network, String address) {
+        requests.add(count + " " + item + " " + network + " -> " + address);
+        return true;
+    }
+
+    @Override
+    public Double stock(String network, String item) {
+        return stock.get(network + "/" + item);
+    }
+
+    @Override
+    public Map<String, Object> restorePersisted() {
+        return Map.copyOf(persisted);
+    }
+
+    @Override
+    public void persist(Map<String, Object> values) {
+        persisted.clear();
+        persisted.putAll(values);
+    }
+
     @Override
     public void taskAborted(VmError error, String detail, int line) {
         aborts.add(error);

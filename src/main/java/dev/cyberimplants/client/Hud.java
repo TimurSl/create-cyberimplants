@@ -341,7 +341,11 @@ final class Hud {
             y += 10;
             for (ScanResultPayload.Marker m : markers) {
                 String name = m.type().contains(":") ? m.type().substring(m.type().indexOf(':') + 1) : m.type();
-                g.drawString(font, String.format("%s  [%s]  %.0fm", name, m.kind(), m.distance()), 6, y, kindColor(m.kind()));
+                String line = String.format("%s  [%s]  %.0fm", name, m.kind(), m.distance());
+                if (!m.implants().isEmpty()) {
+                    line += "  {" + m.implants() + "}";
+                }
+                g.drawString(font, line, 6, y, kindColor(m.kind()));
                 y += 9;
             }
         }
@@ -356,13 +360,7 @@ final class Hud {
     }
 
     private static int kindColor(String kind) {
-        return switch (kind) {
-            case "hostile" -> CyberUi.RED;
-            case "boss" -> 0xFFFF40FF;
-            case "neutral" -> CyberUi.AMBER;
-            case "player" -> 0xFF60C0FF;
-            default -> 0xFF80FF80;
-        };
+        return A11y.kindColor(kind);
     }
 
     private static void bar(GuiGraphics g, int x, int y, int w, int h, double fraction, int color) {

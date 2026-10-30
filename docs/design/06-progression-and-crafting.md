@@ -121,8 +121,9 @@ Rare or biome-bound inputs are item tags so a modpack can swap them without new 
 
 ### Etching
 
-The Precision Etcher (§5) is not built yet. Until it is, every **etch** step of the chains below runs on a **Mechanical
-Saw** (`create:cutting` in the sequenced assembly), so the RPM gates of Tiers III-V only apply to the Rig.
+Every **etch** step of the chains below runs on the **Precision Etcher** (§5), a `cyberimplants:etching` step of the
+sequenced assembly with the tier's `min_rpm`: 64 RPM for Tier III, 128 for Tier IV and 256 for Tier V. Below that
+speed the Etcher lets the item pass, so the assembly stalls until the line spins fast enough.
 
 ### Template: upgrade sequences
 

@@ -31,7 +31,9 @@
         "max_horizontal": 12,
         "full_charge_ticks": 20
       },
-      "unlocks": []
+      "unlocks": [
+        "ground_slam"
+      ]
     },
     {
       "load": 5,
@@ -42,7 +44,10 @@
         "max_horizontal": 16,
         "full_charge_ticks": 16
       },
-      "unlocks": []
+      "unlocks": [
+        "ground_slam",
+        "slam_scaling"
+      ]
     },
     {
       "load": 6,
@@ -53,8 +58,16 @@
         "max_horizontal": 22,
         "full_charge_ticks": 12
       },
-      "unlocks": []
+      "unlocks": [
+        "ground_slam",
+        "rebound",
+        "slam_scaling"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "ground_slam": 3,
+    "rebound": 5,
+    "slam_scaling": 3
+  }
 }

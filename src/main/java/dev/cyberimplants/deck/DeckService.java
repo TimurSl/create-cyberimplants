@@ -3,10 +3,12 @@ package dev.cyberimplants.deck;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
+import dev.cyberimplants.config.Layers;
 import dev.cyberimplants.config.ServerConfig;
 import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.UseResult;
 import dev.cyberimplants.network.DeckStatusPayload;
+import dev.cyberimplants.perf.DeckBudget;
 import dev.cyberimplants.registry.ModAttachments;
 import dev.cyberimplants.synapse.SynapseException;
 import dev.cyberimplants.synapse.compiler.CompiledProgram;
@@ -30,6 +32,18 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class DeckService {
     /** 1 Charge per this many executed cycles (docs/design/03-cyberdeck.md, section 3.4). */
     private static final double CYCLES_PER_CHARGE = 2000.0;
+
+    /** Processor overclock (Tier V, Layer 5): x2 cycles for 10 s at x3 the Charge, then 60 s of cooldown. */
+    public static final int OVERCLOCK_TICKS = 200;
+    public static final int OVERCLOCK_COOLDOWN_TICKS = 1200;
+    public static final int OVERCLOCK_CYCLE_FACTOR = 2;
+    public static final int OVERCLOCK_CHARGE_FACTOR = 3;
+
+    /** Per player: game time the overclock ends, and when it may run again. */
+    private record Overclock(long until, long readyAt) {
+    }
+
+    private static final Map<UUID, Overclock> OVERCLOCKS = new ConcurrentHashMap<>();
 
     /** Per player: thread number -> the program running on it. */
     private static final Map<UUID, Map<Integer, DeckRuntime>> RUNTIMES = new ConcurrentHashMap<>();
@@ -220,6 +234,38 @@ public final class DeckService {
         }
     }
 
+    // ---------------------------------------------------------------- overclock (ISA-5)
+
+    public static UseResult overclock(ServerPlayer player) {
+        DeckHardware hw = DeckHardware.of(BodyState.get(player));
+        if (!Layers.atLeast(5) || hw.processorTier() < 5) {
+            return UseResult.DENIED;
+        }
+        long now = player.level().getGameTime();
+        Overclock current = OVERCLOCKS.get(player.getUUID());
+        if (current != null && now < current.until()) {
+            return UseResult.BUSY;
+        }
+        if (current != null && now < current.readyAt()) {
+            return UseResult.COOLDOWN;
+        }
+        OVERCLOCKS.put(player.getUUID(), new Overclock(now + OVERCLOCK_TICKS, now + OVERCLOCK_TICKS + OVERCLOCK_COOLDOWN_TICKS));
+        runtimes(player).forEach(rt -> rt.log("[overclock] x" + OVERCLOCK_CYCLE_FACTOR + " cycles for "
+                + OVERCLOCK_TICKS / 20 + " s"));
+        return UseResult.OK;
+    }
+
+    public static boolean overclocked(ServerPlayer player) {
+        Overclock current = OVERCLOCKS.get(player.getUUID());
+        return current != null && player.level().getGameTime() < current.until();
+    }
+
+    /** Ticks until the overclock may run again (0 = ready). */
+    public static long overclockCooldown(ServerPlayer player) {
+        Overclock current = OVERCLOCKS.get(player.getUUID());
+        return current == null ? 0 : Math.max(0, current.readyAt() - player.level().getGameTime());
+    }
+
     // ---------------------------------------------------------------- per-tick
 
     public static void tick(ServerPlayer player) {
@@ -230,6 +276,7 @@ public final class DeckService {
         BodyState body = BodyState.get(player);
         DeckHardware hw = DeckHardware.of(body);
         long now = player.level().getGameTime();
+        boolean overclocked = overclocked(player);
         for (DeckRuntime rt : List.copyOf(threads.values())) {
             if (rt.runner().state() != ProgramRunner.State.RUNNING) {
                 continue;
@@ -241,10 +288,17 @@ public final class DeckService {
 
             // Computation costs Charge; a drained battery stalls the deck.
             boolean powered = !Body.chargeEnabled() || body.charge() > 0;
-            int used = powered ? rt.runner().tick(hw.cyclesFor(rt.thread())) : 0;
+            int budget = hw.cyclesFor(rt.thread());
+            if (overclocked) {
+                budget = Math.min(budget * OVERCLOCK_CYCLE_FACTOR, ServerConfig.DECK_MAX_CYCLES_PER_PLAYER_PER_TICK.get());
+            }
+            budget = DeckBudget.claim(budget);
+            long started = System.nanoTime();
+            int used = powered && budget > 0 ? rt.runner().tick(budget) : 0;
+            DeckBudget.record(used, System.nanoTime() - started);
             rt.lastCycles = used;
             if (Body.chargeEnabled() && used > 0) {
-                rt.cycleDebt += used;
+                rt.cycleDebt += overclocked ? used * OVERCLOCK_CHARGE_FACTOR : used;
                 while (rt.cycleDebt >= CYCLES_PER_CHARGE) {
                     rt.cycleDebt -= CYCLES_PER_CHARGE;
                     Body.spend(player, 1.0);

@@ -6,7 +6,8 @@
       "cooldown_ticks": 0,
       "values": {
         "air_control": 0.25,
-        "wall_impact_reduction": 0.2
+        "wall_impact_reduction": 0.2,
+        "redirect_charge": 10.0
       },
       "unlocks": []
     },
@@ -16,7 +17,8 @@
       "cooldown_ticks": 0,
       "values": {
         "air_control": 0.5,
-        "wall_impact_reduction": 0.4
+        "wall_impact_reduction": 0.4,
+        "redirect_charge": 10.0
       },
       "unlocks": []
     },
@@ -26,7 +28,8 @@
       "cooldown_ticks": 0,
       "values": {
         "air_control": 0.75,
-        "wall_impact_reduction": 0.6
+        "wall_impact_reduction": 0.6,
+        "redirect_charge": 10.0
       },
       "unlocks": []
     },
@@ -36,7 +39,8 @@
       "cooldown_ticks": 0,
       "values": {
         "air_control": 1.0,
-        "wall_impact_reduction": 0.8
+        "wall_impact_reduction": 0.8,
+        "redirect_charge": 10.0
       },
       "unlocks": []
     },
@@ -46,10 +50,15 @@
       "cooldown_ticks": 0,
       "values": {
         "air_control": 1.5,
-        "wall_impact_reduction": 1.0
+        "wall_impact_reduction": 1.0,
+        "redirect_charge": 10.0
       },
-      "unlocks": []
+      "unlocks": [
+        "redirect"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "redirect": 5
+  }
 }

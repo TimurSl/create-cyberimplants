@@ -53,8 +53,12 @@
         "indicators": 4,
         "counter_bonus": 0.4
       },
-      "unlocks": []
+      "unlocks": [
+        "precog"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "precog": 5
+  }
 }

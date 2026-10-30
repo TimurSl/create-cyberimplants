@@ -56,6 +56,14 @@ public enum Op {
     MANIPULATE(12),
     /** ISA-2: pop an object, push its member {@code k} freshly sampled (fixed cost of 6). */
     READ(6),
+    /** ISA-5: {@code k} = {@link AwaitInfo}; pops the timeout if it has one, then suspends until an event or the timeout. */
+    AWAIT(1),
+    /** ISA-5: start the Processor overclock. */
+    OVERCLOCK(10),
+    /** ISA-5: pop address, network, count and item; place a logistics package request. */
+    REQUEST(40),
+    /** Pop {@code a} arguments and an object; call its method {@code k}. */
+    INVOKE(4),
     LOG(2),
     ALERT(2),
     STOP(1),

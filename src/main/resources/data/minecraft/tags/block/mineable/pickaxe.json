@@ -3,6 +3,7 @@
   "values": [
     "cyberimplants:implantation_rig",
     "cyberimplants:kinetic_charger",
+    "cyberimplants:precision_etcher",
     "cyberimplants:neural_port",
     "cyberimplants:proximity_sensor"
   ]

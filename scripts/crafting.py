@@ -3,8 +3,8 @@ basic Tier I recipes and the Tier II-V grade upgrades, plus the item tags modpac
 
 Tier I ("basic") implants are shaped crafting-table recipes from andesite-age parts (press, saw, unheated mixer,
 deployer), so the first implant comes right after the andesite age (section 6.5). Every grade above is a sequenced
-assembly on the implant of the previous grade, built from a shared template per tier plus a category part. The
-Precision Etcher is not built yet: its "etch" steps run on a Mechanical Saw (create:cutting) for now.
+assembly on the implant of the previous grade, built from a shared template per tier plus a category part. The "etch"
+steps run on the Precision Etcher (cyberimplants:etching) at 64, 128 or 256 RPM for Tiers III, IV and V.
 
 Everything here is data; gen_data.py writes it.
 """
@@ -111,7 +111,7 @@ SPECIAL_EXOTICS = ("sandevistan", "emergency_defibrillator")
 
 # ---------------------------------------------------------------- component recipes
 def seq(base, transitional, loops, steps, result):
-    """A Create sequenced assembly. steps: ("deploy", ingredient) | ("fill", fluid, mB) | ("press",) | ("cut",)."""
+    """A Create sequenced assembly. steps: ("deploy", ingredient) | ("fill", fluid, mB) | ("press",) | ("etch", min_rpm)."""
     out = []
     for step in steps:
         t = {"id": transitional}
@@ -121,12 +121,16 @@ def seq(base, transitional, loops, steps, result):
             out.append({"type": "create:filling", "ingredients": [{"item": transitional}, fluid(step[1], step[2])], "results": [t]})
         elif step[0] == "press":
             out.append({"type": "create:pressing", "ingredients": [{"item": transitional}], "results": [t]})
-        elif step[0] == "cut":  # "etch" until the Precision Etcher exists
-            out.append({"type": "create:cutting", "ingredients": [{"item": transitional}], "results": [t]})
+        elif step[0] == "etch":
+            out.append({"type": "%s:etching" % MOD, "ingredients": [{"item": transitional}], "results": [t], "min_rpm": step[1]})
         else:
             raise ValueError(step)
     return {"type": "create:sequenced_assembly", "ingredient": base, "loops": loops, "results": [result],
             "sequence": out, "transitional_item": {"id": transitional}}
+
+
+# Precision Etcher steps by technology tier (docs/design/05-create-integration.md): the RPM gates of Tiers III-V.
+E3, E4, E5 = ("etch", 64), ("etch", 128), ("etch", 256)
 
 
 def mixing(ingredients, results, heat=None):
@@ -170,7 +174,7 @@ def component_recipes():
     R["component/silicon_wafer"] = {"type": "create:cutting", "ingredients": [ing(m("silicon_boule"))], "processing_time": 100,
                                     "results": [res(m("silicon_wafer"), 6)]}
     R["component/logic_chip"] = seq(ing(m("silicon_wafer")), m("incomplete_logic_chip"), 2,
-                                    [("fill", INK, 50), ("cut",), ("deploy", "create:electron_tube"), ("cut",)], res(m("logic_chip")))
+                                    [("fill", INK, 50), E3, ("deploy", "create:electron_tube"), E3], res(m("logic_chip")))
     R["component/myomer_bundle"] = mixing([ing(m("synthetic_muscle"))] * 3 + [ing("#c:slime_balls"), fluid(BIO, 100)],
                                           [res(m("myomer_bundle"))], "heated")
     R["component/inked_steel_sheet"] = {"type": "create:filling", "ingredients": [ing(m("tempered_steel_sheet")), fluid(INK, 100)],
@@ -183,13 +187,13 @@ def component_recipes():
                                          [("deploy", m("tempered_steel_sheet")), ("deploy", "#%s:composite_reinforcement" % MOD), ("press",)],
                                          res(m("composite_plate")))
     R["component/military_processor"] = seq(ing(m("logic_chip")), m("incomplete_military_processor"), 3,
-                                            [("deploy", "#c:plates/gold"), ("cut",), ("fill", COOLANT, 100), ("deploy", m("logic_chip")), ("cut",)],
+                                            [("deploy", "#c:plates/gold"), E4, ("fill", COOLANT, 100), ("deploy", m("logic_chip")), E4],
                                             res(m("military_processor")))
     # Tier V - Experimental
     R["component/echo_lattice"] = mixing([ing("#%s:echo_sources" % MOD), ing("create:polished_rose_quartz"),
                                           ing("create:polished_rose_quartz"), fluid(NANITES, 100)], [res(m("echo_lattice"), 2)], "superheated")
     R["component/experimental_core"] = seq(ing(m("military_processor")), m("incomplete_experimental_core"), 1,
-                                           [("deploy", m("echo_lattice")), ("cut",), ("fill", NANITES, 100), ("cut",), ("press",)],
+                                           [("deploy", m("echo_lattice")), E5, ("fill", NANITES, 100), E5, ("press",)],
                                            res(m("experimental_core")))
     R["component/quantum_substrate"] = mixing([ing("#c:gems/amethyst"), ing("#c:ender_pearls"), ing("#%s:echo_sources" % MOD)],
                                               [res(m("quantum_substrate"))], "superheated")
@@ -254,9 +258,9 @@ CATEGORY_PARTS = {
 # The shared template of each tier, after the category part.
 TEMPLATE = {
     2: [D(m("tempered_steel_sheet")), F(BIO, 100), ("press",)],
-    3: [F(INK, 50), ("cut",), D(m("logic_chip"))],
-    4: [F(COOLANT, 100), ("cut",), D(m("composite_plate")), ("press",)],
-    5: [D(m("experimental_core")), F(NANITES, 100), ("cut",)],
+    3: [F(INK, 50), E3, D(m("logic_chip"))],
+    4: [F(COOLANT, 100), E4, D(m("composite_plate")), ("press",)],
+    5: [D(m("experimental_core")), F(NANITES, 100), E5],
 }
 LOOPS = {2: 1, 3: 2, 4: 3, 5: 4}
 TRANSITIONAL = m("incomplete_implant")
@@ -289,6 +293,10 @@ def machine_recipes():
                             "key": {"A": ing("create:andesite_casing"), "R": ing("minecraft:redstone_block"), "C": ing("#c:plates/copper"),
                                     "S": ing("create:shaft"), "W": ing(m("copper_wire"))},
                             "pattern": ["CRC", "SAS", "WCW"], "result": {"id": m("kinetic_charger"), "count": 1}},
+        "precision_etcher": {"type": "minecraft:crafting_shaped", "category": "misc",
+                             "key": {"S": ing("create:shaft"), "B": ing("create:brass_casing"), "P": ing("create:precision_mechanism"),
+                                     "L": ing(m("ground_lens")), "W": ing(m("copper_wire"))},
+                             "pattern": ["WSW", "BPB", " L "], "result": {"id": m("precision_etcher"), "count": 1}},
         "neural_port": {"type": "minecraft:crafting_shaped", "category": "misc",
                         "key": {"T": ing("create:electron_tube"), "C": ing("#c:plates/copper"), "A": ing("create:andesite_casing"),
                                 "W": ing(m("copper_wire"))},

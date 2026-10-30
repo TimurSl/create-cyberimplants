@@ -1,18 +1,29 @@
 package dev.cyberimplants.deck;
 
+import dev.cyberimplants.body.BodyState;
+import dev.cyberimplants.compat.create.CreateCompat;
+import dev.cyberimplants.config.Layers;
 import dev.cyberimplants.implant.ImplantAction;
 import dev.cyberimplants.implant.ImplantActions;
 import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.UseContext;
 import dev.cyberimplants.implant.UseResult;
 import dev.cyberimplants.implant.optical.TargetTracking;
+import dev.cyberimplants.registry.ModAttachments;
 import dev.cyberimplants.synapse.vm.Host;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.UUID;
 
 /** Binds a running Synapse program to its owner's implants. */
 final class DeckHost implements Host {
@@ -117,6 +128,78 @@ final class DeckHost implements Host {
     @Override
     public boolean scan() {
         return activate("scanner", null, Map.of());
+    }
+
+    @Override
+    public boolean overclock() {
+        UseResult result = DeckService.overclock(player);
+        return result.ok() || fail(result);
+    }
+
+    /** Machine Interface Tier V: {@code network} names a bound Neural Port plugged into a Stock Link or Stock Ticker. */
+    @Override
+    public boolean request(String item, int count, String network, String address) {
+        if (!logistics()) {
+            return fail(UseResult.DENIED);
+        }
+        ItemStack stack = item(item);
+        Optional<UUID> freq = network(network);
+        if (stack.isEmpty() || freq.isEmpty()) {
+            return fail(UseResult.MISSING);
+        }
+        return CreateCompat.logistics().request(freq.get(), stack, count, address) || fail(UseResult.MISSING);
+    }
+
+    @Override
+    public Double stock(String network, String item) {
+        if (!logistics()) {
+            fail(UseResult.DENIED);
+            return null;
+        }
+        ItemStack stack = item(item);
+        Optional<UUID> freq = network(network);
+        if (stack.isEmpty() || freq.isEmpty()) {
+            return null;
+        }
+        OptionalInt count = CreateCompat.logistics().stock(freq.get(), stack);
+        return count.isPresent() ? (double) count.getAsInt() : null;
+    }
+
+    private boolean logistics() {
+        return Layers.atLeast(5) && DeckHardware.of(BodyState.get(player)).machineInterface() >= 5;
+    }
+
+    private Optional<UUID> network(String portName) {
+        BlockPos target = new PortHandle(player, portName).targetPos();
+        return target == null ? Optional.empty() : CreateCompat.logistics().network(player, target);
+    }
+
+    private static ItemStack item(String id) {
+        ResourceLocation key = ResourceLocation.tryParse(id);
+        return key == null ? ItemStack.EMPTY : BuiltInRegistries.ITEM.getOptional(key).map(ItemStack::new).orElse(ItemStack.EMPTY);
+    }
+
+    @Override
+    public Map<String, Object> restorePersisted() {
+        DeckRuntime r = runtime.get();
+        Map<String, String> saved = r == null ? null : player.getData(ModAttachments.DECK_DATA).persisted().get(r.programName());
+        if (saved == null) {
+            return Map.of();
+        }
+        Map<String, Object> out = new HashMap<>();
+        saved.forEach((name, text) -> out.put(name, DeckData.decode(text)));
+        return out;
+    }
+
+    @Override
+    public void persist(Map<String, Object> values) {
+        DeckRuntime r = runtime.get();
+        if (r == null) {
+            return;
+        }
+        Map<String, String> encoded = new HashMap<>();
+        values.forEach((name, value) -> encoded.put(name, DeckData.encode(value)));
+        player.setData(ModAttachments.DECK_DATA, player.getData(ModAttachments.DECK_DATA).withPersisted(r.programName(), encoded));
     }
 
     @Override

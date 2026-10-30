@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "cyberimplants:block/precision_etcher"
+    },
+    "facing=east": {
+      "model": "cyberimplants:block/precision_etcher",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "cyberimplants:block/precision_etcher",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "cyberimplants:block/precision_etcher",
+      "y": 270
+    }
+  }
+}

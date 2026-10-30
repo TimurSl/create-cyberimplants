@@ -53,8 +53,12 @@
         "jump_strength": 0.21,
         "step_height": 0.65
       },
-      "unlocks": []
+      "unlocks": [
+        "elastic_recoil"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "elastic_recoil": 5
+  }
 }

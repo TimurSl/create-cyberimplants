@@ -5,10 +5,14 @@ import dev.cyberimplants.body.BodyState;
 import dev.cyberimplants.data.Stats;
 import dev.cyberimplants.implant.ImplantAction;
 import dev.cyberimplants.implant.ImplantActions;
+import dev.cyberimplants.implant.ImplantIds;
+import dev.cyberimplants.synapse.IsaLevel;
 import dev.cyberimplants.synapse.compiler.Ticks;
 import dev.cyberimplants.synapse.vm.Handle;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+
+import java.util.List;
 
 /** A script's view of one implant: common members here, implant-specific ones in {@link ImplantProps}. */
 final class ImplantHandle implements Handle {
@@ -50,5 +54,15 @@ final class ImplantHandle implements Handle {
     @Override
     public boolean set(String member, Object value) {
         return BodyState.get(player).has(type) && ImplantProps.set(player, type, member, value);
+    }
+
+    /** Implant methods: the Combat Predictor's {@code predict.position} and {@code predict.windup}. */
+    @Override
+    public Object invoke(String method, List<Object> args, IsaLevel isa) {
+        int tier = BodyState.get(player).tierOf(type);
+        if (!type.equals(ImplantIds.COMBAT_PREDICTOR)) {
+            throw new UnsupportedOperationException(method);
+        }
+        return tier == 0 ? null : Prediction.invoke(player, tier, method, args, isa);
     }
 }

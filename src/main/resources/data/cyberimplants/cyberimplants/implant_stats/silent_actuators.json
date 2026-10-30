@@ -53,8 +53,12 @@
         "sneak_speed": 0.35,
         "sneak_detection_reduction": 0.4
       },
-      "unlocks": []
+      "unlocks": [
+        "ghost_step"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "ghost_step": 5
+  }
 }

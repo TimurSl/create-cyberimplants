@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "S": {
+      "item": "create:shaft"
+    },
+    "B": {
+      "item": "create:brass_casing"
+    },
+    "P": {
+      "item": "create:precision_mechanism"
+    },
+    "L": {
+      "item": "cyberimplants:ground_lens"
+    },
+    "W": {
+      "item": "cyberimplants:copper_wire"
+    }
+  },
+  "pattern": [
+    "WSW",
+    "BPB",
+    " L "
+  ],
+  "result": {
+    "id": "cyberimplants:precision_etcher",
+    "count": 1
+  }
+}

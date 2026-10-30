@@ -150,4 +150,26 @@ class StatAuditTest {
             }
         }
     }
+
+    /** Layer 5: Tier III-V grades etch on the Precision Etcher at 64, 128 and 256 RPM; nothing etches on a saw any more. */
+    @Test
+    void etchStepsUseTheEtcherAtTheTierSpeed() throws IOException {
+        int[] rpm = {0, 0, 0, 64, 128, 256};
+        for (Path file : statFiles()) {
+            String id = file.getFileName().toString().replace(".json", "");
+            for (int tier = 2; tier <= 5; tier++) {
+                JsonArray sequence = read(RECIPES.resolve("upgrade/" + id + "_t" + tier + ".json")).getAsJsonArray("sequence");
+                boolean etched = false;
+                for (JsonElement step : sequence) {
+                    JsonObject o = step.getAsJsonObject();
+                    assertFalse(o.get("type").getAsString().equals("create:cutting"), id + " T" + tier + " still cuts");
+                    if (o.get("type").getAsString().equals("cyberimplants:etching")) {
+                        etched = true;
+                        assertEquals(rpm[tier], o.get("min_rpm").getAsInt(), id + " T" + tier + " etches at the tier's speed");
+                    }
+                }
+                assertEquals(tier >= 3, etched, id + " T" + tier + " etch step");
+            }
+        }
+    }
 }

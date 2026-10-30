@@ -58,6 +58,58 @@ def generated_model(name):
                {"parent": "minecraft:item/generated", "textures": {"layer0": "%s:item/%s" % (MOD, name)}})
 
 
+def structure_nbt(size, blocks):
+    """A structure template (gzipped NBT) for Ponder scenes. blocks: [(x, y, z, block id, {property: value})]."""
+    palette = []
+    for _x, _y, _z, name, props in blocks:
+        if (name, props) not in palette:
+            palette.append((name, props))
+    out = b"\x0a" + nbt_string("")
+    out += b"\x03" + nbt_string("DataVersion") + struct.pack(">i", 3955)
+    out += b"\x09" + nbt_string("size") + b"\x03" + struct.pack(">i", 3) + b"".join(struct.pack(">i", n) for n in size)
+    out += b"\x09" + nbt_string("blocks") + b"\x0a" + struct.pack(">i", len(blocks))
+    for x, y, z, name, props in blocks:
+        out += b"\x09" + nbt_string("pos") + b"\x03" + struct.pack(">i", 3) + struct.pack(">iii", x, y, z)
+        out += b"\x03" + nbt_string("state") + struct.pack(">i", palette.index((name, props)))
+        out += b"\x00"
+    out += b"\x09" + nbt_string("entities") + b"\x0a" + struct.pack(">i", 0)
+    out += b"\x09" + nbt_string("palette") + b"\x0a" + struct.pack(">i", len(palette))
+    for name, props in palette:
+        out += b"\x08" + nbt_string("Name") + nbt_string(name)
+        if props:
+            out += b"\x0a" + nbt_string("Properties")
+            for k, v in sorted(props.items()):
+                out += b"\x08" + nbt_string(k) + nbt_string(v)
+            out += b"\x00"
+        out += b"\x00"
+    out += b"\x00"
+    return gzip.compress(out, 9, mtime=0)
+
+
+def ponder_schematic(machine):
+    """A 5x5 smooth stone plate with one of the mod's machines and what drives or reads it (see compat.create.ponder)."""
+    floor = [(x, 0, z, "minecraft:smooth_stone", {}) for x in range(5) for z in range(5)]
+    shaft_x = lambda x, y, z: (x, y, z, "create:shaft", {"axis": "x"})  # noqa: E731
+    shaft_z = lambda x, y, z: (x, y, z, "create:shaft", {"axis": "z"})  # noqa: E731
+    parts = {
+        "implantation_rig": [(2, 1, 2, m_id("implantation_rig"), {"facing": "north"}), shaft_z(2, 1, 3), shaft_z(2, 1, 4)],
+        "kinetic_charger": [(2, 1, 2, m_id("kinetic_charger"), {"axis": "x"}), shaft_x(3, 1, 2), shaft_x(4, 1, 2)],
+        "precision_etcher": [(2, 1, 2, "create:depot", {}), (2, 3, 2, m_id("precision_etcher"), {"facing": "east"}),
+                             shaft_x(3, 3, 2), shaft_x(4, 3, 2)],
+        "neural_port": [(2, 1, 2, "create:gearbox", {"axis": "y"}), (2, 1, 1, m_id("neural_port"), {"facing": "south"}),
+                        shaft_z(2, 1, 3), shaft_z(2, 1, 4)],
+        "proximity_sensor": [(2, 1, 2, m_id("proximity_sensor"), {}), (3, 1, 2, "minecraft:redstone_lamp", {"lit": "false"})],
+    }
+    return structure_nbt((5, 4, 5), floor + parts[machine])
+
+
+def m_id(name):
+    return "%s:%s" % (MOD, name)
+
+
+PONDER_MACHINES = ("implantation_rig", "kinetic_charger", "precision_etcher", "neural_port", "proximity_sensor")
+
+
 # ---------------------------------------------------------------- stats
 def write_stats():
     for ident, (category, loads, charge, cooldown, values) in IMPLANTS.items():
@@ -126,7 +178,11 @@ def write_assets():
     charger = "%s:block/kinetic_charger" % MOD
     write_json("assets/%s/blockstates/kinetic_charger.json" % MOD, {"variants": {
         "axis=y": {"model": charger}, "axis=x": {"model": charger}, "axis=z": {"model": charger}}})
-    blocks = ("implantation_rig", "kinetic_charger", "neural_port", "proximity_sensor")
+    etcher = "%s:block/precision_etcher" % MOD
+    write_json("assets/%s/blockstates/precision_etcher.json" % MOD, {"variants": {
+        "facing=north": {"model": etcher}, "facing=east": {"model": etcher, "y": 90},
+        "facing=south": {"model": etcher, "y": 180}, "facing=west": {"model": etcher, "y": 270}}})
+    blocks = ("implantation_rig", "kinetic_charger", "precision_etcher", "neural_port", "proximity_sensor")
     for name in blocks:
         write_json("assets/%s/models/item/%s.json" % (MOD, name), {"parent": "%s:block/%s" % (MOD, name)})
         write_json("data/%s/loot_table/blocks/%s.json" % (MOD, name), {
@@ -142,6 +198,11 @@ def write_assets():
     os.makedirs(os.path.dirname(path), exist_ok=True)
     with open(path, "wb") as f:
         f.write(empty_structure_nbt())
+    for machine in PONDER_MACHINES:
+        path = os.path.join(ROOT, "assets", MOD, "ponder", machine + ".nbt")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "wb") as f:
+            f.write(ponder_schematic(machine))
 
 
 # ---------------------------------------------------------------- language

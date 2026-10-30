@@ -30,11 +30,12 @@ import java.util.Map;
  * @param logLines           program log buffer
  * @param minEveryTicks      shortest {@code EVERY} interval the Processor allows
  * @param machineInterface   tier of the installed Machine Interface (0 = none; the chassis' built-in interface is T1)
+ * @param processorTier      tier of the Processor (0 if absent); Tier V can overclock
  */
 public record DeckHardware(boolean booted, int chassisTier, int cyclesPerTick, IsaLevel isa, int ramCells, int storageBytes,
                            List<Integer> extraThreadCycles, int latencyTicks, int macroKeys, int logLines,
-                           int minEveryTicks, int machineInterface) {
-    public static final DeckHardware NONE = new DeckHardware(false, 0, 0, IsaLevel.ISA_1, 0, 0, List.of(), 0, 0, 20, 1, 0);
+                           int minEveryTicks, int machineInterface, int processorTier) {
+    public static final DeckHardware NONE = new DeckHardware(false, 0, 0, IsaLevel.ISA_1, 0, 0, List.of(), 0, 0, 20, 1, 0, 0);
 
     public DeckHardware {
         extraThreadCycles = List.copyOf(extraThreadCycles);
@@ -85,7 +86,7 @@ public record DeckHardware(boolean booted, int chassisTier, int cyclesPerTick, I
             }
         }
         if (processor == 0 || ramKb == 0 || storageKb == 0) {
-            return new DeckHardware(false, chassis.tier(), 0, IsaLevel.ISA_1, 0, 0, List.of(), latency, macroKeys, logLines, 1, 0);
+            return new DeckHardware(false, chassis.tier(), 0, IsaLevel.ISA_1, 0, 0, List.of(), latency, macroKeys, logLines, 1, 0, processor);
         }
         var processorStats = Stats.of(ImplantIds.DECK_PROCESSOR, processor);
         int isaNumber = (int) processorStats.value("isa", 1);
@@ -94,7 +95,7 @@ public record DeckHardware(boolean booted, int chassisTier, int cyclesPerTick, I
         int cycles = (int) Math.min(processorStats.value("cycles_per_tick", 20), cap);
         List<Integer> capped = extra.stream().map(c -> Math.min(c, cap)).toList();
         return new DeckHardware(true, chassis.tier(), cycles, isa, (int) (ramKb * 64), (int) (storageKb * 1024), capped,
-                latency, macroKeys, logLines, (int) processorStats.value("min_every_ticks", 1), machineInterface);
+                latency, macroKeys, logLines, (int) processorStats.value("min_every_ticks", 1), machineInterface, processor);
     }
 
     /** The ISA a layer allows: layer 1 runs ISA-1, layer 2 ISA-2, and layers 3 and 4 share ISA-4 (layer 3 adds ISA-3). */

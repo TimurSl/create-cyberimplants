@@ -23,6 +23,7 @@ public final class ModCreativeTabs {
                         output.accept(ModItems.FLECHETTE.get());
                         output.accept(ModItems.IMPLANTATION_RIG.get());
                         output.accept(ModItems.KINETIC_CHARGER.get());
+                        output.accept(ModItems.PRECISION_ETCHER.get());
                         output.accept(ModItems.NEURAL_PORT.get());
                         output.accept(ModItems.PROXIMITY_SENSOR.get());
                         output.accept(ModItems.NEURO_STABILIZER.get());

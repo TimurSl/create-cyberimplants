@@ -27,7 +27,7 @@
       ]
     },
     {
-      "type": "create:cutting",
+      "type": "cyberimplants:etching",
       "ingredients": [
         {
           "item": "cyberimplants:incomplete_military_processor"
@@ -37,7 +37,8 @@
         {
           "id": "cyberimplants:incomplete_military_processor"
         }
-      ]
+      ],
+      "min_rpm": 128
     },
     {
       "type": "create:filling",
@@ -74,7 +75,7 @@
       ]
     },
     {
-      "type": "create:cutting",
+      "type": "cyberimplants:etching",
       "ingredients": [
         {
           "item": "cyberimplants:incomplete_military_processor"
@@ -84,7 +85,8 @@
         {
           "id": "cyberimplants:incomplete_military_processor"
         }
-      ]
+      ],
+      "min_rpm": 128
     }
   ],
   "transitional_item": {
