@@ -1,0 +1,26 @@
+{
+  "type": "create:mixing",
+  "ingredients": [
+    {
+      "tag": "c:strings"
+    },
+    {
+      "tag": "c:strings"
+    },
+    {
+      "tag": "cyberimplants:fiber_fillers"
+    },
+    {
+      "tag": "cyberimplants:fiber_fillers"
+    },
+    {
+      "tag": "c:slime_balls"
+    }
+  ],
+  "results": [
+    {
+      "id": "cyberimplants:synthetic_fiber",
+      "count": 4
+    }
+  ]
+}

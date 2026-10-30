@@ -6,22 +6,25 @@
       "item": "create:andesite_casing"
     },
     "I": {
-      "item": "create:iron_sheet"
+      "tag": "c:plates/iron"
     },
     "M": {
-      "item": "create:precision_mechanism"
+      "item": "cyberimplants:mechanical_servo"
     },
     "S": {
       "item": "create:shaft"
     },
     "C": {
       "item": "create:cogwheel"
+    },
+    "K": {
+      "item": "cyberimplants:civilian_casing"
     }
   },
   "pattern": [
     "IMI",
-    "SAC",
-    "III"
+    "SKC",
+    "IAI"
   ],
   "result": {
     "id": "cyberimplants:implantation_rig",

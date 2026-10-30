@@ -65,12 +65,14 @@
       },
       "unlocks": [
         "cleanses",
-        "knockback_immune"
+        "knockback_immune",
+        "manual_activation"
       ]
     }
   ],
   "unlock_layers": {
     "cleanses": 3,
-    "knockback_immune": 3
+    "knockback_immune": 3,
+    "manual_activation": 5
   }
 }

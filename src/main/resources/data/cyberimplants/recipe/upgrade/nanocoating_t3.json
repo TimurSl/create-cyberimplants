@@ -25,23 +25,7 @@
           "item": "cyberimplants:incomplete_implant"
         },
         {
-          "item": "minecraft:string"
-        }
-      ],
-      "results": [
-        {
-          "id": "cyberimplants:incomplete_implant"
-        }
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "ingredients": [
-        {
-          "item": "cyberimplants:incomplete_implant"
-        },
-        {
-          "item": "create:precision_mechanism"
+          "item": "cyberimplants:inked_steel_sheet"
         }
       ],
       "results": [
@@ -58,8 +42,21 @@
         },
         {
           "type": "neoforge:single",
-          "amount": 100,
-          "fluid": "cyberimplants:bio_interface_gel"
+          "amount": 50,
+          "fluid": "cyberimplants:conductive_ink"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_implant"
+        }
+      ]
+    },
+    {
+      "type": "create:cutting",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_implant"
         }
       ],
       "results": [
@@ -75,20 +72,7 @@
           "item": "cyberimplants:incomplete_implant"
         },
         {
-          "item": "create:golden_sheet"
-        }
-      ],
-      "results": [
-        {
-          "id": "cyberimplants:incomplete_implant"
-        }
-      ]
-    },
-    {
-      "type": "create:pressing",
-      "ingredients": [
-        {
-          "item": "cyberimplants:incomplete_implant"
+          "item": "cyberimplants:logic_chip"
         }
       ],
       "results": [

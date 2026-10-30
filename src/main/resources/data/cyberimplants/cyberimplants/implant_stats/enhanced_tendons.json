@@ -48,8 +48,12 @@
         "air_jumps": 3,
         "strength": 1.0
       },
-      "unlocks": []
+      "unlocks": [
+        "gust"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "gust": 5
+  }
 }

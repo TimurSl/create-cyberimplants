@@ -1,0 +1,13 @@
+{
+  "type": "create:haunting",
+  "ingredients": [
+    {
+      "item": "cyberimplants:ground_lens"
+    }
+  ],
+  "results": [
+    {
+      "id": "cyberimplants:phase_lens"
+    }
+  ]
+}

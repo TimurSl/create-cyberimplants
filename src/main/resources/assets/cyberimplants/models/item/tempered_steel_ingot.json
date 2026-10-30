@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "cyberimplants:item/tempered_steel_ingot"
+  }
+}

@@ -4,6 +4,7 @@ import dev.cyberimplants.fx.ImplantFx;
 import dev.cyberimplants.CyberImplants;
 import dev.cyberimplants.body.Body;
 import dev.cyberimplants.body.BodyState;
+import dev.cyberimplants.body.BodySync;
 import dev.cyberimplants.data.Stats;
 import dev.cyberimplants.data.TierStats;
 import dev.cyberimplants.deck.DeckEvents;
@@ -22,16 +23,20 @@ import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Enemy;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Shock Circuit: melee attackers take an electric discharge. Projectiles don't trigger it. Each proc costs Charge,
- * and a Creeper that is shocked becomes charged, as if struck by lightning.
+ * and a Creeper that is shocked becomes charged, as if struck by lightning. Tier V (Layer 5): the arc chains to three
+ * enemies, and Grounded makes the user immune to lightning, which fully recharges the battery instead.
  */
 @EventBusSubscriber(modid = CyberImplants.MOD_ID)
 public final class ShockCircuit {
@@ -75,15 +80,25 @@ public final class ShockCircuit {
         float damage = (float) stats.value("damage", 2.0);
         shock(level, player, attacker, damage, tier);
         ImplantFx.shock(player, attacker, false);
-        if (Stats.unlocked(ImplantIds.SHOCK_CIRCUIT, tier, "chain_one")) {
-            // Tier III: the discharge arcs to one more hostile within 4 blocks.
-            attacker.level().getEntitiesOfClass(LivingEntity.class, attacker.getBoundingBox().inflate(CHAIN_RANGE),
-                            e -> e != player && e != attacker && e.isAlive() && e instanceof Enemy)
-                    .stream().min(Comparator.comparingDouble(e -> e.distanceToSqr(attacker)))
-                    .ifPresent(next -> {
-                        shock(level, player, next, damage, tier);
-                        ImplantFx.shockChain(player, attacker, next);
-                    });
+        int chain = Stats.unlocked(ImplantIds.SHOCK_CIRCUIT, tier, "chain_three") ? 3
+                : Stats.unlocked(ImplantIds.SHOCK_CIRCUIT, tier, "chain_one") ? 1 : 0;
+        if (chain > 0) {
+            // Tier III: the discharge arcs to one more hostile within 4 blocks; Tier V to three, each from the last one hit.
+            LivingEntity from = attacker;
+            Set<LivingEntity> hit = new HashSet<>(Set.of(player, attacker));
+            for (int i = 0; i < chain; i++) {
+                LivingEntity source = from;
+                LivingEntity next = source.level().getEntitiesOfClass(LivingEntity.class, source.getBoundingBox().inflate(CHAIN_RANGE),
+                                e -> !hit.contains(e) && e.isAlive() && e instanceof Enemy)
+                        .stream().min(Comparator.comparingDouble(e -> e.distanceToSqr(source))).orElse(null);
+                if (next == null) {
+                    break;
+                }
+                shock(level, player, next, damage, tier);
+                ImplantFx.shockChain(player, source, next);
+                hit.add(next);
+                from = next;
+            }
         }
         if (attacker instanceof Creeper creeper && !creeper.isPowered()) {
             LightningBolt bolt = EntityType.LIGHTNING_BOLT.create(level);
@@ -92,6 +107,17 @@ public final class ShockCircuit {
             }
         }
         DeckEvents.fire(player, "shock_proc", Map.of("attacker", EntityHandle.of(player, attacker)));
+    }
+
+    /** Tier V Grounded: lightning does no harm and refills the battery. */
+    @SubscribeEvent
+    public static void onLightning(EntityStruckByLightningEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player && Stats.unlocked(player, ImplantIds.SHOCK_CIRCUIT, "grounded")) {
+            event.setCanceled(true);
+            Body.addCharge(player, Body.maxCharge(BodyState.get(player)));
+            BodySync.markDirty(player);
+            ImplantFx.shock(player, player, true);
+        }
     }
 
     private ShockCircuit() {

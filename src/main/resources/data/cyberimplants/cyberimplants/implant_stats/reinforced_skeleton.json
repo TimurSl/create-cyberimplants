@@ -53,8 +53,12 @@
         "machinery": 0.7,
         "max_health": 6
       },
-      "unlocks": []
+      "unlocks": [
+        "crit_immune"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "crit_immune": 5
+  }
 }

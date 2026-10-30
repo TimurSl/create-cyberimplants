@@ -1,0 +1,28 @@
+{
+  "type": "create:mixing",
+  "heat_requirement": "heated",
+  "ingredients": [
+    {
+      "item": "cyberimplants:synthetic_muscle"
+    },
+    {
+      "item": "cyberimplants:synthetic_muscle"
+    },
+    {
+      "item": "cyberimplants:synthetic_muscle"
+    },
+    {
+      "tag": "c:slime_balls"
+    },
+    {
+      "type": "neoforge:single",
+      "amount": 100,
+      "fluid": "cyberimplants:bio_interface_gel"
+    }
+  ],
+  "results": [
+    {
+      "id": "cyberimplants:myomer_bundle"
+    }
+  ]
+}

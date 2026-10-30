@@ -19,29 +19,15 @@
   ],
   "sequence": [
     {
-      "type": "create:deploying",
+      "type": "create:filling",
       "ingredients": [
         {
           "item": "cyberimplants:incomplete_implant"
         },
         {
-          "item": "minecraft:string"
-        }
-      ],
-      "results": [
-        {
-          "id": "cyberimplants:incomplete_implant"
-        }
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "ingredients": [
-        {
-          "item": "cyberimplants:incomplete_implant"
-        },
-        {
-          "item": "minecraft:netherite_scrap"
+          "type": "neoforge:single",
+          "amount": 100,
+          "fluid": "cyberimplants:nanite_suspension"
         }
       ],
       "results": [
@@ -59,7 +45,20 @@
         {
           "type": "neoforge:single",
           "amount": 100,
-          "fluid": "cyberimplants:neural_gel"
+          "fluid": "cyberimplants:cryo_coolant"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_implant"
+        }
+      ]
+    },
+    {
+      "type": "create:cutting",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_implant"
         }
       ],
       "results": [
@@ -75,7 +74,7 @@
           "item": "cyberimplants:incomplete_implant"
         },
         {
-          "item": "create:sturdy_sheet"
+          "item": "cyberimplants:composite_plate"
         }
       ],
       "results": [

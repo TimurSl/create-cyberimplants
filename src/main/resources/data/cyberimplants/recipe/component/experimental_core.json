@@ -1,0 +1,90 @@
+{
+  "type": "create:sequenced_assembly",
+  "ingredient": {
+    "item": "cyberimplants:military_processor"
+  },
+  "loops": 1,
+  "results": [
+    {
+      "id": "cyberimplants:experimental_core"
+    }
+  ],
+  "sequence": [
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_experimental_core"
+        },
+        {
+          "item": "cyberimplants:echo_lattice"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_experimental_core"
+        }
+      ]
+    },
+    {
+      "type": "create:cutting",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_experimental_core"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_experimental_core"
+        }
+      ]
+    },
+    {
+      "type": "create:filling",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_experimental_core"
+        },
+        {
+          "type": "neoforge:single",
+          "amount": 100,
+          "fluid": "cyberimplants:nanite_suspension"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_experimental_core"
+        }
+      ]
+    },
+    {
+      "type": "create:cutting",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_experimental_core"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_experimental_core"
+        }
+      ]
+    },
+    {
+      "type": "create:pressing",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_experimental_core"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_experimental_core"
+        }
+      ]
+    }
+  ],
+  "transitional_item": {
+    "id": "cyberimplants:incomplete_experimental_core"
+  }
+}

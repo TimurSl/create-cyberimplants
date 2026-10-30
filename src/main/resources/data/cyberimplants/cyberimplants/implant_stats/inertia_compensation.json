@@ -48,8 +48,12 @@
         "turn_speed_kept": 0.9,
         "knockback_resistance": 0.4
       },
-      "unlocks": []
+      "unlocks": [
+        "blast_resistant"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "blast_resistant": 5
+  }
 }

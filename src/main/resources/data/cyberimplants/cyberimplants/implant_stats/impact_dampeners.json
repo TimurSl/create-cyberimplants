@@ -58,8 +58,12 @@
         "energy_per_block": 4,
         "recovery_cap": 50
       },
-      "unlocks": []
+      "unlocks": [
+        "recoil_storage"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "recoil_storage": 5
+  }
 }

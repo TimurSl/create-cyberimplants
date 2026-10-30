@@ -73,11 +73,13 @@
         "emergency_cooldown_ticks": 900
       },
       "unlocks": [
-        "absorbs_projectiles"
+        "absorbs_projectiles",
+        "overcharge"
       ]
     }
   ],
   "unlock_layers": {
-    "absorbs_projectiles": 3
+    "absorbs_projectiles": 3,
+    "overcharge": 5
   }
 }

@@ -6,6 +6,7 @@ import dev.cyberimplants.data.Stats;
 import dev.cyberimplants.data.TierStats;
 import dev.cyberimplants.deck.DeckEvents;
 import dev.cyberimplants.fx.ImplantFx;
+import dev.cyberimplants.implant.Attrs;
 import dev.cyberimplants.implant.ImplantAction;
 import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.Tags;
@@ -23,6 +24,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -39,14 +41,32 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Sandevistan (docs/design/implants/a-neural.md): a stationary temporal field. Entities inside run only a fraction
  * of their ticks while their hurt cooldown keeps counting at real speed, so the user gets a hit window.
- * Layer 1: fixed slow, cast on self, no unlocks.
+ * Tier V (Layer 5): Temporal Anchor spares the owner's allies and speeds up the owner's attacks inside the field.
  */
 @EventBusSubscriber(modid = CyberImplants.MOD_ID)
 public final class Sandevistan {
-    /** An active field. {@code usedFraction} feeds the cooldown refund when it is cut short. */
-    private record Field(ResourceKey<Level> dimension, Vec3 center, double radius, long endTick, double scale,
-                         int durationTicks, int maxDurationTicks) {
+    /**
+     * An active field. {@code durationTicks / maxDurationTicks} feeds the cooldown refund when it is cut short.
+     * {@code anchor} is the Tier V Temporal Anchor: the owner's allies are not slowed.
+     */
+    private record Field(UUID owner, ResourceKey<Level> dimension, Vec3 center, double radius, long endTick, double scale,
+                         int durationTicks, int maxDurationTicks, boolean anchor) {
+        boolean contains(Entity entity) {
+            return dimension.equals(entity.level().dimension()) && entity.position().distanceToSqr(center) <= radius * radius;
+        }
+
+        /** Temporal Anchor: teammates (scoreboard teams) and the owner's tamed animals keep real time. */
+        boolean spares(Entity entity) {
+            if (!anchor) {
+                return false;
+            }
+            Player ownerPlayer = entity.level().getPlayerByUUID(owner);
+            return ownerPlayer != null && (entity.isAlliedTo(ownerPlayer) || ownerPlayer.isAlliedTo(entity));
+        }
     }
+
+    /** Temporal Anchor: the owner's attack speed inside their own field. */
+    private static final double ANCHOR_ATTACK_SPEED = 0.25;
 
     private static final Map<UUID, Field> FIELDS = new ConcurrentHashMap<>();
     private static final Map<UUID, Double> ACCUMULATORS = new ConcurrentHashMap<>();
@@ -76,8 +96,9 @@ public final class Sandevistan {
                 return UseResult.NO_CHARGE;
             }
 
-            Field field = new Field(player.level().dimension(), player.position(), radius,
-                    player.level().getGameTime() + duration, scale, duration, maxDuration);
+            boolean anchor = Stats.unlocked(player, ImplantIds.SANDEVISTAN, "temporal_anchor");
+            Field field = new Field(player.getUUID(), player.level().dimension(), player.position(), radius,
+                    player.level().getGameTime() + duration, scale, duration, maxDuration, anchor);
             FIELDS.put(player.getUUID(), field);
             ImplantFx.sandevistanStart(player, field.center, radius, duration);
             DeckEvents.fire(player, "chrono_field_started", Map.of("position", new Position(field.center.x, field.center.y, field.center.z)));
@@ -111,6 +132,7 @@ public final class Sandevistan {
         if (FIELDS.isEmpty()) {
             ACCUMULATORS.clear();
         }
+        Attrs.multiplied(owner, Attributes.ATTACK_SPEED, "sandevistan_anchor", 0, false);
         if (owner.isAlive()) {
             owner.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 0));
         }
@@ -141,8 +163,7 @@ public final class Sandevistan {
             return;
         }
         for (Field field : FIELDS.values()) {
-            if (!field.dimension.equals(entity.level().dimension())
-                    || entity.position().distanceToSqr(field.center) > field.radius * field.radius) {
+            if (!field.contains(entity) || field.spares(entity)) {
                 continue;
             }
             double scale = entity.getType().is(Tags.AUGMENT_RESISTANT) ? Math.max(field.scale, 0.5) : field.scale;
@@ -187,11 +208,13 @@ public final class Sandevistan {
         // Other players cannot have ticks skipped: slow them instead (docs/design/08-technical-architecture.md, 8.7).
         if (owner.tickCount % 10 == 0) {
             for (ServerPlayer other : level.players()) {
-                if (other != owner && other.position().distanceToSqr(field.center) <= field.radius * field.radius) {
+                if (other != owner && field.contains(other) && !field.spares(other)) {
                     other.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 15, 2, false, true));
                 }
             }
         }
+        Attrs.multiplied(owner, Attributes.ATTACK_SPEED, "sandevistan_anchor", ANCHOR_ATTACK_SPEED,
+                field.anchor && field.contains(owner));
         long age = level.getGameTime() - (field.endTick - field.durationTicks);
         ImplantFx.sandevistanTick(owner, field.center, field.radius, age);
         if (owner.tickCount % 3 == 0) {

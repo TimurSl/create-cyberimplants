@@ -24,15 +24,25 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Kinetic Shield: a regenerating absorb pool that takes a share of each hit. The pool lives in the synced body data
- * (key {@code shield}; -1 means "full") so the HUD can show it. Recharging costs Charge.
+ * (key {@code shield}; -1 means "full") so the HUD can show it. Recharging costs Charge. Tier V Overcharge (Layer 5):
+ * once the pool is full, an installed Energy Buffer keeps feeding it up to 150%.
  */
 @EventBusSubscriber(modid = CyberImplants.MOD_ID)
 public final class KineticShield {
     public static final String KEY = "shield";
     private static final Map<UUID, Long> LAST_HIT = new ConcurrentHashMap<>();
 
+    private static final double OVERCHARGE = 1.5;
+
     public static double max(Player player) {
         return Stats.value(player, ImplantIds.KINETIC_SHIELD, "capacity", 4);
+    }
+
+    /** The highest the pool can go: {@link #max} or, with Overcharge and an Energy Buffer installed, 150% of it. */
+    public static double cap(Player player) {
+        boolean overcharge = BodyState.get(player).has(ImplantIds.ENERGY_BUFFER)
+                && Stats.unlocked(player, ImplantIds.KINETIC_SHIELD, "overcharge");
+        return max(player) * (overcharge ? OVERCHARGE : 1.0);
     }
 
     public static double value(Player player) {
@@ -41,7 +51,7 @@ public final class KineticShield {
             return 0;
         }
         double v = s.number(KEY, -1);
-        return v < 0 ? max(player) : Math.min(v, max(player));
+        return v < 0 ? max(player) : Math.min(v, cap(player));
     }
 
     /** Takes the shield's share of {@code amount}; returns what is left to hit the player. */
@@ -102,7 +112,8 @@ public final class KineticShield {
         }
         TierStats stats = Stats.of(ImplantIds.KINETIC_SHIELD, tier);
         double pool = value(player);
-        double cap = max(player);
+        double full = max(player);
+        double cap = cap(player);
         if (pool >= cap) {
             return;
         }
@@ -110,11 +121,13 @@ public final class KineticShield {
         if (sinceHit < stats.value("recharge_delay_ticks", 160)) {
             return;
         }
-        double add = Math.min(cap - pool, stats.value("recharge_rate", 0.5) * 0.5); // per 10 ticks
-        if (Body.spend(player, add * stats.value("charge_per_hp", 3.0))) {
+        boolean overcharging = pool >= full;
+        double add = Math.min((overcharging ? cap : full) - pool, stats.value("recharge_rate", 0.5) * 0.5); // per 10 ticks
+        double cost = add * stats.value("charge_per_hp", 3.0);
+        if (overcharging ? Body.spendBuffer(player, cost) : Body.spend(player, cost)) {
             double next = pool + add;
             Body.updateQuiet(player, st -> st.withData(KEY, next));
-            if (next >= cap - 1.0E-6) {
+            if (!overcharging && next >= full - 1.0E-6) {
                 ImplantFx.shieldFull(player);
                 DeckEvents.fire(player, "shield_full", Map.of());
             }

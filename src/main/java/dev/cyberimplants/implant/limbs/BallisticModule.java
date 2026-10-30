@@ -31,6 +31,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @EventBusSubscriber(modid = CyberImplants.MOD_ID)
 public final class BallisticModule {
     public static final String MAGAZINE_KEY = "ballistic/magazine";
+    /** Entity tag on every flechette, so hits can be told apart from ordinary arrows (Target Tracking's tracer tagging). */
+    public static final String FLECHETTE_TAG = CyberImplants.MOD_ID + ".flechette";
     private static final Map<UUID, Long> RELOAD_DONE = new ConcurrentHashMap<>();
 
     public static int magazine(Player player) {
@@ -71,6 +73,7 @@ public final class BallisticModule {
         flechette.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0f, (float) velocity, 0.5f);
         flechette.setBaseDamage(stats.value("damage", 3.0) / velocity);
         flechette.pickup = AbstractArrow.Pickup.DISALLOWED;
+        flechette.addTag(FLECHETTE_TAG);
         player.level().addFreshEntity(flechette);
         ImplantFx.ballisticFire(player);
     }

@@ -2,13 +2,16 @@
 """Draws every texture of the mod in a cyberpunk pixel-art style: neon-edged hardware on dark steel.
 
 Items: one 16x16 icon per implant. The housing shape and the neon colour come from the implant's category, the glyph in
-the middle from the implant itself. Blocks: the Rig, Charger, Neural Port and Proximity Sensor, plus the animated gel fluids.
-Stdlib only. Run from the repository root:  python3 scripts/gen_textures.py   (gen_layer1_data.py calls it too)
+the middle from the implant itself. Components: tinted by the tier of their production chain.
+Blocks: the Rig, Charger, Neural Port and Proximity Sensor, plus the animated process fluids.
+Stdlib only. Run from the repository root:  python3 scripts/gen_textures.py   (gen_data.py calls it too)
 """
 import json
 import os
 import struct
 import zlib
+
+import crafting
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src", "main", "resources", "assets", "cyberimplants")
 
@@ -118,7 +121,18 @@ G = {
     "tag": ["#####..", "#...##.", "#.+..##", "#....##", "#...##.", "#####..", "......."],
     "mask": [".#####.", "#######", "#o###o#", "#o###o#", ".#####.", "..###..", "......."],
     "dash": ["..#..#.", ".##.##.", "###.###", "####+##", "###.###", ".##.##.", "..#..#."],
+    # components
+    "wire": ["..###..", ".#...#.", "#..#..#", "#.#+#.#", "#..#..#", ".#...#.", "..###.."],
+    "fiber": ["#.#.#.#", ".#.#.#.", "#.#.#.#", ".#+#.#.", "#.#.#.#", ".#.#.#.", "#.#.#.#"],
+    "ingot": [".......", "..####.", ".#+ooo#", "#ooooo#", "#######", ".......", "......."],
+    "sheet": [".......", "#######", "#+....#", "#.....#", "#.....#", "#######", "......."],
+    "dust": [".......", "...#...", "..#o#..", ".#o+o#.", "#ooooo#", "#######", "......."],
+    "wafer": ["..###..", ".#o.o#.", "#.o.o.#", "#o.+.o#", "#.o.o.#", ".#o.o#.", "..###.."],
+    "lens": ["..###..", ".#+..#.", "#+....#", "#.....#", "#.....#", ".#...#.", "..###.."],
 }
+
+# Component icons are tinted by the tier of the production chain they belong to.
+TIER_NEON = {1: (0xFF, 0x9A, 0x4A), 2: (0x6A, 0xA8, 0xFF), 3: (0x3A, 0xF0, 0x9A), 4: (0xFF, 0x3A, 0x5A), 5: (0xC8, 0x6A, 0xFF)}
 
 GLYPH = {
     "cybernetic_core": "chip", "sandevistan": "wave", "reflex_booster": "bolt", "combat_predictor": "target",
@@ -213,6 +227,19 @@ def item_icon(ident):
     cv.glyph(G[GLYPH.get(ident, "chip")], 4, 4, neon, dim(neon, 0.5))
     # tiny status LED, a corner highlight
     cv.set(12, 3, WHITE)
+    return cv
+
+
+def component_icon(tier, glyph, shape, unfinished=False):
+    """A shared production part: the tier's neon on a steel housing; unfinished assembly parts are dimmed."""
+    neon = TIER_NEON[tier]
+    if unfinished:
+        neon = dim(neon, 0.55)
+    cv = Canvas()
+    housing(cv, shape, neon)
+    cv.glyph(G[glyph], 4, 4, neon, dim(neon, 0.5))
+    if not unfinished:
+        cv.set(12, 3, WHITE)
     return cv
 
 
@@ -509,8 +536,17 @@ def main():
             continue
         save("textures/item/%s.png" % ident, item_icon(ident).png())
     save("textures/item/field_manual.png", manual_icon().png())
-    save("textures/item/bio_interface_gel_bucket.png", bucket_icon((0x6F, 0xE0, 0xA8), (0x0E, 0x6A, 0x4A)).png())
-    save("textures/item/neural_gel_bucket.png", bucket_icon((0xB4, 0x5C, 0xFF), (0x3E, 0x12, 0x7A)).png())
+    for ident, (tier, _en, _ru, glyph, shape) in crafting.COMPONENTS.items():
+        save("textures/item/%s.png" % ident, component_icon(tier, glyph, shape).png())
+    for ident, (target, _en, _ru) in crafting.INCOMPLETE.items():
+        tier, _en, _ru, glyph, shape = crafting.COMPONENTS[target]
+        save("textures/item/%s.png" % ident, component_icon(tier, glyph, shape, unfinished=True).png())
+    for fluid, (_en, _ru, _bucket, neon, deep) in crafting.FLUIDS.items():
+        save("textures/item/%s_bucket.png" % fluid, bucket_icon(neon, deep).png())
+        save("textures/block/%s_still.png" % fluid, gel_still(neon, deep).png())
+        save("textures/block/%s_still.png.mcmeta" % fluid, mcmeta())
+        save("textures/block/%s_flow.png" % fluid, gel_flow(neon, deep).png())
+        save("textures/block/%s_flow.png.mcmeta" % fluid, mcmeta())
     for name, cv in (("implantation_rig", rig_side()), ("implantation_rig_top", rig_top()), ("implantation_rig_bottom", rig_bottom()),
                      ("implantation_rig_metal", rig_metal()), ("implantation_rig_column", rig_column()),
                      ("implantation_rig_cushion", rig_cushion()), ("implantation_rig_gearbox", rig_gearbox()),
@@ -518,12 +554,6 @@ def main():
                      ("kinetic_charger", charger_side()), ("kinetic_charger_top", charger_top()),
                      ("neural_port", port_tex()), ("proximity_sensor", sensor_tex())):
         save("textures/block/%s.png" % name, cv.png())
-    for gel, neon, deep in (("bio_interface_gel", (0x6F, 0xE0, 0xA8), (0x0E, 0x6A, 0x4A)),
-                            ("neural_gel", (0xB4, 0x5C, 0xFF), (0x3E, 0x12, 0x7A))):
-        save("textures/block/%s_still.png" % gel, gel_still(neon, deep).png())
-        save("textures/block/%s_still.png.mcmeta" % gel, mcmeta())
-        save("textures/block/%s_flow.png" % gel, gel_flow(neon, deep).png())
-        save("textures/block/%s_flow.png.mcmeta" % gel, mcmeta())
 
     # models that use the new multi-face textures
     def model(path, obj):

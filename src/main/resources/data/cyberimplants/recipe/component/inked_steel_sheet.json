@@ -1,0 +1,18 @@
+{
+  "type": "create:filling",
+  "ingredients": [
+    {
+      "item": "cyberimplants:tempered_steel_sheet"
+    },
+    {
+      "type": "neoforge:single",
+      "amount": 100,
+      "fluid": "cyberimplants:conductive_ink"
+    }
+  ],
+  "results": [
+    {
+      "id": "cyberimplants:inked_steel_sheet"
+    }
+  ]
+}

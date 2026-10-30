@@ -32,6 +32,8 @@ public final class AdrenalinePump {
     /** "Jump +0.5": half a block of extra jump height is roughly +0.06 jump strength. */
     private static final double JUMP_BONUS = 0.06;
     private static final double ATTACK_SPEED_BONUS = 0.15;
+    /** Tier V Last Stand (Layer 5): the boost doubles when the hit leaves the user below this share of health. */
+    private static final double LAST_STAND_HEALTH = 0.3;
 
     @SubscribeEvent
     public static void onDamaged(LivingDamageEvent.Post event) {
@@ -50,7 +52,10 @@ public final class AdrenalinePump {
         int boostTicks = (int) stats.value("boost_ticks", 60);
         BOOST_END.put(player.getUUID(), player.level().getGameTime() + boostTicks);
         ImplantFx.adrenaline(player, boostTicks);
-        Attrs.multiplied(player, Attributes.MOVEMENT_SPEED, "adrenaline_boost", stats.value("boost", 0.15), true);
+        boolean lastStand = player.getHealth() < player.getMaxHealth() * LAST_STAND_HEALTH
+                && Stats.unlocked(ImplantIds.ADRENALINE_PUMP, tier, "last_stand");
+        double boost = stats.value("boost", 0.15) * (lastStand ? 2.0 : 1.0);
+        Attrs.multiplied(player, Attributes.MOVEMENT_SPEED, "adrenaline_boost", boost, true);
         applyUnlocks(player, tier, true);
         Body.startCooldown(player, ImplantIds.ADRENALINE_PUMP, stats.cooldownTicks());
         DeckEvents.fire(player, "adrenaline_triggered", Map.of());

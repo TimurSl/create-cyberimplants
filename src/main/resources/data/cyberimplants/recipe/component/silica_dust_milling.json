@@ -1,0 +1,19 @@
+{
+  "type": "create:milling",
+  "ingredients": [
+    {
+      "tag": "c:gems/quartz"
+    }
+  ],
+  "processing_time": 150,
+  "results": [
+    {
+      "id": "cyberimplants:silica_dust",
+      "count": 2
+    },
+    {
+      "id": "cyberimplants:silica_dust",
+      "chance": 0.25
+    }
+  ]
+}

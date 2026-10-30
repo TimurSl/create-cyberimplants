@@ -6,16 +6,17 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 
-/** Gel textures: the animated neon sprites of this mod (textures/block/*_gel_still and *_flow), lightly translucent. */
+/** Process fluid textures: the animated neon sprites of this mod (textures/block/*_still and *_flow), lightly translucent. */
 public final class ClientFluids {
     public static void register(RegisterClientExtensionsEvent event) {
-        event.registerFluidType(sprites("bio_interface_gel", 0xE6FFFFFF), ModFluids.BIO_GEL_TYPE.get());
-        event.registerFluidType(sprites("neural_gel", 0xE6FFFFFF), ModFluids.NEURAL_GEL_TYPE.get());
+        for (ModFluids.ProcessFluid fluid : ModFluids.ALL) {
+            event.registerFluidType(sprites(fluid.name(), 0xE6FFFFFF), fluid.type().get());
+        }
     }
 
-    private static IClientFluidTypeExtensions sprites(String gel, int argb) {
-        ResourceLocation still = CyberImplants.id("block/" + gel + "_still");
-        ResourceLocation flowing = CyberImplants.id("block/" + gel + "_flow");
+    private static IClientFluidTypeExtensions sprites(String name, int argb) {
+        ResourceLocation still = CyberImplants.id("block/" + name + "_still");
+        ResourceLocation flowing = CyberImplants.id("block/" + name + "_flow");
         return new IClientFluidTypeExtensions() {
             @Override
             public ResourceLocation getStillTexture() {

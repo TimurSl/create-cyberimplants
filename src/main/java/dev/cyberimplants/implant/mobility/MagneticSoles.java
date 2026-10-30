@@ -8,10 +8,13 @@ import dev.cyberimplants.data.Stats;
 import dev.cyberimplants.deck.DeckEvents;
 import dev.cyberimplants.implant.ImplantAction;
 import dev.cyberimplants.implant.ImplantIds;
+import dev.cyberimplants.implant.Tags;
 import dev.cyberimplants.implant.Toggles;
 import dev.cyberimplants.implant.UseContext;
 import dev.cyberimplants.implant.UseResult;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -25,12 +28,15 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Magnetic Soles: a toggle that lets the user walk up metal walls. The climbing itself runs on the client; it reports
  * attach / detach and refreshes the attachment every few ticks, and the server bills the upkeep while attached.
+ * Tier V Polarity (Layer 5): while the soles are on, metal item entities within 6 blocks drift to the user.
  */
 @EventBusSubscriber(modid = CyberImplants.MOD_ID)
 public final class MagneticSoles {
     private static final Map<UUID, Long> ATTACHED_UNTIL = new ConcurrentHashMap<>();
     /** The client re-reports at least this often while attached. */
     private static final long LEASE_TICKS = 12;
+    private static final double POLARITY_RANGE = 6.0;
+    private static final double POLARITY_PULL = 0.12;
 
     public static final ImplantAction ACTION = new ImplantAction() {
         @Override
@@ -92,6 +98,10 @@ public final class MagneticSoles {
         if (!(event.getEntity() instanceof ServerPlayer player)) {
             return;
         }
+        if (player.tickCount % 2 == 0 && Toggles.isOn(player, ImplantIds.MAGNETIC_SOLES)
+                && Stats.unlocked(player, ImplantIds.MAGNETIC_SOLES, "polarity")) {
+            pullMetal(player);
+        }
         Long until = ATTACHED_UNTIL.get(player.getUUID());
         if (until == null) {
             return;
@@ -108,6 +118,18 @@ public final class MagneticSoles {
         if (!Body.spend(player, perSecond / 20.0)) {
             Toggles.set(player, ImplantIds.MAGNETIC_SOLES, false);
             detach(player);
+        }
+    }
+
+    private static void pullMetal(ServerPlayer player) {
+        Vec3 target = player.position().add(0, player.getBbHeight() * 0.5, 0);
+        for (ItemEntity item : player.level().getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().inflate(POLARITY_RANGE),
+                i -> i.isAlive() && !i.hasPickUpDelay() && i.getItem().is(Tags.MAGNETIC_ITEMS))) {
+            Vec3 toward = target.subtract(item.position());
+            if (toward.lengthSqr() > 0.25) {
+                item.setDeltaMovement(item.getDeltaMovement().scale(0.8).add(toward.normalize().scale(POLARITY_PULL * 2)));
+                item.hasImpulse = true;
+            }
         }
     }
 

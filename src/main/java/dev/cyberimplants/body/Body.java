@@ -5,6 +5,7 @@ import dev.cyberimplants.config.ServerConfig;
 import dev.cyberimplants.data.Stats;
 import dev.cyberimplants.data.TierStats;
 import dev.cyberimplants.implant.ImplantIds;
+import dev.cyberimplants.implant.circulatory.EnergyBuffer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -97,7 +98,10 @@ public final class Body {
         return BodyState.get(player).charge();
     }
 
-    /** Spends Charge from the main battery. With the energy system disabled this is free and always succeeds. */
+    /**
+     * Spends Charge from the main battery. With the energy system disabled this is free and always succeeds. When the
+     * battery is short, an Energy Buffer with the Tier V Surge may cover the rest once per minute.
+     */
     public static boolean spend(ServerPlayer player, double amount) {
         if (amount <= 0 || !chargeEnabled()) {
             return true;
@@ -105,7 +109,7 @@ public final class Body {
         BodyState s = BodyState.get(player);
         double cost = amount * chargeMultiplier(s);
         if (s.charge() + 1e-9 < cost) {
-            return false;
+            return EnergyBuffer.surge(player, cost) && drain(player, cost);
         }
         updateQuiet(player, st -> st.withCharge(st.charge() - cost, st.buffer()));
         return true;
@@ -116,8 +120,12 @@ public final class Body {
         if (amount <= 0 || !chargeEnabled()) {
             return true;
         }
+        return drain(player, amount * chargeMultiplier(BodyState.get(player)));
+    }
+
+    /** Takes an already multiplied cost from the battery first, then the Energy Buffer; false if both together are short. */
+    private static boolean drain(ServerPlayer player, double cost) {
         BodyState s = BodyState.get(player);
-        double cost = amount * chargeMultiplier(s);
         if (s.charge() + s.buffer() + 1e-9 < cost) {
             return false;
         }
@@ -125,6 +133,19 @@ public final class Body {
         double fromBuffer = cost - fromBattery;
         updateQuiet(player, st -> st.withCharge(st.charge() - fromBattery, st.buffer() - fromBuffer));
         BodySync.markDirty(player);
+        return true;
+    }
+
+    /** Takes Charge from the Energy Buffer only (Kinetic Shield Overcharge); false if the buffer is short. */
+    public static boolean spendBuffer(ServerPlayer player, double amount) {
+        BodyState s = BodyState.get(player);
+        if (amount <= 0 || !chargeEnabled()) {
+            return true;
+        }
+        if (s.buffer() + 1e-9 < amount) {
+            return false;
+        }
+        updateQuiet(player, st -> st.withCharge(st.charge(), st.buffer() - amount));
         return true;
     }
 

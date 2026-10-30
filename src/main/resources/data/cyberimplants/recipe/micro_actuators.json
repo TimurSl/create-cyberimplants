@@ -1,28 +1,27 @@
 {
-  "type": "create:mechanical_crafting",
-  "accept_mirrored": false,
+  "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "A": {
-      "item": "create:iron_sheet"
+    "a": {
+      "tag": "c:plates/iron"
     },
-    "B": {
-      "item": "create:andesite_casing"
-    },
-    "C": {
+    "b": {
       "item": "minecraft:bone_block"
     },
-    "D": {
-      "item": "create:cogwheel"
+    "w": {
+      "item": "cyberimplants:copper_wire"
     },
     "X": {
       "item": "minecraft:leather"
+    },
+    "C": {
+      "item": "cyberimplants:civilian_casing"
     }
   },
   "pattern": [
-    "ABA",
-    "CXC",
-    "ADA"
+    "aba",
+    "wXw",
+    "aCa"
   ],
   "result": {
     "id": "cyberimplants:micro_actuators",
@@ -30,6 +29,5 @@
     "components": {
       "cyberimplants:tier": 1
     }
-  },
-  "show_notification": false
+  }
 }

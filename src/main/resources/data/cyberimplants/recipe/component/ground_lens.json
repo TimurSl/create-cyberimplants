@@ -1,0 +1,14 @@
+{
+  "type": "create:cutting",
+  "ingredients": [
+    {
+      "tag": "c:gems/amethyst"
+    }
+  ],
+  "processing_time": 100,
+  "results": [
+    {
+      "id": "cyberimplants:ground_lens"
+    }
+  ]
+}

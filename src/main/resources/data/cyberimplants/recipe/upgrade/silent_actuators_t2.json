@@ -25,7 +25,7 @@
           "item": "cyberimplants:incomplete_implant"
         },
         {
-          "item": "minecraft:piston"
+          "item": "cyberimplants:synthetic_muscle"
         }
       ],
       "results": [
@@ -41,7 +41,23 @@
           "item": "cyberimplants:incomplete_implant"
         },
         {
-          "item": "create:brass_sheet"
+          "item": "cyberimplants:synthetic_muscle"
+        }
+      ],
+      "results": [
+        {
+          "id": "cyberimplants:incomplete_implant"
+        }
+      ]
+    },
+    {
+      "type": "create:deploying",
+      "ingredients": [
+        {
+          "item": "cyberimplants:incomplete_implant"
+        },
+        {
+          "item": "cyberimplants:tempered_steel_sheet"
         }
       ],
       "results": [
@@ -60,22 +76,6 @@
           "type": "neoforge:single",
           "amount": 100,
           "fluid": "cyberimplants:bio_interface_gel"
-        }
-      ],
-      "results": [
-        {
-          "id": "cyberimplants:incomplete_implant"
-        }
-      ]
-    },
-    {
-      "type": "create:deploying",
-      "ingredients": [
-        {
-          "item": "cyberimplants:incomplete_implant"
-        },
-        {
-          "item": "create:electron_tube"
         }
       ],
       "results": [

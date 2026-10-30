@@ -5,6 +5,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
 /** Tags that carry this mod's data-driven rules (see data/cyberimplants/tags). */
@@ -21,6 +22,8 @@ public final class Tags {
     public static final TagKey<EntityType<?>> EVADABLE = TagKey.create(Registries.ENTITY_TYPE, CyberImplants.id("evadable"));
 
     public static final TagKey<Block> MAGNETIC = TagKey.create(Registries.BLOCK, CyberImplants.id("magnetic"));
+    /** Item entities Magnetic Soles pull in with the Tier V Polarity unlock. */
+    public static final TagKey<Item> MAGNETIC_ITEMS = TagKey.create(Registries.ITEM, CyberImplants.id("magnetic_items"));
     /** Glass and ice: ungrippable until Microgrip Tier III. */
     public static final TagKey<Block> UNGRIPPABLE_SMOOTH = TagKey.create(Registries.BLOCK, CyberImplants.id("ungrippable_smooth"));
     public static final TagKey<Block> UNGRIPPABLE = TagKey.create(Registries.BLOCK, CyberImplants.id("ungrippable"));

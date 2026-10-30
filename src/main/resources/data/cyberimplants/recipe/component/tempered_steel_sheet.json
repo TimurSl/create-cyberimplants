@@ -1,0 +1,13 @@
+{
+  "type": "create:pressing",
+  "ingredients": [
+    {
+      "item": "cyberimplants:tempered_steel_ingot"
+    }
+  ],
+  "results": [
+    {
+      "id": "cyberimplants:tempered_steel_sheet"
+    }
+  ]
+}

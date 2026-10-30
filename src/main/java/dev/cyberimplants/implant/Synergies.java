@@ -22,6 +22,8 @@ public final class Synergies {
     public static final double FALL_MOMENTUM_PER_BLOCK = 5.0;
     /** Impact Dampeners turn the landing into stored motion instead of lost motion. */
     public static final double DAMPENER_MOMENTUM_FACTOR = 1.5;
+    /** Impact Dampeners Tier V Recoil Storage (Layer 5). */
+    public static final double RECOIL_STORAGE_FACTOR = 2.0;
     private static final double VANILLA_SAFE_FALL = 3.0;
 
     /** AES + Kerenzikov: every evasion opens a Kerenzikov reaction window at no Charge and no cooldown. */
@@ -44,7 +46,10 @@ public final class Synergies {
             return 0.0;
         }
         double gain = Math.max(0.0, distance - VANILLA_SAFE_FALL) * FALL_MOMENTUM_PER_BLOCK;
-        return body.has(ImplantIds.IMPACT_DAMPENERS) ? gain * DAMPENER_MOMENTUM_FACTOR : gain;
+        if (!body.has(ImplantIds.IMPACT_DAMPENERS)) {
+            return gain;
+        }
+        return gain * (Stats.unlocked(player, ImplantIds.IMPACT_DAMPENERS, "recoil_storage") ? RECOIL_STORAGE_FACTOR : DAMPENER_MOMENTUM_FACTOR);
     }
 
     @SubscribeEvent

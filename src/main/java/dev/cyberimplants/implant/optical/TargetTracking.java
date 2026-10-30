@@ -12,16 +12,19 @@ import dev.cyberimplants.implant.ImplantAction;
 import dev.cyberimplants.implant.ImplantIds;
 import dev.cyberimplants.implant.UseContext;
 import dev.cyberimplants.implant.UseResult;
+import dev.cyberimplants.implant.limbs.BallisticModule;
 import dev.cyberimplants.network.TrackedTargetPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -120,6 +123,18 @@ public final class TargetTracking {
     public static void onBodyChanged(ServerPlayer player) {
         if (!BodyState.get(player).has(ImplantIds.TARGET_TRACKING)) {
             untag(player);
+        }
+    }
+
+    /** Tier V tracer tagging (Layer 5): a Ballistic Module flechette that hits a creature tags it. */
+    @SubscribeEvent
+    public static void onFlechetteHit(LivingDamageEvent.Post event) {
+        if (event.getSource().getDirectEntity() instanceof AbstractArrow arrow
+                && arrow.getTags().contains(BallisticModule.FLECHETTE_TAG)
+                && event.getSource().getEntity() instanceof ServerPlayer shooter
+                && event.getEntity().isAlive() && !event.getEntity().getUUID().equals(TARGETS.get(shooter.getUUID()))
+                && Stats.unlocked(shooter, ImplantIds.TARGET_TRACKING, "tracer_tagging")) {
+            tag(shooter, event.getEntity(), false);
         }
     }
 

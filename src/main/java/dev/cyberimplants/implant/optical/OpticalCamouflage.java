@@ -31,12 +31,21 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Optical Camouflage: temporary concealment. Detection ranges collapse (visibility modifier) and mobs that already
  * target the user forget after the aggro-drop delay. Attacking or taking damage breaks it. The cooldown starts when
- * the effect ends.
+ * the effect ends. Tier V Re-cloak (Layer 5): the first attack only drops the cloak for a second.
  */
 @EventBusSubscriber(modid = CyberImplants.MOD_ID)
 public final class OpticalCamouflage {
-    private record Camo(long start, long end) {
+    /**
+     * A running camouflage. {@code suspendedUntil} is the Tier V Re-cloak: after the one attack it survives, the cloak
+     * drops for a second and comes back; {@code recloakUsed} allows that once per activation.
+     */
+    private record Camo(long start, long end, boolean recloakUsed, long suspendedUntil) {
+        boolean suspended(long now) {
+            return now < suspendedUntil;
+        }
     }
+
+    private static final int RECLOAK_DELAY_TICKS = 20;
 
     private static final Map<UUID, Camo> ACTIVE = new ConcurrentHashMap<>();
 
@@ -55,7 +64,7 @@ public final class OpticalCamouflage {
             }
             long now = player.level().getGameTime();
             int duration = (int) stats.value("duration_ticks", 80);
-            ACTIVE.put(player.getUUID(), new Camo(now, now + duration));
+            ACTIVE.put(player.getUUID(), new Camo(now, now + duration, false, 0));
             // A faint shimmer: invisibility without particles.
             player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, duration, 0, false, false, false));
             ImplantFx.camoOn(player, duration);
@@ -115,6 +124,14 @@ public final class OpticalCamouflage {
             end(player, "expired");
             return;
         }
+        if (camo.suspended(now)) {
+            return;
+        }
+        if (camo.suspendedUntil() > 0 && !player.hasEffect(MobEffects.INVISIBILITY)) {
+            // Re-cloak: the second is over and the cloak re-engages for the rest of its time.
+            player.addEffect(new MobEffectInstance(MobEffects.INVISIBILITY, (int) (camo.end() - now), 0, false, false, false));
+            ImplantFx.camoOn(player, (int) (camo.end() - now));
+        }
         if (player.tickCount % 3 == 0) {
             ImplantFx.camoShimmer(player);
         }
@@ -136,7 +153,8 @@ public final class OpticalCamouflage {
     /** Detection ranges collapse while camouflaged: smaller multiplier when still, larger when moving. */
     @SubscribeEvent
     public static void onVisibility(LivingEvent.LivingVisibilityEvent event) {
-        if (!(event.getEntity() instanceof Player player) || !ACTIVE.containsKey(player.getUUID())) {
+        Camo camo = event.getEntity() instanceof Player p ? ACTIVE.get(p.getUUID()) : null;
+        if (!(event.getEntity() instanceof Player player) || camo == null || camo.suspended(player.level().getGameTime())) {
             return;
         }
         TierStats stats = Stats.of(player, ImplantIds.OPTICAL_CAMOUFLAGE);
@@ -146,9 +164,25 @@ public final class OpticalCamouflage {
 
     @SubscribeEvent
     public static void onAttack(AttackEntityEvent event) {
-        if (event.getEntity() instanceof ServerPlayer player) {
+        if (event.getEntity() instanceof ServerPlayer player && !recloak(player)) {
             end(player, "attack");
         }
+    }
+
+    /** Tier V: the first attack only drops the cloak for a second. Returns false when the camo must end instead. */
+    private static boolean recloak(ServerPlayer player) {
+        Camo camo = ACTIVE.get(player.getUUID());
+        if (camo == null || camo.recloakUsed() || !Stats.unlocked(player, ImplantIds.OPTICAL_CAMOUFLAGE, "recloak")) {
+            return false;
+        }
+        long now = player.level().getGameTime();
+        if (now + RECLOAK_DELAY_TICKS >= camo.end()) {
+            return false;
+        }
+        ACTIVE.put(player.getUUID(), new Camo(camo.start(), camo.end(), true, now + RECLOAK_DELAY_TICKS));
+        player.removeEffect(MobEffects.INVISIBILITY);
+        ImplantFx.camoOff(player, true);
+        return true;
     }
 
     @SubscribeEvent

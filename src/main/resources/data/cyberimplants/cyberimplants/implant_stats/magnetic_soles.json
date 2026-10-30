@@ -48,8 +48,12 @@
         "upkeep_per_second": 0.5,
         "wall_walk_speed": 1.0
       },
-      "unlocks": []
+      "unlocks": [
+        "polarity"
+      ]
     }
   ],
-  "unlock_layers": {}
+  "unlock_layers": {
+    "polarity": 5
+  }
 }

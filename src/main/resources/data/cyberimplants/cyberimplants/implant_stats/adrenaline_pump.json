@@ -70,13 +70,15 @@
       "unlocks": [
         "boost_attack_speed",
         "boost_jump",
-        "ignores_slowness"
+        "ignores_slowness",
+        "last_stand"
       ]
     }
   ],
   "unlock_layers": {
     "boost_attack_speed": 3,
     "boost_jump": 3,
-    "ignores_slowness": 3
+    "ignores_slowness": 3,
+    "last_stand": 5
   }
 }

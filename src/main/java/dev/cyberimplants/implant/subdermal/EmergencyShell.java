@@ -7,7 +7,10 @@ import dev.cyberimplants.body.BodyState;
 import dev.cyberimplants.data.Stats;
 import dev.cyberimplants.data.TierStats;
 import dev.cyberimplants.implant.Attrs;
+import dev.cyberimplants.implant.ImplantAction;
 import dev.cyberimplants.implant.ImplantIds;
+import dev.cyberimplants.implant.UseContext;
+import dev.cyberimplants.implant.UseResult;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
@@ -48,8 +51,34 @@ public final class EmergencyShell {
         return (float) (amount * (1.0 - reduction));
     }
 
+    /**
+     * Tier V (Layer 5): the shell may be hardened by hand or by a deck at any health, for half the duration. ImplantActions
+     * only offers it once the installed tier has the {@code manual_activation} unlock.
+     */
+    public static final ImplantAction MANUAL = new ImplantAction() {
+        @Override
+        public UseResult use(ServerPlayer player, UseContext ctx) {
+            if (active(player)) {
+                return UseResult.BUSY;
+            }
+            if (!Body.ready(player, ImplantIds.EMERGENCY_SHELL)) {
+                return UseResult.COOLDOWN;
+            }
+            return trigger(player, 0.5) ? UseResult.OK : UseResult.NO_CHARGE;
+        }
+
+        @Override
+        public boolean isActive(ServerPlayer player) {
+            return active(player);
+        }
+    };
+
     /** Hardens the shell now (ERS or auto-trigger). Returns false if it is missing, cooling down or unaffordable. */
     public static boolean trigger(ServerPlayer player) {
+        return trigger(player, 1.0);
+    }
+
+    private static boolean trigger(ServerPlayer player, double durationFactor) {
         int tier = BodyState.get(player).tierOf(ImplantIds.EMERGENCY_SHELL);
         if (tier == 0 || active(player) || !Body.ready(player, ImplantIds.EMERGENCY_SHELL)) {
             return false;
@@ -58,7 +87,7 @@ public final class EmergencyShell {
         if (!Body.spendEmergency(player, stats.chargeCost())) {
             return false;
         }
-        int duration = (int) stats.value("duration_ticks", 40);
+        int duration = (int) Math.max(1, Math.round(stats.value("duration_ticks", 40) * durationFactor));
         ACTIVE_UNTIL.put(player.getUUID(), player.level().getGameTime() + duration);
         Attrs.multiplied(player, Attributes.MOVEMENT_SPEED, "shell_slow", -stats.value("movement_penalty", 0.4), true);
         if (Stats.unlocked(ImplantIds.EMERGENCY_SHELL, tier, "knockback_immune")) {

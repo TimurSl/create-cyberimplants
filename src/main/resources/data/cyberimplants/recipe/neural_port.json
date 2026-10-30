@@ -6,19 +6,19 @@
       "item": "create:electron_tube"
     },
     "C": {
-      "item": "create:copper_sheet"
+      "tag": "c:plates/copper"
     },
     "A": {
       "item": "create:andesite_casing"
     },
-    "R": {
-      "item": "minecraft:redstone"
+    "W": {
+      "item": "cyberimplants:copper_wire"
     }
   },
   "pattern": [
     " T ",
     "CAC",
-    " R "
+    " W "
   ],
   "result": {
     "id": "cyberimplants:neural_port",

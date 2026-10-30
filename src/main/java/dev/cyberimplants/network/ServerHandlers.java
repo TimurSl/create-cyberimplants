@@ -1,5 +1,6 @@
 package dev.cyberimplants.network;
 
+import dev.cyberimplants.body.BodyState;
 import dev.cyberimplants.body.BodyRegion;
 import dev.cyberimplants.body.BodySync;
 import dev.cyberimplants.body.SlotId;
@@ -38,7 +39,7 @@ final class ServerHandlers {
     }
 
     static void useImplant(ServerPlayer player, UseImplantPayload payload) {
-        if (ImplantActions.wheelEligible(payload.implant())) {
+        if (ImplantActions.wheelEligible(payload.implant(), BodyState.get(player).tierOf(payload.implant()))) {
             ImplantActions.use(player, payload.implant(), UseContext.MANUAL);
         }
     }
